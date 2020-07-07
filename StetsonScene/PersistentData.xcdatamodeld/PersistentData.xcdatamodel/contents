@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="15702" systemVersion="19B2093" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Favorites" representedClassName="Favorites" syncable="YES">
+        <attribute name="contactMail" optional="YES" attributeType="String"/>
+        <attribute name="contactName" optional="YES" attributeType="String"/>
+        <attribute name="contactPhone" optional="YES" attributeType="String"/>
+        <attribute name="date" optional="YES" attributeType="String"/>
+        <attribute name="daysIntoYear" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="eventDescription" optional="YES" attributeType="String"/>
+        <attribute name="eventType" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String]"/>
+        <attribute name="guid" optional="YES" attributeType="String"/>
+        <attribute name="hasCultural" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isAttending" optional="YES" attributeType="Boolean" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="isFavorite" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isInCalendar" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="location" optional="YES" attributeType="String"/>
+        <attribute name="locations" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String]"/>
+        <attribute name="mainAddress" optional="YES" attributeType="String"/>
+        <attribute name="mainCity" optional="YES" attributeType="String"/>
+        <attribute name="mainEventType" optional="YES" attributeType="String"/>
+        <attribute name="mainLat" optional="YES" attributeType="String"/>
+        <attribute name="mainLon" optional="YES" attributeType="String"/>
+        <attribute name="mainState" optional="YES" attributeType="String"/>
+        <attribute name="mainZip" optional="YES" attributeType="String"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="numAttending" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="summary" optional="YES" attributeType="String"/>
+        <attribute name="time" optional="YES" attributeType="String"/>
+        <attribute name="url" optional="YES" attributeType="String"/>
+    </entity>
+    <elements>
+        <element name="Favorites" positionX="-63" positionY="-18" width="128" height="433"/>
+    </elements>
+</model>
