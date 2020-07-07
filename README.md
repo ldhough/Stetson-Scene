@@ -1,6 +1,6 @@
 # Stetson Scene iOS Application
 
-"Stetson Scene" is an iOS application that I built with two friends for students at our school to use.  We use a Python backend to parse XML and HTML on Stetson's websites to extract information about events going on.  This information is passed to Firebase and read by the iOS application.  We provide integration with various features like Apple's calendar and sharing with friends.  We have integrated a map component and AR component to help students navigate to events.  Search features are built in so that students can filter for events they are interested in including "Cultural Credit" events that you need to graduate.  You can also see how many people have "favorited" an event as a measure of popularity.
+"Stetson Scene" is an iOS application that I built with two friends (Madison Gipson, Aaron Stewart) for students at our school to use.  We use a Python backend to parse XML and HTML on Stetson's websites to extract information about events going on.  This information is passed to Firebase and read by the iOS application.  We provide integration with various features like Apple's calendar and sharing with friends.  We have integrated a map component and AR component to help students navigate to events.  Search features are built in so that students can filter for events they are interested in including "Cultural Credit" events that you need to graduate.  You can also see how many people have "favorited" an event as a measure of popularity.
 
 ## Tech
  - Python backend
