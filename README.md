@@ -8,8 +8,9 @@
  - Swift
  - SwiftUI, UIKit, EventKit, ARKit, Core Data
 
-## My contributions
-My main contributions include building the Python XML and HTML parser and the Firebase integration on both sides.  I also worked with Core Data to provide persistence for information like favorites and search criteria.  I built out a significant amount of the UI using SwiftUI, built the searching features, and built the Apple Calendar integration.
+## Contributions
+
+Lannie: Contributions include building the Python XML and HTML parser and the Firebase integration on both sides.  Used Core Data to provide persistence for information like favorites and search criteria.  Built out part of the UI using SwiftUI, built the searching features, and worked on the Apple Calendar integration.
 
 https://www.youtube.com/watch?v=LQdyA4Y4_qM
 
