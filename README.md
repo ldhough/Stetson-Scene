@@ -12,7 +12,7 @@
 
 Lannie: Contributions include building the Python XML and HTML parser and the Firebase integration on both sides.  Used Core Data to provide persistence for information like favorites and search criteria.  Built out part of the UI using SwiftUI, built the searching features, and worked on the Apple Calendar integration.
 
-Maddie: Headed the AR component, working with ARKit & UIKit to deliver an interactive AR Scene in which the user sees tags above campus buildings and can tap to see a list of upcoming events in that building. Additionally, contributed to the user experience across the app using layouts, view transitions, haptics, and animation in SwiftUI.
+Maddie: Headed the AR component, working with ARKit & UIKit to deliver an interactive AR Scene in which the user sees tags above campus buildings and can tap to see a list of upcoming events in that building. Designed the Event Detail View, implemented sharing, and the context menu allowing shortcuts from the event list. Additionally, contributed to the user experience across the app using layouts, view transitions, haptics, and animation in SwiftUI.
 
 https://www.youtube.com/watch?v=LQdyA4Y4_qM
 
