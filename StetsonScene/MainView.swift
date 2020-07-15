@@ -107,7 +107,7 @@ struct TabBar : View {
                 .background(viewRouter.currentPage == "Information" ? Color.yellow.opacity(0.3) : Color.clear)
                 .clipShape(Capsule())
                 .onTapGesture { self.viewRouter.currentPage = "Information" }
-        }.padding(.vertical, 5)
+        }.padding(.vertical, 10)
         .frame(width: Constants.width)
         .background(Color.white)
         .animation(.default)

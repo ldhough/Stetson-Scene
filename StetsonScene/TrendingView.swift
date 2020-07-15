@@ -47,7 +47,7 @@ struct Carousel : UIViewRepresentable {
         scrollview.delegate = context.coordinator
         
         //make the Card SwiftUI View into a UIView (essentially)
-        let uiCardView = UIHostingController(rootView: Cards(height: height))
+        let uiCardView = UIHostingController(rootView: Cards(height: height*0.9))
         uiCardView.view.frame = CGRect(x: 0, y: 0, width: carouselWidth, height: self.height)
         uiCardView.view.backgroundColor = .clear
         
@@ -114,6 +114,7 @@ struct Cards : View {
                     }.padding([.horizontal, .vertical])
                     .frame(width: self.cardWidth, height: self.height)
                     .cornerRadius(20)
+                    .shadow(radius: 5)
                     //end of card view
                 }.frame(width: Constants.width)
                 .animation(.default)
