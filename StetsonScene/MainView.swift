@@ -53,8 +53,7 @@ struct MainView : View {
     @EnvironmentObject var viewRouter: ViewRouter
     
     var body: some View {
-        ZStack {
-            //View
+        VStack {
             if viewRouter.currentPage == "Trending" {
                 TrendingView()
             } else if viewRouter.currentPage == "Discover" {
@@ -64,12 +63,8 @@ struct MainView : View {
             } else if viewRouter.currentPage == "Information" {
                 InformationView()
             }
-
-            //TabBar layered over View
-            VStack {
-                Spacer()
-                TabBar()
-            }
+            
+            TabBar()
         }.animation(.spring())
     }
 }
@@ -85,7 +80,7 @@ struct TabBar : View {
                 Image(systemName: "hand.thumbsup").resizable().frame(width: 20, height: 20)
                 Text(viewRouter.currentPage == "Trending" ? viewRouter.currentPage : "").fontWeight(.light).font(.system(size: 14))
             }.padding(15)
-                .background(viewRouter.currentPage == "Trending" ? Color.blue.opacity(0.3) : Color.clear)
+                .background(viewRouter.currentPage == "Trending" ? Color.yellow.opacity(0.3) : Color.clear)
                 .clipShape(Capsule())
                 .onTapGesture { self.viewRouter.currentPage = "Trending" }
             //Discover
@@ -93,7 +88,7 @@ struct TabBar : View {
                 Image(systemName: "magnifyingglass").resizable().frame(width: 20, height: 20)
                 Text(viewRouter.currentPage == "Discover" ? viewRouter.currentPage : "").fontWeight(.light).font(.system(size: 14))
             }.padding(15)
-                .background(viewRouter.currentPage == "Discover" ? Color.blue.opacity(0.3) : Color.clear)
+                .background(viewRouter.currentPage == "Discover" ? Color.yellow.opacity(0.3) : Color.clear)
                 .clipShape(Capsule())
                 .onTapGesture { self.viewRouter.currentPage = "Discover" }
             //Favorites
@@ -101,7 +96,7 @@ struct TabBar : View {
                 Image(systemName: "heart").resizable().frame(width: 20, height: 20)
                 Text(viewRouter.currentPage == "Favorites" ? viewRouter.currentPage : "").fontWeight(.light).font(.system(size: 14))
             }.padding(15)
-                .background(viewRouter.currentPage == "Favorites" ? Color.blue.opacity(0.3) : Color.clear)
+                .background(viewRouter.currentPage == "Favorites" ? Color.yellow.opacity(0.3) : Color.clear)
                 .clipShape(Capsule())
                 .onTapGesture { self.viewRouter.currentPage = "Favorites" }
             //Info
@@ -109,7 +104,7 @@ struct TabBar : View {
                 Image(systemName: "info.circle").resizable().frame(width: 20, height: 20)
                 Text(viewRouter.currentPage == "Information" ? viewRouter.currentPage : "").fontWeight(.light).font(.system(size: 14))
             }.padding(15)
-                .background(viewRouter.currentPage == "Information" ? Color.blue.opacity(0.3) : Color.clear)
+                .background(viewRouter.currentPage == "Information" ? Color.yellow.opacity(0.3) : Color.clear)
                 .clipShape(Capsule())
                 .onTapGesture { self.viewRouter.currentPage = "Information" }
         }.padding(.vertical, 5)

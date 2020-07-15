@@ -15,7 +15,6 @@
 		3C0F524023EDC32100C91790 /* SearchFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F523923EDC16E00C91790 /* SearchFormView.swift */; };
 		3C0F524123EDC32100C91790 /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F523C23EDC16E00C91790 /* EventDetailView.swift */; };
 		3C0F524323EDCD4600C91790 /* EventInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F524223EDCD4600C91790 /* EventInstance.swift */; };
-		3C0F524523EDCE4100C91790 /* StetsonSceneIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3C0F524423EDCE4000C91790 /* StetsonSceneIcon.png */; };
 		3C22171723E22776003CC5C3 /* ARTourViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C22171623E22776003CC5C3 /* ARTourViewController.swift */; };
 		3C22171A23E22776003CC5C3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3C22171823E22776003CC5C3 /* Main.storyboard */; };
 		3C22171C23E22778003CC5C3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3C22171B23E22778003CC5C3 /* Assets.xcassets */; };
@@ -55,7 +54,6 @@
 		3C0F523B23EDC16E00C91790 /* SearchEventFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchEventFormView.swift; sourceTree = "<group>"; };
 		3C0F523C23EDC16E00C91790 /* EventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailView.swift; sourceTree = "<group>"; };
 		3C0F524223EDCD4600C91790 /* EventInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventInstance.swift; sourceTree = "<group>"; };
-		3C0F524423EDCE4000C91790 /* StetsonSceneIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StetsonSceneIcon.png; sourceTree = "<group>"; };
 		3C22170F23E22776003CC5C3 /* StetsonScene.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StetsonScene.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3C22171623E22776003CC5C3 /* ARTourViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARTourViewController.swift; sourceTree = "<group>"; };
 		3C22171923E22776003CC5C3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -158,7 +156,6 @@
 				3C4D64FD24BF3F4900477A22 /* GoogleService-Info.plist */,
 				3C7A740824BF4068005DA0B1 /* Info.plist */,
 				3CDCC95D2453588100B6AB9D /* App-Icon.png */,
-				3C0F524423EDCE4000C91790 /* StetsonSceneIcon.png */,
 				3C22171B23E22778003CC5C3 /* Assets.xcassets */,
 			);
 			path = StetsonScene;
@@ -272,7 +269,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3C0F524523EDCE4100C91790 /* StetsonSceneIcon.png in Resources */,
 				3C22171F23E22778003CC5C3 /* LaunchScreen.storyboard in Resources */,
 				3C22171C23E22778003CC5C3 /* Assets.xcassets in Resources */,
 				3C22171A23E22776003CC5C3 /* Main.storyboard in Resources */,
