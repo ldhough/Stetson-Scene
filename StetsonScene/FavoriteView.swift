@@ -1,5 +1,5 @@
 //
-//  InformationView.swift
+//  FavoriteView.swift
 //  StetsonScene
 //
 //  Created by Madison Gipson on 7/15/20.
@@ -9,13 +9,13 @@
 import Foundation
 import SwiftUI
 
-struct InformationView : View {
+struct FavoriteView : View {
     
     @EnvironmentObject var viewRouter: ViewRouter
     
     var body: some View {
         VStack {
-            Text("Information View")
+            Text("Favorite View")
         }
     }
 }

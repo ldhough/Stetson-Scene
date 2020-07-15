@@ -22,13 +22,18 @@
 		3C22171F23E22778003CC5C3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3C22171D23E22778003CC5C3 /* LaunchScreen.storyboard */; };
 		3C23C9CA24699902003E254D /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C23C9C924699902003E254D /* Constants.swift */; };
 		3C4D64FE24BF3F4900477A22 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3C4D64FD24BF3F4900477A22 /* GoogleService-Info.plist */; };
+		3C7A740B24BF5CF7005DA0B1 /* ViewRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A740A24BF5CF7005DA0B1 /* ViewRouter.swift */; };
+		3C7A740D24BF5E01005DA0B1 /* TrendingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A740C24BF5E01005DA0B1 /* TrendingView.swift */; };
+		3C7A740F24BF5E16005DA0B1 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A740E24BF5E16005DA0B1 /* DiscoverView.swift */; };
+		3C7A741124BF68C5005DA0B1 /* FavoriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A741024BF68C5005DA0B1 /* FavoriteView.swift */; };
+		3C7A741324BF68E8005DA0B1 /* InformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A741224BF68E8005DA0B1 /* InformationView.swift */; };
 		3C90E495248C867800427FFB /* RecommendationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C90E494248C867800427FFB /* RecommendationView.swift */; };
-		3CBC5FA123EB9BA800111972 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CBC5FA023EB9BA800111972 /* HomeViewController.swift */; };
+		3CBC5FA123EB9BA800111972 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CBC5FA023EB9BA800111972 /* MainView.swift */; };
 		3CDCC95E2453588100B6AB9D /* App-Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3CDCC95D2453588100B6AB9D /* App-Icon.png */; };
 		3CF31B8E246A338200840E3F /* TourModeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CF31B8D246A338200840E3F /* TourModeDetailView.swift */; };
 		4806CA86244A7984004B010C /* MapNavView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4806CA85244A7984004B010C /* MapNavView.swift */; };
 		483ACD85242A970C003E2DE6 /* RecommendationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483ACD84242A970B003E2DE6 /* RecommendationEngine.swift */; };
-		483ACD87242A9752003E2DE6 /* FavoriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483ACD86242A9752003E2DE6 /* FavoriteView.swift */; };
+		483ACD87242A9752003E2DE6 /* FavoriteView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483ACD86242A9752003E2DE6 /* FavoriteView2.swift */; };
 		4898798023F0E39D00062714 /* EventListNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4898797F23F0E39D00062714 /* EventListNavigationView.swift */; };
 		4898798323F1A9FD00062714 /* PersistentData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4898798123F1A9FD00062714 /* PersistentData.xcdatamodeld */; };
 		4898798523F456F100062714 /* EventListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4898798423F456F000062714 /* EventListView.swift */; };
@@ -37,7 +42,7 @@
 		48D2213B240615B50051A66D /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48D2213A240615B50051A66D /* LocationManager.swift */; };
 		48D30A14246A3D49004E84A6 /* BuildingInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48D30A13246A3D49004E84A6 /* BuildingInstance.swift */; };
 		48D30A16246A4C53004E84A6 /* BuildingModelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48D30A15246A4C53004E84A6 /* BuildingModelController.swift */; };
-		48F41C1A245A419E0071E13E /* InformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F41C19245A419E0071E13E /* InformationView.swift */; };
+		48F41C1A245A419E0071E13E /* InformationView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F41C19245A419E0071E13E /* InformationView2.swift */; };
 		70C30AF35FBEC4FB52F1C51F /* libPods-StetsonScene.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 95BBFB32261BA4BB38F46687 /* libPods-StetsonScene.a */; };
 /* End PBXBuildFile section */
 
@@ -59,13 +64,18 @@
 		3C23C9C924699902003E254D /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		3C4D64FD24BF3F4900477A22 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		3C7A740824BF4068005DA0B1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3C7A740A24BF5CF7005DA0B1 /* ViewRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewRouter.swift; sourceTree = "<group>"; };
+		3C7A740C24BF5E01005DA0B1 /* TrendingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingView.swift; sourceTree = "<group>"; };
+		3C7A740E24BF5E16005DA0B1 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
+		3C7A741024BF68C5005DA0B1 /* FavoriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteView.swift; sourceTree = "<group>"; };
+		3C7A741224BF68E8005DA0B1 /* InformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InformationView.swift; sourceTree = "<group>"; };
 		3C90E494248C867800427FFB /* RecommendationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecommendationView.swift; sourceTree = "<group>"; };
-		3CBC5FA023EB9BA800111972 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
+		3CBC5FA023EB9BA800111972 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		3CDCC95D2453588100B6AB9D /* App-Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "App-Icon.png"; sourceTree = "<group>"; };
 		3CF31B8D246A338200840E3F /* TourModeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TourModeDetailView.swift; sourceTree = "<group>"; };
 		4806CA85244A7984004B010C /* MapNavView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapNavView.swift; sourceTree = "<group>"; };
 		483ACD84242A970B003E2DE6 /* RecommendationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendationEngine.swift; sourceTree = "<group>"; };
-		483ACD86242A9752003E2DE6 /* FavoriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteView.swift; sourceTree = "<group>"; };
+		483ACD86242A9752003E2DE6 /* FavoriteView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteView2.swift; sourceTree = "<group>"; };
 		4898797F23F0E39D00062714 /* EventListNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventListNavigationView.swift; sourceTree = "<group>"; };
 		4898798223F1A9FD00062714 /* PersistentData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PersistentData.xcdatamodel; sourceTree = "<group>"; };
 		4898798423F456F000062714 /* EventListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventListView.swift; sourceTree = "<group>"; };
@@ -74,7 +84,7 @@
 		48D2213A240615B50051A66D /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		48D30A13246A3D49004E84A6 /* BuildingInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildingInstance.swift; sourceTree = "<group>"; };
 		48D30A15246A4C53004E84A6 /* BuildingModelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildingModelController.swift; sourceTree = "<group>"; };
-		48F41C19245A419E0071E13E /* InformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InformationView.swift; sourceTree = "<group>"; };
+		48F41C19245A419E0071E13E /* InformationView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InformationView2.swift; sourceTree = "<group>"; };
 		95BBFB32261BA4BB38F46687 /* libPods-StetsonScene.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StetsonScene.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		980868587A0DE3706AA354F5 /* Pods-StetsonScene.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StetsonScene.debug.xcconfig"; path = "Target Support Files/Pods-StetsonScene/Pods-StetsonScene.debug.xcconfig"; sourceTree = "<group>"; };
 		98A433492B59C3249CC0A070 /* Pods-StetsonScene.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StetsonScene.release.xcconfig"; path = "Target Support Files/Pods-StetsonScene/Pods-StetsonScene.release.xcconfig"; sourceTree = "<group>"; };
@@ -101,7 +111,7 @@
 				3C0F523C23EDC16E00C91790 /* EventDetailView.swift */,
 				3C0F523B23EDC16E00C91790 /* SearchEventFormView.swift */,
 				3C0F523923EDC16E00C91790 /* SearchFormView.swift */,
-				483ACD86242A9752003E2DE6 /* FavoriteView.swift */,
+				483ACD86242A9752003E2DE6 /* FavoriteView2.swift */,
 				3C90E494248C867800427FFB /* RecommendationView.swift */,
 			);
 			path = "Event List";
@@ -130,9 +140,14 @@
 			children = (
 				3C0F520623EBA72600C91790 /* AppDelegate.swift */,
 				3C0F520723EBA72600C91790 /* SceneDelegate.swift */,
-				3CBC5FA023EB9BA800111972 /* HomeViewController.swift */,
-				48F41C19245A419E0071E13E /* InformationView.swift */,
+				3CBC5FA023EB9BA800111972 /* MainView.swift */,
+				3C7A740A24BF5CF7005DA0B1 /* ViewRouter.swift */,
+				3C7A740C24BF5E01005DA0B1 /* TrendingView.swift */,
+				3C7A740E24BF5E16005DA0B1 /* DiscoverView.swift */,
+				3C7A741024BF68C5005DA0B1 /* FavoriteView.swift */,
+				3C7A741224BF68E8005DA0B1 /* InformationView.swift */,
 				3C23C9C924699902003E254D /* Constants.swift */,
+				48F41C19245A419E0071E13E /* InformationView2.swift */,
 				4898798123F1A9FD00062714 /* PersistentData.xcdatamodeld */,
 				3C0F523023EDC0B600C91790 /* Event List */,
 				48D22135240614B90051A66D /* Map */,
@@ -298,26 +313,31 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				48F41C1A245A419E0071E13E /* InformationView.swift in Sources */,
+				48F41C1A245A419E0071E13E /* InformationView2.swift in Sources */,
 				3C23C9CA24699902003E254D /* Constants.swift in Sources */,
 				3C0F520823EBA72600C91790 /* AppDelegate.swift in Sources */,
+				3C7A740B24BF5CF7005DA0B1 /* ViewRouter.swift in Sources */,
 				48D22137240615260051A66D /* MapView.swift in Sources */,
 				48D30A14246A3D49004E84A6 /* BuildingInstance.swift in Sources */,
 				48D30A16246A4C53004E84A6 /* BuildingModelController.swift in Sources */,
 				4898798023F0E39D00062714 /* EventListNavigationView.swift in Sources */,
 				3C22171723E22776003CC5C3 /* ARTourViewController.swift in Sources */,
+				3C7A740D24BF5E01005DA0B1 /* TrendingView.swift in Sources */,
 				3C0F523F23EDC32100C91790 /* SearchEventFormView.swift in Sources */,
+				3C7A740F24BF5E16005DA0B1 /* DiscoverView.swift in Sources */,
 				3C0F523D23EDC29900C91790 /* EventViewController.swift in Sources */,
 				48D22139240615520051A66D /* ContentView.swift in Sources */,
 				4806CA86244A7984004B010C /* MapNavView.swift in Sources */,
-				483ACD87242A9752003E2DE6 /* FavoriteView.swift in Sources */,
+				3C7A741324BF68E8005DA0B1 /* InformationView.swift in Sources */,
+				483ACD87242A9752003E2DE6 /* FavoriteView2.swift in Sources */,
 				48D2213B240615B50051A66D /* LocationManager.swift in Sources */,
-				3CBC5FA123EB9BA800111972 /* HomeViewController.swift in Sources */,
+				3CBC5FA123EB9BA800111972 /* MainView.swift in Sources */,
 				3C0F523623EDC11B00C91790 /* EventModelController.swift in Sources */,
 				3C0F524323EDCD4600C91790 /* EventInstance.swift in Sources */,
 				3C90E495248C867800427FFB /* RecommendationView.swift in Sources */,
 				4898798523F456F100062714 /* EventListView.swift in Sources */,
 				483ACD85242A970C003E2DE6 /* RecommendationEngine.swift in Sources */,
+				3C7A741124BF68C5005DA0B1 /* FavoriteView.swift in Sources */,
 				3CF31B8E246A338200840E3F /* TourModeDetailView.swift in Sources */,
 				4898798323F1A9FD00062714 /* PersistentData.xcdatamodeld in Sources */,
 				3C0F524023EDC32100C91790 /* SearchFormView.swift in Sources */,

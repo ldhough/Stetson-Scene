@@ -83,10 +83,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)
-            window.rootViewController = UIHostingController(rootView: contentView/*.onTapGesture(count: 2, perform: { window.endEditing(true) })*/)
+            //window.rootViewController = UIHostingController(rootView: contentView/*.onTapGesture(count: 2, perform: { window.endEditing(true) })*/)
 //            window.rootViewController = UIHostingController(rootView: contentView.onTapGesture(count: 2, perform: {
 //                window.endEditing(true)
 //            }))
+            window.rootViewController = UIHostingController(rootView: MainView().environmentObject(ViewRouter()))
             self.window = window
             window.makeKeyAndVisible()
         }

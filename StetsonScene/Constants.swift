@@ -11,7 +11,8 @@ import SwiftUI
 import UIKit
 
 struct Constants {
-    static let screenSize = UIScreen.main.bounds
+    static let width = UIScreen.main.bounds.width
+    static let height = UIScreen.main.bounds.height
     //COLORS: IGNORING DARK & LIGHT MODE
     
     //backgrounds e.g. different shades of gray
