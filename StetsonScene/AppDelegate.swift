@@ -14,7 +14,7 @@ import CoreData
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, ObservableObject {
-    @Published var eventModelController:EventModelController!
+    //@Published var eventModelController:EventModelController!
     
     @Published var eventListRef:DatabaseReference! //references to Firebase Realtime Database
     @Published var eventListOrderRef:DatabaseReference!
@@ -22,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, ObservableObject {
     @Published var locationAssocationRef:DatabaseReference!
     @Published var connectedRef:DatabaseReference!
     @Published var buildingsRef:DatabaseReference!
-    var eventList:[EventInstance]! = []
+    //var eventList:[EventInstance]! = []
     var eventTypeAssociations:Dictionary<String, Any> = [:]
     var locationAssociations:Dictionary<String, Any> = [:]
     var eventTypesList:[String] = []

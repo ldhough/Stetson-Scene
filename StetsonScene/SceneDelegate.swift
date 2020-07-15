@@ -32,8 +32,8 @@ extension SceneDelegate: UIGestureRecognizerDelegate {
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-    var eventModelController:EventModelController!
-    var event:EventInstance!
+    //var eventModelController:EventModelController!
+    //var event:EventInstance!
     //var wheelNavigation:WheelNavigation!
 
     ///Establishes our Model Controller & Root View.  Starts the passing of our model controller around our views.
@@ -42,15 +42,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         //Keeps List views from having cell dividers
         //UITableView.appearance().allowsSelection = false
         //UITableViewCell.appearance().selectionStyle = .none
-        UITableView.appearance().separatorStyle = .none
-        UITableView.appearance().backgroundColor = UIColor.clear
+//        UITableView.appearance().separatorStyle = .none
+//        UITableView.appearance().backgroundColor = UIColor.clear
         //UITableView.appearance().separatorColor = .clear
         
         //Model Controller initiation
-        self.eventModelController = EventModelController(eventList: AppDelegate.shared().eventList,
-                                                    eventTypeList: AppDelegate.shared().eventTypesList,
-                                                    locationList: AppDelegate.shared().locationList)
-        self.event = EventInstance()
+        //self.eventModelController = EventModelController(eventList: AppDelegate.shared().eventList,
+                                                    //eventTypeList: AppDelegate.shared().eventTypesList,
+                                                    //locationList: AppDelegate.shared().locationList)
+        //self.event = EventInstance()
         
         //let tapGesture = AnyGestureRecognizer(target: window, action:#selector(UIView.endEditing))
         //tapGesture.requiresExclusiveTouchType = false
@@ -61,25 +61,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        tapGesture.requiresExclusiveTouchType = false
 //        tapGesture.cancelsTouchesInView = false
 //        window?.addGestureRecognizer(tapGesture)
-        AppDelegate.shared().eventModelController = eventModelController
-        let buildingModelController:BuildingModelController = BuildingModelController()
-        self.eventModelController.buildingModelController = buildingModelController
-        self.eventModelController.buildingModelController.retrieveFirebaseDataBuildings()
+//        AppDelegate.shared().eventModelController = eventModelController
+//        let buildingModelController:BuildingModelController = BuildingModelController()
+//        self.eventModelController.buildingModelController = buildingModelController
+//        self.eventModelController.buildingModelController.retrieveFirebaseDataBuildings()
         //BuildingModelController.retrieveFirebaseDataBuildings()
         
         //Initiates parsing of Firebase data with one week's worth of events
-        self.eventModelController.retrieveFirebaseData(daysIntoYear: self.eventModelController.getDaysIntoYear(nowPlusWeeks: 1))
-        let recommendationEngine = RecommendationEngine(eventModelController: self.eventModelController)
-        self.eventModelController.recommendationEngine = recommendationEngine
-        self.eventModelController.testFirebaseConnection()
-        
+//        self.eventModelController.retrieveFirebaseData(daysIntoYear: self.eventModelController.getDaysIntoYear(nowPlusWeeks: 1))
+//        let recommendationEngine = RecommendationEngine(eventModelController: self.eventModelController)
+//        self.eventModelController.recommendationEngine = recommendationEngine
+//        self.eventModelController.testFirebaseConnection()
+//
         //self.wheelNavigation = WheelNavigation()
         //map initialization
-        var landmarkSupport:LandmarkSupport = LandmarkSupport() //new
+        //var landmarkSupport:LandmarkSupport = LandmarkSupport() //new
         
         //SwiftUI root view
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        let contentView = HomeViewController(eventModelController: self.eventModelController, event: self.event, landmarkSupport: landmarkSupport/*, helperClass: self.wheelNavigation*/).environment(\.managedObjectContext, context)
+        //let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let contentView = HomeViewController(/*eventModelController: self.eventModelController, event: self.event, landmarkSupport: landmarkSupport*//*, helperClass: self.wheelNavigation*/)//.environment(\.managedObjectContext, context)
         
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)
