@@ -15,11 +15,12 @@ struct TrendingView : View {
     
     var body: some View {
         VStack {
-            Text("Trending").fontWeight(.heavy).font(.system(size: 50)).padding([.vertical, .horizontal]).frame(maxWidth: .infinity, alignment: .leading)
+            Text("Trending").fontWeight(.heavy).font(.system(size: 50)).padding([.vertical, .horizontal]).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(Color(Constants.text1))
             //Carousel List- using GeomtryReader to detect the remaining height on the screen (smart scaling)
             GeometryReader{ geometry in
                 Carousel(card: self.$card, height: geometry.frame(in: .global).height)
             }
+            //Carousel(card: self.$card, height: Constants.height*0.5)
             //dots that show which card is being displayed
             CardControl(card: self.$card).padding([.vertical, .horizontal])
         }
@@ -104,12 +105,12 @@ struct Cards : View {
                                 }.frame(width: self.cardWidth, height: self.height*0.6)
                                 //Text
                                 VStack (alignment: .leading) {
-                                    Text(event.eventName).fontWeight(.heavy).font(.system(size: 40)).padding(.top, 10)
-                                    Text(event.date + " | " + event.time).fontWeight(.light).font(.system(size: 25)).padding(.top, 5).padding(.bottom, 5)
-                                    Text(event.location).fontWeight(.light).font(.system(size: 25)).padding(.bottom, 10)
+                                    Text(event.eventName).fontWeight(.medium).font(.system(size: 40)).padding(.top, 10).foregroundColor(Color(Constants.text1))
+                                    Text(event.date + " | " + event.time).fontWeight(.light).font(.system(size: 25)).padding(.top, 5).padding(.bottom, 5).foregroundColor(Color(Constants.text2))
+                                    Text(event.location).fontWeight(.light).font(.system(size: 25)).padding(.bottom, 10).foregroundColor(Color(Constants.text2))
                                 }.padding([.horizontal, .vertical])
                                     .frame(width: self.cardWidth, height: self.height*0.4, alignment: .leading)
-                                    .background(Color.white.opacity(0.7))
+                                    .background(Color(Constants.bg2).opacity(0.7))
                             }.frame(width: self.cardWidth, height: self.height)
                         }.padding([.horizontal, .vertical])
                             .frame(width: self.cardWidth, height: self.height)
@@ -130,8 +131,8 @@ struct CardControl : UIViewRepresentable {
     
     func makeUIView(context: Context) -> UIPageControl {
         let cardControl = UIPageControl()
-        cardControl.currentPageIndicatorTintColor = UIColor.black
-        cardControl.pageIndicatorTintColor = UIColor.black.withAlphaComponent(0.25)
+        cardControl.currentPageIndicatorTintColor = Constants.text1
+        cardControl.pageIndicatorTintColor = Constants.text2.withAlphaComponent(0.25)
         cardControl.numberOfPages = data.count
         return cardControl
     }

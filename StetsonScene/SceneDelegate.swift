@@ -43,7 +43,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         //UITableView.appearance().allowsSelection = false
         //UITableViewCell.appearance().selectionStyle = .none
         UITableView.appearance().separatorStyle = .none
-        UITableView.appearance().backgroundColor = Constants.lightblue//UIColor.blue
+        UITableView.appearance().backgroundColor = Constants.accent1//UIColor.blue
         //UITableView.appearance().separatorColor = .clear
         
         //Model Controller initiation

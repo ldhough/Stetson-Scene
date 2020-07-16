@@ -12,13 +12,18 @@ import SwiftUI
 struct CalendarView : View {
     @State var selectedDate: Date = Date()
     @State var month = 0
+    @State var detailView: Bool = false
     
     var body: some View {
-        VStack {
-            GeometryReader{ geometry in
-                MonthCarousel(selectedDate: self.$selectedDate, month: self.$month, height: geometry.frame(in: .global).height)
-            }
-        }
+        VStack(spacing: 0) {
+            MonthCarousel(selectedDate: self.$selectedDate, month: self.$month, height: Constants.height*0.4).frame(height: Constants.height*0.4)
+            Rectangle().frame(width: Constants.width, height: 2).foregroundColor(Color(Constants.bg1))
+            List {
+                ForEach(data) { event in
+                    SmallDiscoverListCell(event: event).onTapGesture { self.detailView = true }
+                }.listRowBackground(Color(Constants.accent1))
+            }.sheet(isPresented: $detailView, content: { EventDetailView() })
+        }.background(Color(Constants.accent1))
     }
 }
 
@@ -42,7 +47,7 @@ struct MonthCarousel : UIViewRepresentable {
         //make the Months SwiftUI View into a UIView (essentially)
         let uiMonthView = UIHostingController(rootView: Months(selectedDate: self.$selectedDate, numMonths: numberOfMonths()))
         uiMonthView.view.frame = CGRect(x: 0, y: 0, width: carouselWidth, height: self.height)
-        uiMonthView.view.backgroundColor = Constants.lightblue
+        uiMonthView.view.backgroundColor = Constants.accent1
         
         //add the uiMonthView as a subview of the scrollview
         //(effectively embeds the Months SwiftUI View into the Carousel UIScrollView)
@@ -72,7 +77,7 @@ struct Months: View {
         HStack {
             ForEach(0..<numMonths) { index in
                 Month(selectedDate: self.$selectedDate, monthOffset: index)
-            }
+            }.padding(.horizontal, 10)
         }
     }
 }
@@ -88,7 +93,7 @@ struct Month: View {
     
     var body: some View {
         VStack(alignment: HorizontalAlignment.center, spacing: 10) {
-            Text(getMonthHeader()).fontWeight(.heavy).font(.system(size: 40)).padding(.bottom, 25)
+            Text(getMonthHeader()).fontWeight(.medium).font(.system(size: 30)).foregroundColor(Color(Constants.accent1)).padding(.top, 15)
             //month
             VStack(alignment: .leading, spacing: 5) {
                 ForEach(monthsArray, id:  \.self) { row in
@@ -99,18 +104,18 @@ struct Month: View {
                             HStack {
                                 Spacer()
                                 if Calendar.current.isDate(column, equalTo: self.firstOfMonth(), toGranularity: .month) {
-                                    DateCell(date: column, selectedDate: self.$selectedDate, cellWidth: CGFloat(32))
+                                    DateCell(date: column, selectedDate: self.$selectedDate, cellWidth: CGFloat(30))
                                     .onTapGesture { self.selectedDate = column }
                                 } else {
-                                    Text("").frame(width: CGFloat(32), height: CGFloat(32))
+                                    Text("").frame(width: CGFloat(30), height: CGFloat(30))
                                 }
                                 Spacer()
                             }
                         }
                     }
                 }
-            }.frame(minWidth: 0, maxWidth: .infinity)
-        }
+            }.frame(minWidth: 0, maxWidth: .infinity).padding(.vertical, 15)
+        }.background(RoundedRectangle(cornerRadius: 10)).foregroundColor(Color(Constants.bg1))
     }
     
     //MONTH OFFSET
@@ -150,7 +155,7 @@ struct Month: View {
     func getMonthHeader() -> String {
         let headerDateFormatter = DateFormatter()
         headerDateFormatter.calendar = Calendar.current
-        headerDateFormatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "yyyy LLLL", options: 0, locale:  Calendar.current.locale)
+        headerDateFormatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "LLLL", options: 0, locale:  Calendar.current.locale)
         return headerDateFormatter.string(from: firstOfMonth())
     }
 }
@@ -164,12 +169,11 @@ struct DateCell: View {
     var body: some View {
         Text(self.formatDate(date: date, calendar: Calendar.current))
             .fontWeight(Font.Weight.light)
-            .foregroundColor(date == selectedDate ? Color(Constants.lightblue) : Color.black)
+            .foregroundColor(date == selectedDate ? Color(Constants.bg2) : Color(Constants.text1))
             .frame(width: cellWidth, height: cellWidth)
-            .font(.system(size: 20))
-            .background(date == selectedDate ? Color.white : Color.clear)
+            .font(.system(size: 18))
+            .background(date == selectedDate ? Color(Constants.accent1) : Color.clear)
             .clipShape(Circle())
-            .padding(.vertical, 5)
     }
     
     func formatDate(date: Date, calendar: Calendar) -> String {
@@ -183,5 +187,31 @@ struct DateCell: View {
     }
 }
 
-
+//CONTENTS OF EACH EVENT CELL
+struct SmallDiscoverListCell : View {
+    var event: Type
+    
+    var body: some View {
+        ZStack {
+            HStack {
+                //Date & Time, Left Side
+                VStack(alignment: .trailing) {
+                    Text(event.date).fontWeight(.medium).font(.system(size: 12)).foregroundColor(Color(Constants.accent1)).padding(.vertical, 5)
+                    Text(event.time).fontWeight(.medium).font(.system(size: 10)).foregroundColor(Color(Constants.text2).opacity(0.5)).padding(.bottom, 5)
+                    //Duration?
+                }.frame(width: Constants.width*0.15)
+                
+                //Name & Location, Right Side
+                VStack(alignment: .leading) {
+                    Text(event.eventName).fontWeight(.medium).font(.system(size: 16)).lineLimit(1).foregroundColor(Color(Constants.text1)).padding(.vertical, 5)
+                    Text(event.location).fontWeight(.light).font(.system(size: 12)).foregroundColor(Color(Constants.text2).opacity(0.5)).padding(.bottom, 5)
+                }
+                
+                //Fill out rest of cell
+                Spacer()
+                
+            }.padding(([.vertical, .horizontal])) //padding within the cell, between words and borders
+        }.frame(height: Constants.height*0.075).background(RoundedRectangle(cornerRadius: 10).stroke(Color(Constants.accent1)).foregroundColor(Color(Constants.text1)).background(RoundedRectangle(cornerRadius: 10).foregroundColor(Color(Constants.bg2))))
+    }
+}
 

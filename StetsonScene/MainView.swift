@@ -53,7 +53,9 @@ struct MainView : View {
     @EnvironmentObject var viewRouter: ViewRouter
     
     var body: some View {
-        VStack {
+        ZStack {
+            Color(Constants.bg1).edgesIgnoringSafeArea(.all)
+        VStack(spacing: 0){
             if viewRouter.currentPage == "Trending" {
                 TrendingView()
             } else if viewRouter.currentPage == "Discover" {
@@ -65,6 +67,8 @@ struct MainView : View {
             }
             
             TabBar()
+        }.edgesIgnoringSafeArea(.bottom)
+            
         }.animation(.spring())
     }
 }
@@ -77,39 +81,39 @@ struct TabBar : View {
         HStack(spacing: 20){
             //Trending
             HStack {
-                Image(systemName: "hand.thumbsup").resizable().frame(width: 20, height: 20)
-                Text(viewRouter.currentPage == "Trending" ? viewRouter.currentPage : "").fontWeight(.light).font(.system(size: 14))
+                Image(systemName: "hand.thumbsup").resizable().frame(width: 20, height: 20).foregroundColor(viewRouter.currentPage == "Trending" ? Color(Constants.bg2) : Color(Constants.text2))
+                Text(viewRouter.currentPage == "Trending" ? viewRouter.currentPage : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color(Constants.bg2))
             }.padding(15)
-                .background(viewRouter.currentPage == "Trending" ? Color(Constants.lightblue) : Color.clear)
+                .background(viewRouter.currentPage == "Trending" ? Color(Constants.accent1) : Color.clear)
                 .clipShape(Capsule())
                 .onTapGesture { self.viewRouter.currentPage = "Trending" }
             //Discover
             HStack {
-                Image(systemName: "magnifyingglass").resizable().frame(width: 20, height: 20)
-                Text(viewRouter.currentPage == "Discover" ? viewRouter.currentPage : "").fontWeight(.light).font(.system(size: 14))
+                Image(systemName: "magnifyingglass").resizable().frame(width: 20, height: 20).foregroundColor(viewRouter.currentPage == "Discover" ? Color(Constants.bg2) : Color(Constants.text2))
+                Text(viewRouter.currentPage == "Discover" ? viewRouter.currentPage : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color(Constants.bg2))
             }.padding(15)
-                .background(viewRouter.currentPage == "Discover" ? Color(Constants.lightblue) : Color.clear)
+                .background(viewRouter.currentPage == "Discover" ? Color(Constants.accent1) : Color.clear)
                 .clipShape(Capsule())
                 .onTapGesture { self.viewRouter.currentPage = "Discover" }
             //Favorites
             HStack {
-                Image(systemName: "heart").resizable().frame(width: 20, height: 20)
-                Text(viewRouter.currentPage == "Favorites" ? viewRouter.currentPage : "").fontWeight(.light).font(.system(size: 14))
+                Image(systemName: "heart").resizable().frame(width: 20, height: 20).foregroundColor(viewRouter.currentPage == "Favorites" ? Color(Constants.bg2) : Color(Constants.text2))
+                Text(viewRouter.currentPage == "Favorites" ? viewRouter.currentPage : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color(Constants.bg2))
             }.padding(15)
-                .background(viewRouter.currentPage == "Favorites" ? Color(Constants.lightblue) : Color.clear)
+                .background(viewRouter.currentPage == "Favorites" ? Color(Constants.accent1) : Color.clear)
                 .clipShape(Capsule())
                 .onTapGesture { self.viewRouter.currentPage = "Favorites" }
             //Info
             HStack {
-                Image(systemName: "info.circle").resizable().frame(width: 20, height: 20)
-                Text(viewRouter.currentPage == "Information" ? viewRouter.currentPage : "").fontWeight(.light).font(.system(size: 14))
+                Image(systemName: "info.circle").resizable().frame(width: 20, height: 20).foregroundColor(viewRouter.currentPage == "Information" ? Color(Constants.bg2) : Color(Constants.text2))
+                Text(viewRouter.currentPage == "Information" ? viewRouter.currentPage : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color(Constants.bg2))
             }.padding(15)
-                .background(viewRouter.currentPage == "Information" ? Color(Constants.lightblue) : Color.clear)
+                .background(viewRouter.currentPage == "Information" ? Color(Constants.accent1) : Color.clear)
                 .clipShape(Capsule())
                 .onTapGesture { self.viewRouter.currentPage = "Information" }
-        }.padding(.vertical, 10)
+        }.padding(.vertical, 5)
         .frame(width: Constants.width)
-        .background(Color.white)
+        .background(Color(Constants.bg2))
         .animation(.default)
     }
 }

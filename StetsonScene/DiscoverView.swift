@@ -21,19 +21,19 @@ struct DiscoverView : View {
             //HEADER
             HStack {
                 //Title
-                Text("Discover").fontWeight(.heavy).font(.system(size: 50)).frame(maxWidth: .infinity, alignment: .leading)
+                Text("Discover").fontWeight(.heavy).font(.system(size: 50)).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(Color(Constants.text1))
                 
                 //Filter Button
                 Image(systemName: "line.horizontal.3.decrease.circle")
                 .resizable().frame(width: 25, height: 25).padding(.trailing, 10)
-                .foregroundColor(filterApplied ? Color(Constants.lightblue) : Color.gray)
+                    .foregroundColor(filterApplied ? Color(Constants.accent1) : Color(Constants.text2))
                 .onTapGesture { self.filterView = true }
                 .sheet(isPresented: $filterView, content: { FilterView() })
                 
                 //Quick Search Button
                 Image(systemName: "magnifyingglass")
                 .resizable().frame(width: 25, height: 25).padding(.trailing, 10)
-                .foregroundColor(Color.gray)
+                .foregroundColor(Color(Constants.text2))
                 
             }.padding([.vertical, .horizontal])
             
@@ -42,36 +42,36 @@ struct DiscoverView : View {
                 
                 //List Tab (order of attributes matters)
                 Text("List").fontWeight(.light).font(.system(size: 20))
-                .foregroundColor(discoverView == "List" ? Color.white : Color(Constants.lightblue)).padding(.vertical, 10)
+                    .foregroundColor(discoverView == "List" ? Color(Constants.bg2) : Color(Constants.accent1)).padding(.vertical, 10)
                 .frame(width: Constants.width*0.45)
-                .background(discoverView == "List" ? Color(Constants.lightblue) : Color.white)
+                .background(discoverView == "List" ? Color(Constants.accent1) : Color(Constants.bg2))
                 .cornerRadius(radius: 10, corners: [.topLeft, .topRight])
                 .onTapGesture { self.discoverView = "List" }
                 
                 //Calendar Tab
                 Text("Calendar").fontWeight(.light).font(.system(size: 20))
-                .foregroundColor(discoverView == "Calendar" ? Color.white : Color(Constants.lightblue)).padding(.vertical, 10)
+                .foregroundColor(discoverView == "Calendar" ? Color(Constants.bg2) : Color(Constants.accent1)).padding(.vertical, 10)
                 .frame(width: Constants.width*0.45)
-                .background(discoverView == "Calendar" ? Color(Constants.lightblue): Color.white)
+                .background(discoverView == "Calendar" ? Color(Constants.accent1): Color(Constants.bg2))
                 .cornerRadius(radius: 10, corners: [.topLeft, .topRight])
                 .onTapGesture { self.discoverView = "Calendar" }
             }
             
             //SMALL SPACER
-            Rectangle().frame(width: Constants.width, height: 8).foregroundColor(Color(Constants.lightblue))
+            Rectangle().frame(width: Constants.width, height: 8).foregroundColor(Color(Constants.accent1))
             
             //LIST OR CALENDAR VIEW
             if discoverView == "List" {
                 List {
                     ForEach(data) { event in
                         DiscoverListCell(event: event).onTapGesture { self.detailView = true }
-                    }.listRowBackground(Color(Constants.lightblue))
+                    }.listRowBackground(Color(Constants.accent1))
                 }.sheet(isPresented: $detailView, content: { EventDetailView() })
             } else if discoverView == "Calendar" {
                 CalendarView()
             }
             
-        }//end of largest VStack
+        }//.background(Color(Constants.bg1))//end of largest VStack
     } //end of View
 }
 
@@ -84,22 +84,22 @@ struct DiscoverListCell : View {
             HStack {
                 //Date & Time, Left Side
                 VStack(alignment: .trailing) {
-                    Text(event.date).fontWeight(.medium).font(.system(size: 16)).foregroundColor(Color(Constants.lightblue)).padding(.vertical, 5)
-                    Text(event.time).fontWeight(.medium).font(.system(size: 12)).foregroundColor(Color.gray.opacity(0.5)).padding(.bottom, 5)
+                    Text(event.date).fontWeight(.medium).font(.system(size: 16)).foregroundColor(Color(Constants.accent1)).padding(.vertical, 5)
+                    Text(event.time).fontWeight(.medium).font(.system(size: 12)).foregroundColor(Color(Constants.text2).opacity(0.5)).padding(.bottom, 5)
                     //Duration?
                 }.frame(width: Constants.width*0.2)
                 
                 //Name & Location, Right Side
                 VStack(alignment: .leading) {
-                    Text(event.eventName).fontWeight(.heavy).font(.system(size: 22)).lineLimit(1).foregroundColor(Color.black).padding(.vertical, 5)
-                    Text(event.location).fontWeight(.light).font(.system(size: 16)).foregroundColor(Color.gray.opacity(0.5)).padding(.bottom, 5)
+                    Text(event.eventName).fontWeight(.medium).font(.system(size: 22)).lineLimit(1).foregroundColor(Color(Constants.text1)).padding(.vertical, 5)
+                    Text(event.location).fontWeight(.light).font(.system(size: 16)).foregroundColor(Color(Constants.text2).opacity(0.5)).padding(.bottom, 5)
                 }
                 
                 //Fill out rest of cell
                 Spacer()
                 
             }.padding(([.vertical, .horizontal])) //padding within the cell, between words and borders
-        }.background(RoundedRectangle(cornerRadius: 10).stroke(Color(Constants.lightblue)).foregroundColor(Color.black).background(RoundedRectangle(cornerRadius: 10).foregroundColor(Color.white)))
+        }.background(RoundedRectangle(cornerRadius: 10).stroke(Color(Constants.accent1)).foregroundColor(Color(Constants.text1)).background(RoundedRectangle(cornerRadius: 10).foregroundColor(Color(Constants.bg2))))
     }
 }
 
