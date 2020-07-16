@@ -13,13 +13,16 @@
 		3C0F523D23EDC29900C91790 /* EventViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F523723EDC13A00C91790 /* EventViewController.swift */; };
 		3C0F523F23EDC32100C91790 /* SearchEventFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F523B23EDC16E00C91790 /* SearchEventFormView.swift */; };
 		3C0F524023EDC32100C91790 /* SearchFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F523923EDC16E00C91790 /* SearchFormView.swift */; };
-		3C0F524123EDC32100C91790 /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F523C23EDC16E00C91790 /* EventDetailView.swift */; };
+		3C0F524123EDC32100C91790 /* EventDetailView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F523C23EDC16E00C91790 /* EventDetailView2.swift */; };
 		3C0F524323EDCD4600C91790 /* EventInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F524223EDCD4600C91790 /* EventInstance.swift */; };
 		3C22171723E22776003CC5C3 /* ARTourViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C22171623E22776003CC5C3 /* ARTourViewController.swift */; };
 		3C22171A23E22776003CC5C3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3C22171823E22776003CC5C3 /* Main.storyboard */; };
 		3C22171C23E22778003CC5C3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3C22171B23E22778003CC5C3 /* Assets.xcassets */; };
 		3C22171F23E22778003CC5C3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3C22171D23E22778003CC5C3 /* LaunchScreen.storyboard */; };
 		3C23C9CA24699902003E254D /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C23C9C924699902003E254D /* Constants.swift */; };
+		3C290C1F24BFCE54008D83F0 /* FilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C290C1E24BFCE54008D83F0 /* FilterView.swift */; };
+		3C290C2124BFCEE1008D83F0 /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C290C2024BFCEE1008D83F0 /* EventDetailView.swift */; };
+		3C290C2324BFD677008D83F0 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C290C2224BFD677008D83F0 /* CalendarView.swift */; };
 		3C4D64FE24BF3F4900477A22 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3C4D64FD24BF3F4900477A22 /* GoogleService-Info.plist */; };
 		3C7A740B24BF5CF7005DA0B1 /* ViewRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A740A24BF5CF7005DA0B1 /* ViewRouter.swift */; };
 		3C7A740D24BF5E01005DA0B1 /* TrendingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A740C24BF5E01005DA0B1 /* TrendingView.swift */; };
@@ -52,7 +55,7 @@
 		3C0F523723EDC13A00C91790 /* EventViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventViewController.swift; sourceTree = "<group>"; };
 		3C0F523923EDC16E00C91790 /* SearchFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFormView.swift; sourceTree = "<group>"; };
 		3C0F523B23EDC16E00C91790 /* SearchEventFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchEventFormView.swift; sourceTree = "<group>"; };
-		3C0F523C23EDC16E00C91790 /* EventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailView.swift; sourceTree = "<group>"; };
+		3C0F523C23EDC16E00C91790 /* EventDetailView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailView2.swift; sourceTree = "<group>"; };
 		3C0F524223EDCD4600C91790 /* EventInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventInstance.swift; sourceTree = "<group>"; };
 		3C22170F23E22776003CC5C3 /* StetsonScene.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StetsonScene.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3C22171623E22776003CC5C3 /* ARTourViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARTourViewController.swift; sourceTree = "<group>"; };
@@ -60,6 +63,9 @@
 		3C22171B23E22778003CC5C3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3C22171E23E22778003CC5C3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3C23C9C924699902003E254D /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		3C290C1E24BFCE54008D83F0 /* FilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterView.swift; sourceTree = "<group>"; };
+		3C290C2024BFCEE1008D83F0 /* EventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailView.swift; sourceTree = "<group>"; };
+		3C290C2224BFD677008D83F0 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
 		3C4D64FD24BF3F4900477A22 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		3C7A740824BF4068005DA0B1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3C7A740A24BF5CF7005DA0B1 /* ViewRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewRouter.swift; sourceTree = "<group>"; };
@@ -106,7 +112,7 @@
 				3C0F523723EDC13A00C91790 /* EventViewController.swift */,
 				4898798423F456F000062714 /* EventListView.swift */,
 				4898797F23F0E39D00062714 /* EventListNavigationView.swift */,
-				3C0F523C23EDC16E00C91790 /* EventDetailView.swift */,
+				3C0F523C23EDC16E00C91790 /* EventDetailView2.swift */,
 				3C0F523B23EDC16E00C91790 /* SearchEventFormView.swift */,
 				3C0F523923EDC16E00C91790 /* SearchFormView.swift */,
 				483ACD86242A9752003E2DE6 /* FavoriteView2.swift */,
@@ -142,6 +148,9 @@
 				3C7A740A24BF5CF7005DA0B1 /* ViewRouter.swift */,
 				3C7A740C24BF5E01005DA0B1 /* TrendingView.swift */,
 				3C7A740E24BF5E16005DA0B1 /* DiscoverView.swift */,
+				3C290C2224BFD677008D83F0 /* CalendarView.swift */,
+				3C290C2024BFCEE1008D83F0 /* EventDetailView.swift */,
+				3C290C1E24BFCE54008D83F0 /* FilterView.swift */,
 				3C7A741024BF68C5005DA0B1 /* FavoriteView.swift */,
 				3C7A741224BF68E8005DA0B1 /* InformationView.swift */,
 				3C23C9C924699902003E254D /* Constants.swift */,
@@ -309,6 +318,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3C290C2124BFCEE1008D83F0 /* EventDetailView.swift in Sources */,
 				48F41C1A245A419E0071E13E /* InformationView2.swift in Sources */,
 				3C23C9CA24699902003E254D /* Constants.swift in Sources */,
 				3C0F520823EBA72600C91790 /* AppDelegate.swift in Sources */,
@@ -320,10 +330,12 @@
 				3C22171723E22776003CC5C3 /* ARTourViewController.swift in Sources */,
 				3C7A740D24BF5E01005DA0B1 /* TrendingView.swift in Sources */,
 				3C0F523F23EDC32100C91790 /* SearchEventFormView.swift in Sources */,
+				3C290C1F24BFCE54008D83F0 /* FilterView.swift in Sources */,
 				3C7A740F24BF5E16005DA0B1 /* DiscoverView.swift in Sources */,
 				3C0F523D23EDC29900C91790 /* EventViewController.swift in Sources */,
 				48D22139240615520051A66D /* ContentView.swift in Sources */,
 				4806CA86244A7984004B010C /* MapNavView.swift in Sources */,
+				3C290C2324BFD677008D83F0 /* CalendarView.swift in Sources */,
 				3C7A741324BF68E8005DA0B1 /* InformationView.swift in Sources */,
 				483ACD87242A9752003E2DE6 /* FavoriteView2.swift in Sources */,
 				48D2213B240615B50051A66D /* LocationManager.swift in Sources */,
@@ -337,7 +349,7 @@
 				3CF31B8E246A338200840E3F /* TourModeDetailView.swift in Sources */,
 				4898798323F1A9FD00062714 /* PersistentData.xcdatamodeld in Sources */,
 				3C0F524023EDC32100C91790 /* SearchFormView.swift in Sources */,
-				3C0F524123EDC32100C91790 /* EventDetailView.swift in Sources */,
+				3C0F524123EDC32100C91790 /* EventDetailView2.swift in Sources */,
 				3C0F520923EBA72600C91790 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

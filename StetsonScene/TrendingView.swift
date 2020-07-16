@@ -10,7 +10,6 @@ import Foundation
 import SwiftUI
 
 struct TrendingView : View {
-    
     @EnvironmentObject var viewRouter: ViewRouter
     @State var card = 0
     
@@ -22,7 +21,7 @@ struct TrendingView : View {
                 Carousel(card: self.$card, height: geometry.frame(in: .global).height)
             }
             //dots that show which card is being displayed
-            PageControl(page: self.$card).padding([.vertical, .horizontal])
+            CardControl(card: self.$card).padding([.vertical, .horizontal])
         }
     }
 }
@@ -67,7 +66,7 @@ struct Carousel : UIViewRepresentable {
     class Coordinator : NSObject, UIScrollViewDelegate {
         var carousel : Carousel
         init(parent: Carousel) {
-           carousel = parent
+            carousel = parent
         }
         
         //get current page
@@ -82,65 +81,65 @@ struct Carousel : UIViewRepresentable {
 struct Cards : View {
     var height : CGFloat
     let cardWidth = Constants.width*0.9
+    @State var detailView: Bool = false
+    
     var body: some View {
         //horizontal list of events in list
         HStack(spacing: 0) {
             ForEach(data) {  event in
                 //area around the card (whole screen width)
-                VStack {
-                    //card view
-                    ZStack {
-                        //Background Image
-                        Image("SS").resizable()
-                            .aspectRatio(contentMode: .fill)
+                    VStack {
+                        //card view
+                        ZStack {
+                            //Background Image
+                            Image("SS").resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: self.cardWidth, height: self.height)
+                                .cornerRadius(20)
+                            //Layer over image
+                            VStack {
+                                //Spacer
+                                VStack {
+                                    Spacer()
+                                }.frame(width: self.cardWidth, height: self.height*0.6)
+                                //Text
+                                VStack (alignment: .leading) {
+                                    Text(event.eventName).fontWeight(.heavy).font(.system(size: 40)).padding(.top, 10)
+                                    Text(event.date + " | " + event.time).fontWeight(.light).font(.system(size: 25)).padding(.top, 5).padding(.bottom, 5)
+                                    Text(event.location).fontWeight(.light).font(.system(size: 25)).padding(.bottom, 10)
+                                }.padding([.horizontal, .vertical])
+                                    .frame(width: self.cardWidth, height: self.height*0.4, alignment: .leading)
+                                    .background(Color.white.opacity(0.7))
+                            }.frame(width: self.cardWidth, height: self.height)
+                        }.padding([.horizontal, .vertical])
                             .frame(width: self.cardWidth, height: self.height)
                             .cornerRadius(20)
-                        //Layer over image
-                        VStack {
-                            //Spacer
-                            VStack {
-                                Spacer()
-                            }.frame(width: self.cardWidth, height: self.height*0.6)
-                            //Text
-                            VStack (alignment: .leading) {
-                                Text(event.eventName).fontWeight(.heavy).font(.system(size: 40)).padding(.top, 10)
-                                Text(event.date + " | " + event.time).fontWeight(.light).font(.system(size: 25)).padding(.top, 5).padding(.bottom, 5)
-                                Text(event.location).fontWeight(.light).font(.system(size: 25)).padding(.bottom, 10)
-                            }.padding([.horizontal, .vertical])
-                            .frame(width: self.cardWidth, height: self.height*0.4, alignment: .leading)
-                            .background(Color.white.opacity(0.7))
-                        }.frame(width: self.cardWidth, height: self.height)
-                        
-                    }.padding([.horizontal, .vertical])
-                    .frame(width: self.cardWidth, height: self.height)
-                    .cornerRadius(20)
-                    .shadow(radius: 5)
-                    //end of card view
-                }.frame(width: Constants.width)
-                .animation(.default)
-                //end of area around the card vstack
+                            .shadow(radius: 5)
+                            .onTapGesture { self.detailView = true }
+                            .sheet(isPresented: self.$detailView, content: { EventDetailView() }) //end of button
+                    }.frame(width: Constants.width).animation(.default) //end of vstack
             } //end of foreach
         } //end of hstack
         
     }
 }
 
-//PAGECONTROL: shows which card is currently displayed
-struct PageControl : UIViewRepresentable {
-    @Binding var page : Int
+//CARDCONTROL: shows which card is currently displayed
+struct CardControl : UIViewRepresentable {
+    @Binding var card : Int
     
     func makeUIView(context: Context) -> UIPageControl {
-        let pageControl = UIPageControl()
-        pageControl.currentPageIndicatorTintColor = UIColor.black
-        pageControl.pageIndicatorTintColor = UIColor.black.withAlphaComponent(0.25)
-        pageControl.numberOfPages = data.count
-        return pageControl
+        let cardControl = UIPageControl()
+        cardControl.currentPageIndicatorTintColor = UIColor.black
+        cardControl.pageIndicatorTintColor = UIColor.black.withAlphaComponent(0.25)
+        cardControl.numberOfPages = data.count
+        return cardControl
     }
     
     //update page indicator (dots)
     func updateUIView(_ uiView: UIPageControl, context: Context) {
         DispatchQueue.main.async {
-            uiView.currentPage = self.page
+            uiView.currentPage = self.card
         }
     }
 }
@@ -157,9 +156,9 @@ struct Type : Identifiable {
 }
 
 var data = [
-    Type(id: 0, eventName: "Event 1", date: "6/1", time: "9:00am", location: "CUB", category: "test"),
-    Type(id: 1, eventName: "Event 2", date: "6/2", time: "10:00am", location: "Elizabeth Hall", category: "test"),
-    Type(id: 2, eventName: "Event 3", date: "6/3", time: "11:00am", location: "DuPont Ball Library", category: "test"),
-    Type(id: 3, eventName: "Event 4", date: "6/4", time: "5:00pm", location: "Allen Hall", category: "test"),
-    Type(id: 4, eventName: "Event 5", date: "6/5", time: "9:00pm", location: "Stetson Green", category: "test")
+    Type(id: 0, eventName: "Event 1", date: "JUL 1", time: "9:00am", location: "CUB", category: "test"),
+    Type(id: 1, eventName: "Event 2", date: "JUL 2", time: "10:00am", location: "Elizabeth Hall", category: "test"),
+    Type(id: 2, eventName: "Event 3", date: "AUG 3", time: "11:00am", location: "DuPont Ball Library", category: "test"),
+    Type(id: 3, eventName: "Event 4", date: "AUG 4", time: "5:00pm", location: "Allen Hall", category: "test"),
+    Type(id: 4, eventName: "Event 5", date: "SEP 5", time: "9:00pm", location: "Stetson Green", category: "test")
 ]

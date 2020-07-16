@@ -42,8 +42,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         //Keeps List views from having cell dividers
         //UITableView.appearance().allowsSelection = false
         //UITableViewCell.appearance().selectionStyle = .none
-//        UITableView.appearance().separatorStyle = .none
-//        UITableView.appearance().backgroundColor = UIColor.clear
+        UITableView.appearance().separatorStyle = .none
+        UITableView.appearance().backgroundColor = Constants.lightblue//UIColor.blue
         //UITableView.appearance().separatorColor = .clear
         
         //Model Controller initiation

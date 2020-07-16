@@ -13,6 +13,9 @@ import UIKit
 struct Constants {
     static let width = UIScreen.main.bounds.width
     static let height = UIScreen.main.bounds.height
+    
+    static let lightblue = UIColor(red: 63.0/255.0, green: 128.0/255.0, blue: 230.0/255.0, alpha: 0.5)
+    
     //COLORS: IGNORING DARK & LIGHT MODE
     
     //backgrounds e.g. different shades of gray
@@ -24,6 +27,7 @@ struct Constants {
     //static let lightAccent =
     //static let darkAccent =
     
+    //static let stroke =      //most of the time stroke = accent, but not always
     
     //static let mainText =     //used for cells, event detail view, etc.
     //static let supportText =     //used where mainText would match background
