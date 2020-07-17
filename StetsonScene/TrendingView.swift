@@ -106,7 +106,8 @@ struct Cards : View {
                                 //Text
                                 VStack (alignment: .leading) {
                                     Text(event.eventName).fontWeight(.medium).font(.system(size: 40)).padding(.top, 10).foregroundColor(Color(Constants.text1))
-                                    Text(event.date + " | " + event.time).fontWeight(.light).font(.system(size: 25)).padding(.top, 5).padding(.bottom, 5).foregroundColor(Color(Constants.text2))
+                                    //TODO: CHANGE DATESTRING TO MONTH + DAY
+                                    Text(event.dateString + " | " + event.time).fontWeight(.light).font(.system(size: 25)).padding(.top, 5).padding(.bottom, 5).foregroundColor(Color(Constants.text2))
                                     Text(event.location).fontWeight(.light).font(.system(size: 25)).padding(.bottom, 10).foregroundColor(Color(Constants.text2))
                                 }.padding([.horizontal, .vertical])
                                     .frame(width: self.cardWidth, height: self.height*0.4, alignment: .leading)
@@ -121,7 +122,6 @@ struct Cards : View {
                     }.frame(width: Constants.width).animation(.default) //end of vstack
             } //end of foreach
         } //end of hstack
-        
     }
 }
 
@@ -150,16 +150,26 @@ struct CardControl : UIViewRepresentable {
 struct Type : Identifiable {
     var id : Int
     var eventName : String
-    var date : String
+    var dateString : String
+    var date: Date?
+    var month: String?
+    var day: String?
+    var weekday: String?
     var time : String
     var location : String
     var category : String
 }
 
 var data = [
-    Type(id: 0, eventName: "Event 1", date: "JUL 1", time: "9:00am", location: "CUB", category: "test"),
-    Type(id: 1, eventName: "Event 2", date: "JUL 2", time: "10:00am", location: "Elizabeth Hall", category: "test"),
-    Type(id: 2, eventName: "Event 3", date: "AUG 3", time: "11:00am", location: "DuPont Ball Library", category: "test"),
-    Type(id: 3, eventName: "Event 4", date: "AUG 4", time: "5:00pm", location: "Allen Hall", category: "test"),
-    Type(id: 4, eventName: "Event 5", date: "SEP 5", time: "9:00pm", location: "Stetson Green", category: "test")
+    Type(id: 0, eventName: "Event 1", dateString: "7/1/2020", time: "9:00am", location: "CUB", category: "test"),
+    Type(id: 1, eventName: "Event 2", dateString: "7/1/2020", time: "10:00am", location: "Elizabeth Hall", category: "test"),
+    Type(id: 2, eventName: "Event 3", dateString: "7/2/2020", time: "11:00am", location: "DuPont Ball Library", category: "test"),
+    Type(id: 3, eventName: "Event 4", dateString: "7/3/2020", time: "5:00pm", location: "Allen Hall", category: "test"),
+    Type(id: 4, eventName: "Event 1", dateString: "7/17/2020", time: "9:00am", location: "CUB", category: "test"),
+    Type(id: 5, eventName: "Event 2", dateString: "7/7/2020", time: "10:00am", location: "Elizabeth Hall", category: "test"),
+    Type(id: 6, eventName: "Event 3", dateString: "7/18/2020", time: "11:00am", location: "DuPont Ball Library", category: "test"),
+    Type(id: 7, eventName: "Event 4", dateString: "7/19/2020", time: "5:00pm", location: "Allen Hall", category: "test"),
+    Type(id: 8, eventName: "Event 5", dateString: "7/4/2020", time: "9:00pm", location: "Stetson Green", category: "test")
 ]
+
+

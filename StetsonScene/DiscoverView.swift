@@ -64,7 +64,7 @@ struct DiscoverView : View {
             if discoverView == "List" {
                 List {
                     ForEach(data) { event in
-                        DiscoverListCell(event: event).onTapGesture { self.detailView = true }
+                        DiscoverListCell(event: event, context: "List").onTapGesture { self.detailView = true }
                     }.listRowBackground(Color(Constants.accent1))
                 }.sheet(isPresented: $detailView, content: { EventDetailView() })
             } else if discoverView == "Calendar" {
@@ -78,28 +78,28 @@ struct DiscoverView : View {
 //CONTENTS OF EACH EVENT CELL
 struct DiscoverListCell : View {
     var event: Type
+    var context: String
     
     var body: some View {
         ZStack {
             HStack {
                 //Date & Time, Left Side
                 VStack(alignment: .trailing) {
-                    Text(event.date).fontWeight(.medium).font(.system(size: 16)).foregroundColor(Color(Constants.accent1)).padding(.vertical, 5)
-                    Text(event.time).fontWeight(.medium).font(.system(size: 12)).foregroundColor(Color(Constants.text2).opacity(0.5)).padding(.bottom, 5)
+                    //TODO: CHANGE DATESTRING TO MONTH + DAY
+                    Text(event.dateString).fontWeight(.medium).font(.system(size: context == "List" ? 16 : 12)).foregroundColor(Color(Constants.accent1)).padding(.vertical, context == "List" ? 5 : 2)
+                    Text(event.time).fontWeight(.medium).font(.system(size: context == "List" ? 12 : 10)).foregroundColor(Color(Constants.text2).opacity(0.5)).padding(.bottom, context == "List" ? 5 : 2)
                     //Duration?
-                }.frame(width: Constants.width*0.2)
+                }.padding(.horizontal, 5)
                 
                 //Name & Location, Right Side
                 VStack(alignment: .leading) {
-                    Text(event.eventName).fontWeight(.medium).font(.system(size: 22)).lineLimit(1).foregroundColor(Color(Constants.text1)).padding(.vertical, 5)
-                    Text(event.location).fontWeight(.light).font(.system(size: 16)).foregroundColor(Color(Constants.text2).opacity(0.5)).padding(.bottom, 5)
+                    Text(event.eventName).fontWeight(.medium).font(.system(size: context == "List" ? 22 : 16)).lineLimit(1).foregroundColor(Color(Constants.text1)).padding(.vertical, context == "List" ? 5 : 2)
+                    Text(event.location).fontWeight(.light).font(.system(size: context == "List" ? 16 : 12)).foregroundColor(Color(Constants.text2).opacity(0.5)).padding(.bottom, context == "List" ? 5 : 2)
                 }
-                
-                //Fill out rest of cell
-                Spacer()
-                
-            }.padding(([.vertical, .horizontal])) //padding within the cell, between words and borders
-        }.background(RoundedRectangle(cornerRadius: 10).stroke(Color(Constants.accent1)).foregroundColor(Color(Constants.text1)).background(RoundedRectangle(cornerRadius: 10).foregroundColor(Color(Constants.bg2))))
+
+                Spacer() //fill out rest of cell
+            }.padding(.vertical, context == "List" ? 10 : 5).padding(.horizontal, context == "List" ? 10 : 5) //padding within the cell, between words and borders
+            }.background(RoundedRectangle(cornerRadius: 10).stroke(Color(Constants.accent1)).foregroundColor(Color(Constants.text1)).background(RoundedRectangle(cornerRadius: 10).foregroundColor(context == "List" ? Color(Constants.bg2) : Color(Constants.bg1))))
     }
 }
 
