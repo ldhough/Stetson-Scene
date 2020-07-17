@@ -10,6 +10,7 @@ import SwiftUI
 
 //MARK: CALENDARVIEW DISPLAYS MONTHCAROUSEL
 struct CalendarView : View {
+    @State var page: String
     @State var selectedDate: Date = Date()
     @State var month = 0
     @State var detailView: Bool = false
@@ -22,7 +23,11 @@ struct CalendarView : View {
             List {
                 ForEach(data) { event in
                     if self.compareDates(date1: self.selectedDate, date2: self.getEventDate(event: event)) {
-                        DiscoverListCell(event: event, context: "Calendar").onTapGesture { self.detailView = true }
+                        if self.page == "Favorites" && event.favorite {
+                            DiscoverListCell(event: event, context: "Calendar").onTapGesture { self.detailView = true }
+                        } else if self.page == "Discover" {
+                            DiscoverListCell(event: event, context: "Calendar").onTapGesture { self.detailView = true }
+                        }
                     }
                 }.padding(.horizontal, 10).listRowBackground(Color(Constants.accent1))
             }.frame(alignment: .center).sheet(isPresented: $detailView, content: { EventDetailView() })

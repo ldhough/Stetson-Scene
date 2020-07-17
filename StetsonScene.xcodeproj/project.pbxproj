@@ -26,8 +26,7 @@
 		3C4D64FE24BF3F4900477A22 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3C4D64FD24BF3F4900477A22 /* GoogleService-Info.plist */; };
 		3C7A740B24BF5CF7005DA0B1 /* ViewRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A740A24BF5CF7005DA0B1 /* ViewRouter.swift */; };
 		3C7A740D24BF5E01005DA0B1 /* TrendingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A740C24BF5E01005DA0B1 /* TrendingView.swift */; };
-		3C7A740F24BF5E16005DA0B1 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A740E24BF5E16005DA0B1 /* DiscoverView.swift */; };
-		3C7A741124BF68C5005DA0B1 /* FavoriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A741024BF68C5005DA0B1 /* FavoriteView.swift */; };
+		3C7A740F24BF5E16005DA0B1 /* DiscoverFavoritesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A740E24BF5E16005DA0B1 /* DiscoverFavoritesView.swift */; };
 		3C7A741324BF68E8005DA0B1 /* InformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A741224BF68E8005DA0B1 /* InformationView.swift */; };
 		3C90E495248C867800427FFB /* RecommendationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C90E494248C867800427FFB /* RecommendationView.swift */; };
 		3CBC5FA123EB9BA800111972 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CBC5FA023EB9BA800111972 /* MainView.swift */; };
@@ -70,8 +69,7 @@
 		3C7A740824BF4068005DA0B1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3C7A740A24BF5CF7005DA0B1 /* ViewRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewRouter.swift; sourceTree = "<group>"; };
 		3C7A740C24BF5E01005DA0B1 /* TrendingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingView.swift; sourceTree = "<group>"; };
-		3C7A740E24BF5E16005DA0B1 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
-		3C7A741024BF68C5005DA0B1 /* FavoriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteView.swift; sourceTree = "<group>"; };
+		3C7A740E24BF5E16005DA0B1 /* DiscoverFavoritesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverFavoritesView.swift; sourceTree = "<group>"; };
 		3C7A741224BF68E8005DA0B1 /* InformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InformationView.swift; sourceTree = "<group>"; };
 		3C90E494248C867800427FFB /* RecommendationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecommendationView.swift; sourceTree = "<group>"; };
 		3CBC5FA023EB9BA800111972 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
@@ -147,11 +145,10 @@
 				3CBC5FA023EB9BA800111972 /* MainView.swift */,
 				3C7A740A24BF5CF7005DA0B1 /* ViewRouter.swift */,
 				3C7A740C24BF5E01005DA0B1 /* TrendingView.swift */,
-				3C7A740E24BF5E16005DA0B1 /* DiscoverView.swift */,
+				3C7A740E24BF5E16005DA0B1 /* DiscoverFavoritesView.swift */,
 				3C290C2224BFD677008D83F0 /* CalendarView.swift */,
 				3C290C2024BFCEE1008D83F0 /* EventDetailView.swift */,
 				3C290C1E24BFCE54008D83F0 /* FilterView.swift */,
-				3C7A741024BF68C5005DA0B1 /* FavoriteView.swift */,
 				3C7A741224BF68E8005DA0B1 /* InformationView.swift */,
 				3C23C9C924699902003E254D /* Constants.swift */,
 				48F41C19245A419E0071E13E /* InformationView2.swift */,
@@ -331,7 +328,7 @@
 				3C7A740D24BF5E01005DA0B1 /* TrendingView.swift in Sources */,
 				3C0F523F23EDC32100C91790 /* SearchEventFormView.swift in Sources */,
 				3C290C1F24BFCE54008D83F0 /* FilterView.swift in Sources */,
-				3C7A740F24BF5E16005DA0B1 /* DiscoverView.swift in Sources */,
+				3C7A740F24BF5E16005DA0B1 /* DiscoverFavoritesView.swift in Sources */,
 				3C0F523D23EDC29900C91790 /* EventViewController.swift in Sources */,
 				48D22139240615520051A66D /* ContentView.swift in Sources */,
 				4806CA86244A7984004B010C /* MapNavView.swift in Sources */,
@@ -345,7 +342,6 @@
 				3C90E495248C867800427FFB /* RecommendationView.swift in Sources */,
 				4898798523F456F100062714 /* EventListView.swift in Sources */,
 				483ACD85242A970C003E2DE6 /* RecommendationEngine.swift in Sources */,
-				3C7A741124BF68C5005DA0B1 /* FavoriteView.swift in Sources */,
 				3CF31B8E246A338200840E3F /* TourModeDetailView.swift in Sources */,
 				4898798323F1A9FD00062714 /* PersistentData.xcdatamodeld in Sources */,
 				3C0F524023EDC32100C91790 /* SearchFormView.swift in Sources */,

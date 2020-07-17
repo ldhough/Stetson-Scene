@@ -1,5 +1,5 @@
 //
-//  DiscoverView.swift
+//  DiscoverFavoritesView.swift
 //  StetsonScene
 //
 //  Created by Madison Gipson on 7/15/20.
@@ -9,9 +9,10 @@
 import Foundation
 import SwiftUI
 
-struct DiscoverView : View {
+struct DiscoverFavoritesView : View { 
     @EnvironmentObject var viewRouter: ViewRouter
-    @State var discoverView: String = "List"
+    @State var page: String
+    @State var tab: String = "List"
     @State var filterApplied: Bool = false
     @State var filterView: Bool = false
     @State var detailView: Bool = false
@@ -21,14 +22,16 @@ struct DiscoverView : View {
             //HEADER
             HStack {
                 //Title
-                Text("Discover").fontWeight(.heavy).font(.system(size: 50)).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(Color(Constants.text1))
+                Text(page).fontWeight(.heavy).font(.system(size: 50)).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(Color(Constants.text1))
                 
                 //Filter Button
+                if page == "Discover" {
                 Image(systemName: "line.horizontal.3.decrease.circle")
                 .resizable().frame(width: 25, height: 25).padding(.trailing, 10)
                     .foregroundColor(filterApplied ? Color(Constants.accent1) : Color(Constants.text2))
                 .onTapGesture { self.filterView = true }
                 .sheet(isPresented: $filterView, content: { FilterView() })
+                }
                 
                 //Quick Search Button
                 Image(systemName: "magnifyingglass")
@@ -42,33 +45,37 @@ struct DiscoverView : View {
                 
                 //List Tab (order of attributes matters)
                 Text("List").fontWeight(.light).font(.system(size: 20))
-                    .foregroundColor(discoverView == "List" ? Color(Constants.bg2) : Color(Constants.accent1)).padding(.vertical, 10)
+                    .foregroundColor(tab == "List" ? Color(Constants.bg2) : Color(Constants.accent1)).padding(.vertical, 10)
                 .frame(width: Constants.width*0.45)
-                .background(discoverView == "List" ? Color(Constants.accent1) : Color(Constants.bg2))
+                .background(tab == "List" ? Color(Constants.accent1) : Color(Constants.bg2))
                 .cornerRadius(radius: 10, corners: [.topLeft, .topRight])
-                .onTapGesture { self.discoverView = "List" }
+                .onTapGesture { self.tab = "List" }
                 
                 //Calendar Tab
                 Text("Calendar").fontWeight(.light).font(.system(size: 20))
-                .foregroundColor(discoverView == "Calendar" ? Color(Constants.bg2) : Color(Constants.accent1)).padding(.vertical, 10)
+                .foregroundColor(tab == "Calendar" ? Color(Constants.bg2) : Color(Constants.accent1)).padding(.vertical, 10)
                 .frame(width: Constants.width*0.45)
-                .background(discoverView == "Calendar" ? Color(Constants.accent1): Color(Constants.bg2))
+                .background(tab == "Calendar" ? Color(Constants.accent1): Color(Constants.bg2))
                 .cornerRadius(radius: 10, corners: [.topLeft, .topRight])
-                .onTapGesture { self.discoverView = "Calendar" }
+                .onTapGesture { self.tab = "Calendar" }
             }
             
             //SMALL SPACER
             Rectangle().frame(width: Constants.width, height: 8).foregroundColor(Color(Constants.accent1))
             
             //LIST OR CALENDAR VIEW
-            if discoverView == "List" {
+            if tab == "List" {
                 List {
                     ForEach(data) { event in
-                        DiscoverListCell(event: event, context: "List").onTapGesture { self.detailView = true }
+                        if self.page == "Favorites" && event.favorite {
+                            DiscoverListCell(event: event, context: "List").onTapGesture { self.detailView = true }
+                        } else if self.page == "Discover" {
+                            DiscoverListCell(event: event, context: "List").onTapGesture { self.detailView = true }
+                        }
                     }.listRowBackground(Color(Constants.accent1))
                 }.sheet(isPresented: $detailView, content: { EventDetailView() })
-            } else if discoverView == "Calendar" {
-                CalendarView()
+            } else if tab == "Calendar" {
+                CalendarView(page: self.page)
             }
             
         }//.background(Color(Constants.bg1))//end of largest VStack

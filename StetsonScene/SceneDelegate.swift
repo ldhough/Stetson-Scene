@@ -79,7 +79,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         //SwiftUI root view
         //let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        let contentView = HomeViewController(/*eventModelController: self.eventModelController, event: self.event, landmarkSupport: landmarkSupport*//*, helperClass: self.wheelNavigation*/)//.environment(\.managedObjectContext, context)
+        let contentView = MainView(/*eventModelController: self.eventModelController, event: self.event, landmarkSupport: landmarkSupport*//*, helperClass: self.wheelNavigation*/)//.environment(\.managedObjectContext, context)
         
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)

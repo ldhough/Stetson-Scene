@@ -1,0 +1,40 @@
+//
+//  RKViewController.swift
+//  RKCalendar
+//
+//  Created by Raffi Kian on 7/14/19.
+//  Copyright © 2019 Raffi Kian. All rights reserved.
+//
+
+import SwiftUI
+
+struct RKViewController: View {
+    
+    @Binding var isPresented: Bool
+    @State var selectedDate: Date!
+    var minimumDate: Date
+    var maximumDate: Date
+    //@Published var calendar = Calendar.current
+    
+    var body: some View {
+            List {
+                ForEach(0..<numberOfMonths()) { index in
+                    RKMonth(isPresented: self.$isPresented, selectedDate: self.$selectedDate, minimumDate: self.minimumDate, maximumDate: self.maximumDate, monthOffset: index)
+                }
+                Divider()
+            }
+    }
+    
+    func numberOfMonths() -> Int {
+        return Calendar.current.dateComponents([.month], from:minimumDate, to: RKMaximumDateMonthLastDay()).month! + 1
+    }
+    
+    func RKMaximumDateMonthLastDay() -> Date {
+        var components = Calendar.current.dateComponents([.year, .month, .day], from: maximumDate)
+        components.month! += 1
+        components.day = 0
+        
+        return Calendar.current.date(from: components)!
+    }
+}
+

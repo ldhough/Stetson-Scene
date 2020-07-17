@@ -1,0 +1,66 @@
+//
+//  RKCell.swift
+//  RKCalendar
+//
+//  Created by Raffi Kian on 7/14/19.
+//  Copyright © 2019 Raffi Kian. All rights reserved.
+//
+
+import SwiftUI
+
+struct RKCell: View {
+    
+    var rkDate: RKDate
+    var cellWidth: CGFloat
+    
+    var body: some View {
+        Text(rkDate.formatDate(date: rkDate.date, calendar: Calendar.current))
+            .fontWeight(Font.Weight.medium)
+            .foregroundColor(Color.blue)
+            .frame(width: cellWidth, height: cellWidth)
+            .font(.system(size: 20))
+            .background(Color.white)
+            .cornerRadius(cellWidth/2)
+    }
+}
+
+
+
+
+
+
+//
+//  RKDate.swift
+//  RKCalendar
+//
+//  Created by Raffi Kian on 7/14/19.
+//  Copyright © 2019 Raffi Kian. All rights reserved.
+//
+
+import SwiftUI
+
+struct RKDate {
+    
+    var date: Date
+    var isToday: Bool = false
+    var isSelected: Bool = false
+    
+    init(date: Date,isToday: Bool, isSelected: Bool) {
+        self.date = date
+        self.isToday = isToday
+        self.isSelected = isSelected
+    }
+    
+    // MARK: - Date Formats
+    
+    func formatDate(date: Date, calendar: Calendar) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = .current
+        formatter.dateFormat = "d"
+        if formatter.calendar != calendar {
+            formatter.calendar = calendar
+        }
+        return formatter.string(from: date)
+    }
+}
+

@@ -8,11 +8,13 @@
 import Foundation
 import SwiftUI
 import UIKit
-import SceneKit
-import ARKit
-import ARCL
-import CoreLocation
-import MapKit
+//import SceneKit
+//import ARKit
+//import ARCL
+//import CoreLocation
+//import MapKit
+import Combine
+
 
 ///UIViewControllerRepresentable builds on View, struct is used inside SwiftUI view, view's body is ViewController - shows what UI kit sends back.
 //struct NavigationIndicator: UIViewControllerRepresentable {
@@ -48,36 +50,46 @@ import MapKit
 //    }
 //}
 
+class ViewRouter: ObservableObject {
+    let objectWillChange = PassthroughSubject<ViewRouter,Never>()
+    var currentPage: String = "Trending" {
+        didSet {
+            objectWillChange.send(self)
+        }
+    }
+}
+
 
 struct MainView : View {
     @EnvironmentObject var viewRouter: ViewRouter
     
     var body: some View {
-        ZStack {
+        ZStack { 
             Color(Constants.bg1).edgesIgnoringSafeArea(.all)
-        VStack(spacing: 0){
-            if viewRouter.currentPage == "Trending" {
-                TrendingView()
-            } else if viewRouter.currentPage == "Discover" {
-                DiscoverView()
-            } else if viewRouter.currentPage == "Favorites" {
-                FavoriteView()
-            } else if viewRouter.currentPage == "Information" {
-                InformationView()
-            }
-            
-            TabBar()
-        }.edgesIgnoringSafeArea(.bottom)
+            VStack(spacing: 0){
+                if viewRouter.currentPage == "Trending" {
+                    TrendingView()
+                } else if viewRouter.currentPage == "Discover" {
+                    DiscoverFavoritesView(page: "Discover")
+                } else if viewRouter.currentPage == "Favorites" {
+                    DiscoverFavoritesView(page: "Favorites")
+                } else if viewRouter.currentPage == "Information" {
+                    InformationView()
+                }
+                
+                TabBar()
+                
+            }.edgesIgnoringSafeArea(.bottom)
             
         }.animation(.spring())
     }
 }
 
 struct TabBar : View {
-    
     @EnvironmentObject var viewRouter: ViewRouter
     
     var body: some View {
+        //ZStack {
         HStack(spacing: 20){
             //Trending
             HStack {
@@ -112,123 +124,36 @@ struct TabBar : View {
                 .clipShape(Capsule())
                 .onTapGesture { self.viewRouter.currentPage = "Information" }
         }.padding(.vertical, 5)
-        .frame(width: Constants.width)
-        .background(Color(Constants.bg2))
-        .animation(.default)
+            .frame(width: Constants.width)
+            .background(Color(Constants.bg2))
+            .animation(.default)
     }
 }
 
-struct HomeViewController: View/*, UIViewControllerRepresentable*/ {
-    //    @ObservedObject var eventModelController:EventModelController
-    //    @Environment(\.colorScheme) var colorScheme
-    //    var event:EventInstance
-    //    @ObservedObject var landmarkSupport:LandmarkSupport //new
-    //    @State var page:String = "Event List"
-    //    @State var icon:String = "calendar"
-    //    @State var selectScreen:Bool = false
-    //    @State private var rightSide:Bool = true
-    //    @State private var xOffset:CGFloat = 0
-    //    @State private var yOffset:CGFloat = 0
-    //    @State private var animationAmount = 0.0
-    //    var menuDrag: some Gesture {
-    //        DragGesture().onChanged { value in
-    //            self.xOffset = value.location.x
-    //            self.yOffset = value.location.y
-    //        }.onEnded { value in
-    //            if (self.rightSide && value.translation.width < -(Constants.screenSize.width*0.5)) ||
-    //                (!self.rightSide && value.translation.width > Constants.screenSize.width*0.5){
-    //                self.rightSide.toggle()
-    //            }
-    //            self.xOffset = 0
-    //            self.yOffset = 0
-    //        }
-    //    }
-    
-    var body: some View {
-        Text("Hello")
-        //        ZStack(alignment: rightSide ? .bottomTrailing : .bottomLeading) {
-        //            (colorScheme == .dark ? Constants.darkGray : Color.white).edgesIgnoringSafeArea(.all)
-        //            VStack {
-        //                if page == "Event List" {
-        //                    EventViewController(eventModelController: self.eventModelController)
-        //                }
-        //                if page == "AR" {
-        //                    NavigationIndicator(eventModelController: self.eventModelController, event: self.event, mode: "tour").edgesIgnoringSafeArea(.all)
-        //                }
-        //                if page == "Map" {
-        //                    ContentView(landmarkSupport: self.landmarkSupport, eventModelController: self.eventModelController).edgesIgnoringSafeArea(.all) //landmark support new
-        //                }
-        //                if page == "Favorite List" {
-        //                    FavoriteView(eventModelController: self.eventModelController)
-        //                }
-        //                if page == "Information View"  {
-        //                    InformationView(eventModelController: self.eventModelController)
-        //                }
-        //            }
-        //            ZStack {
-        //                VStack {
-        //                    if !self.eventModelController.navMap && !self.eventModelController.navAR && self.eventModelController.dataReturnedFromSnapshot {
-        //                    if selectScreen {
-        //                        Button(action: {
-        //                            self.page = "Information View"
-        //                            self.icon = "info.circle"
-        //                        }) {
-        //                            Image(systemName: "info.circle").resizable().frame(width: Constants.screenSize.width*0.07, height: Constants.screenSize.width*0.07)
-        //                            }.buttonStyle(PageButtonStyle(colorScheme: self._colorScheme)).background(Constants.light).cornerRadius(15)
-        //                        if self.eventModelController.eventMode {
-        //                            Button(action: {
-        //                                self.page = "Favorite List"
-        //                                self.eventModelController.retrieveFavoriteFirebaseData()
-        //                                self.eventModelController.recommendationEngine.runRecommendationEngine()
-        //                                self.icon = "heart"
-        //                            }) {
-        //                                Image(systemName: "heart").resizable().frame(width: Constants.screenSize.width*0.07, height: Constants.screenSize.width*0.07)
-        //                                }.buttonStyle(PageButtonStyle(colorScheme: self._colorScheme)).background(Constants.lightmed).cornerRadius(15)
-        //                        }
-        //                        Button(action: {
-        //                            self.page = "AR"
-        //                            self.icon = "arkit"
-        //                        }) {
-        //                            Image(systemName: "arkit").resizable().frame(width: Constants.screenSize.width*0.07, height: Constants.screenSize.width*0.07)
-        //                            }.buttonStyle(PageButtonStyle(colorScheme: self._colorScheme)).background(Constants.med).cornerRadius(15)
-        //                        Button(action: {
-        //                            self.landmarkSupport.createAllNodes() //new
-        //                            self.page = "Map"
-        //                            self.icon = "mappin.and.ellipse"
-        //                        }) {
-        //                            Image(systemName: "mappin.and.ellipse").resizable().frame(width: Constants.screenSize.width*0.07, height: Constants.screenSize.width*0.07)
-        //                        }.buttonStyle(PageButtonStyle(colorScheme: self._colorScheme)).background(self.eventModelController.eventMode ? Constants.darkmed : Constants.dark).cornerRadius(15)
-        //                        if self.eventModelController.eventMode {
-        //                            Button(action: {
-        //                                self.page = "Event List"
-        //                                self.icon = "calendar"
-        //                            }) {
-        //                                Image(systemName: "calendar").resizable().frame(width: Constants.screenSize.width*0.07, height: Constants.screenSize.width*0.07)
-        //                            }.buttonStyle(PageButtonStyle(colorScheme: self._colorScheme)).background(Constants.dark).cornerRadius(15)
-        //                        }
-        //                    }
-        //                    //current screen
-        //                    Button(action: {
-        //                        self.selectScreen.toggle()
-        //                    }) {
-        //                        ZStack {
-        //                            LinearGradient(gradient: .init(colors: [Constants.dark, Constants.light]), startPoint: .topTrailing, endPoint: .bottomLeading).mask(RoundedRectangle(cornerRadius: 15)).frame(width: Constants.screenSize.width*0.12, height: Constants.screenSize.width*0.12)
-        //                            Image(systemName: selectScreen ? "chevron.up" : icon).resizable().foregroundColor(colorScheme == .dark ? Constants.darkGray : Color.white).frame(width: Constants.screenSize.width*0.07, height: selectScreen ? Constants.screenSize.width*0.02 : Constants.screenSize.width*0.07)
-        //                        }
-        //                    }.animation(.spring()).gesture(menuDrag)
-        //                }//if end
-        //                }.offset(x: xOffset, y: yOffset).padding([Constants.screenSize.height < 700 ? .all : (rightSide ? .trailing : .leading)]).animation(.spring()).gesture(menuDrag) //VStack end
-        //            }//ZStack end
-        //            if !self.eventModelController.hasFirebaseConnection {
-        //                ZStack {
-        //                    Rectangle().foregroundColor(colorScheme == .dark ? Constants.darkGray : Color.white).edgesIgnoringSafeArea(.all)
-        //                    VStack {
-        //                        Text("Cannot connect to the server :(").foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-        //                        Text("Find internet or try again later!").foregroundColor(colorScheme == .dark ? Color.white : Color.black)
-        //                    }
-        //                }
-        //            }
-        //
-        //        } //ZStack end
-    }//View end
-}//Struct end
+//TESTING PURPOSES ONLY- WILL PULL FROM EVENT OBJECT LATER
+struct Type : Identifiable {
+    var id : Int
+    var eventName : String
+    var dateString : String
+    var date: Date?
+    var month: String?
+    var day: String?
+    var weekday: String?
+    var time : String
+    var location : String
+    var category : String
+    var favorite: Bool
+}
+
+var data = [
+    Type(id: 0, eventName: "Event 1", dateString: "7/1/2020", time: "9:00am", location: "CUB", category: "test", favorite: true),
+    Type(id: 1, eventName: "Event 2", dateString: "7/1/2020", time: "10:00am", location: "Elizabeth Hall", category: "test", favorite: true),
+    Type(id: 2, eventName: "Event 3", dateString: "7/2/2020", time: "11:00am", location: "DuPont Ball Library", category: "test", favorite: true),
+    Type(id: 3, eventName: "Event 4", dateString: "7/3/2020", time: "5:00pm", location: "Allen Hall", category: "test", favorite: true),
+    Type(id: 4, eventName: "Event 5", dateString: "7/17/2020", time: "9:00am", location: "CUB", category: "test", favorite: true),
+    Type(id: 5, eventName: "Event 6", dateString: "7/7/2020", time: "10:00am", location: "Elizabeth Hall", category: "test", favorite: false),
+    Type(id: 6, eventName: "Event 7", dateString: "7/18/2020", time: "11:00am", location: "DuPont Ball Library", category: "test", favorite: false),
+    Type(id: 7, eventName: "Event 8", dateString: "7/19/2020", time: "5:00pm", location: "Allen Hall", category: "test", favorite: false),
+    Type(id: 8, eventName: "Event 9", dateString: "7/4/2020", time: "9:00pm", location: "Stetson Green", category: "test", favorite: false),
+    Type(id: 9, eventName: "Event 10", dateString: "7/4/2020", time: "7:00pm", location: "Stetson Green", category: "test", favorite: false)
+]
