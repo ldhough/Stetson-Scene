@@ -32,6 +32,7 @@ extension SceneDelegate: UIGestureRecognizerDelegate {
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    var viewRouter: ViewRouter!
     //var eventModelController:EventModelController!
     //var event:EventInstance!
     //var wheelNavigation:WheelNavigation!
@@ -39,11 +40,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     ///Establishes our Model Controller & Root View.  Starts the passing of our model controller around our views.
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
 
+        self.viewRouter = ViewRouter()
+        
         //Keeps List views from having cell dividers
         //UITableView.appearance().allowsSelection = false
         //UITableViewCell.appearance().selectionStyle = .none
         UITableView.appearance().separatorStyle = .none
-        UITableView.appearance().backgroundColor = Constants.accent1//UIColor.blue
+        UITableView.appearance().backgroundColor = viewRouter.page == "Favorites" ? Constants.accent1 : UIColor.clear
         //UITableView.appearance().separatorColor = .clear
         
         //Model Controller initiation

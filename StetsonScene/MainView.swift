@@ -52,7 +52,12 @@ import Combine
 
 class ViewRouter: ObservableObject {
     let objectWillChange = PassthroughSubject<ViewRouter,Never>()
-    var currentPage: String = "Trending" {
+    var page: String = "Trending" {
+        didSet {
+            objectWillChange.send(self)
+        }
+    }
+    var subPage: String = "List" {
         didSet {
             objectWillChange.send(self)
         }
@@ -64,16 +69,14 @@ struct MainView : View {
     @EnvironmentObject var viewRouter: ViewRouter
     
     var body: some View {
-        ZStack { 
-            Color(Constants.bg1).edgesIgnoringSafeArea(.all)
+        ZStack {
+            Color(viewRouter.page == "Favorites" ? Constants.accent1 : Constants.bg1).edgesIgnoringSafeArea(.all)
             VStack(spacing: 0){
-                if viewRouter.currentPage == "Trending" {
+                if viewRouter.page == "Trending" {
                     TrendingView()
-                } else if viewRouter.currentPage == "Discover" {
-                    DiscoverFavoritesView(page: "Discover")
-                } else if viewRouter.currentPage == "Favorites" {
-                    DiscoverFavoritesView(page: "Favorites")
-                } else if viewRouter.currentPage == "Information" {
+                } else if viewRouter.page == "Discover" || viewRouter.page == "Favorites" {
+                    DiscoverFavoritesView()
+                } else if viewRouter.page == "Information" {
                     InformationView()
                 }
                 
@@ -87,46 +90,137 @@ struct MainView : View {
 
 struct TabBar : View {
     @EnvironmentObject var viewRouter: ViewRouter
+    @State var showOptions = false
     
     var body: some View {
-        //ZStack {
+        ZStack {
         HStack(spacing: 20){
             //Trending
             HStack {
-                Image(systemName: "hand.thumbsup").resizable().frame(width: 20, height: 20).foregroundColor(viewRouter.currentPage == "Trending" ? Color(Constants.bg2) : Color(Constants.text2))
-                Text(viewRouter.currentPage == "Trending" ? viewRouter.currentPage : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color(Constants.bg2))
+                Image(systemName: "hand.thumbsup").resizable().frame(width: 20, height: 20).foregroundColor(viewRouter.page == "Trending" ? Color(Constants.bg2) : Color(Constants.text2))
+                Text(viewRouter.page == "Trending" ? viewRouter.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color(Constants.bg2))
             }.padding(15)
-                .background(viewRouter.currentPage == "Trending" ? Color(Constants.accent1) : Color.clear)
+                .background(viewRouter.page == "Trending" ? Color(Constants.accent1) : Color.clear)
                 .clipShape(Capsule())
-                .onTapGesture { self.viewRouter.currentPage = "Trending" }
+                .onTapGesture {
+                    self.viewRouter.page = "Trending"
+                    self.showOptions = false
+                }
             //Discover
             HStack {
-                Image(systemName: "magnifyingglass").resizable().frame(width: 20, height: 20).foregroundColor(viewRouter.currentPage == "Discover" ? Color(Constants.bg2) : Color(Constants.text2))
-                Text(viewRouter.currentPage == "Discover" ? viewRouter.currentPage : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color(Constants.bg2))
+                Image(systemName: "magnifyingglass").resizable().frame(width: 20, height: 20).foregroundColor(viewRouter.page == "Discover" ? Color(Constants.bg2) : Color(Constants.text2))
+                Text(viewRouter.page == "Discover" ? viewRouter.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color(Constants.bg2))
             }.padding(15)
-                .background(viewRouter.currentPage == "Discover" ? Color(Constants.accent1) : Color.clear)
+                .background(viewRouter.page == "Discover" ? Color(Constants.accent1) : Color.clear)
                 .clipShape(Capsule())
-                .onTapGesture { self.viewRouter.currentPage = "Discover" }
+                .onTapGesture {
+                    if self.viewRouter.page == "Discover" {
+                        self.showOptions.toggle()
+                    } else {
+                        self.viewRouter.subPage = "List"
+                        self.showOptions = true
+                    }
+                    self.viewRouter.page = "Discover"
+                }
             //Favorites
             HStack {
-                Image(systemName: "heart").resizable().frame(width: 20, height: 20).foregroundColor(viewRouter.currentPage == "Favorites" ? Color(Constants.bg2) : Color(Constants.text2))
-                Text(viewRouter.currentPage == "Favorites" ? viewRouter.currentPage : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color(Constants.bg2))
+                Image(systemName: "heart").resizable().frame(width: 20, height: 20).foregroundColor(viewRouter.page == "Favorites" ? Color(Constants.bg2) : Color(Constants.text2))
+                Text(viewRouter.page == "Favorites" ? viewRouter.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color(Constants.bg2))
             }.padding(15)
-                .background(viewRouter.currentPage == "Favorites" ? Color(Constants.accent1) : Color.clear)
+                .background(viewRouter.page == "Favorites" ? Color(Constants.accent1) : Color.clear)
                 .clipShape(Capsule())
-                .onTapGesture { self.viewRouter.currentPage = "Favorites" }
+                .onTapGesture {
+                    if self.viewRouter.page == "Favorites" {
+                        self.showOptions.toggle()
+                    } else {
+                        self.viewRouter.subPage = "List"
+                        self.showOptions = true
+                    }
+                    self.viewRouter.page = "Favorites"
+                }
             //Info
             HStack {
-                Image(systemName: "info.circle").resizable().frame(width: 20, height: 20).foregroundColor(viewRouter.currentPage == "Information" ? Color(Constants.bg2) : Color(Constants.text2))
-                Text(viewRouter.currentPage == "Information" ? viewRouter.currentPage : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color(Constants.bg2))
+                Image(systemName: "info.circle").resizable().frame(width: 20, height: 20).foregroundColor(viewRouter.page == "Information" ? Color(Constants.bg2) : Color(Constants.text2))
+                Text(viewRouter.page == "Information" ? viewRouter.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color(Constants.bg2))
             }.padding(15)
-                .background(viewRouter.currentPage == "Information" ? Color(Constants.accent1) : Color.clear)
+                .background(viewRouter.page == "Information" ? Color(Constants.accent1) : Color.clear)
                 .clipShape(Capsule())
-                .onTapGesture { self.viewRouter.currentPage = "Information" }
+                .onTapGesture {
+                    self.viewRouter.page = "Information"
+                    self.showOptions = false
+                }
         }.padding(.vertical, 5)
             .frame(width: Constants.width)
             .background(Color(Constants.bg2))
-            .animation(.default)
+            .animation(.default) //hstack end
+
+        //other tabs
+        if self.showOptions {
+            TabOptions(showOptions: self.$showOptions)
+                .offset(x: self.viewRouter.page == "Discover" ? -Constants.width/10 : Constants.width/10, y: -Constants.height/10)
+        }
+            
+        }//zstack end
+    }
+}
+
+struct TabOptions: View {
+    @EnvironmentObject var viewRouter: ViewRouter
+    @Binding var showOptions:Bool
+    
+    var body: some View {
+        HStack {
+            //List
+            ZStack {
+                Image(systemName: "list.bullet")
+                .resizable().frame(width: 20, height: 20)
+                .foregroundColor(self.viewRouter.page == "Discover" ? Color(Constants.bg2) : Color(Constants.accent1))
+            }.padding(15)
+            .background(self.viewRouter.page == "Discover" ? Color(Constants.accent1) : Color(Constants.bg2))
+            .clipShape(Circle())
+            .onTapGesture {
+                self.viewRouter.subPage = "List"
+                self.showOptions = false
+            }
+            //Calendar
+            ZStack {
+                Image(systemName: "calendar")
+                .resizable().frame(width: 20, height: 20)
+                .foregroundColor(self.viewRouter.page == "Discover" ? Color(Constants.bg2) : Color(Constants.accent1))
+            }.padding(15)
+            .background(self.viewRouter.page == "Discover" ? Color(Constants.accent1) : Color(Constants.bg2))
+            .clipShape(Circle())
+            .offset(y: -Constants.height/18)
+            .onTapGesture {
+                self.viewRouter.subPage = "Calendar"
+                self.showOptions = false
+            }
+            //AR
+            ZStack {
+                Image(systemName: "camera")
+                .resizable().frame(width: 22, height: 18)
+                .foregroundColor(self.viewRouter.page == "Discover" ? Color(Constants.bg2) : Color(Constants.accent1))
+            }.padding(15)
+            .background(self.viewRouter.page == "Discover" ? Color(Constants.accent1) : Color(Constants.bg2))
+            .clipShape(Circle())
+            .offset(y: -Constants.height/18)
+            .onTapGesture {
+                self.viewRouter.subPage = "AR"
+                self.showOptions = false
+            }
+            //Map
+            ZStack {
+                Image(systemName: "mappin.and.ellipse")
+                .resizable().frame(width: 20, height: 22)
+                .foregroundColor(self.viewRouter.page == "Discover" ? Color(Constants.bg2) : Color(Constants.accent1))
+            }.padding(15)
+            .background(self.viewRouter.page == "Discover" ? Color(Constants.accent1) : Color(Constants.bg2))
+            .clipShape(Circle())
+            .onTapGesture {
+                self.viewRouter.subPage = "Map"
+                self.showOptions = false
+            }
+        }
     }
 }
 
@@ -143,17 +237,18 @@ struct Type : Identifiable {
     var location : String
     var category : String
     var favorite: Bool
+    var trending: Bool
 }
 
 var data = [
-    Type(id: 0, eventName: "Event 1", dateString: "7/1/2020", time: "9:00am", location: "CUB", category: "test", favorite: true),
-    Type(id: 1, eventName: "Event 2", dateString: "7/1/2020", time: "10:00am", location: "Elizabeth Hall", category: "test", favorite: true),
-    Type(id: 2, eventName: "Event 3", dateString: "7/2/2020", time: "11:00am", location: "DuPont Ball Library", category: "test", favorite: true),
-    Type(id: 3, eventName: "Event 4", dateString: "7/3/2020", time: "5:00pm", location: "Allen Hall", category: "test", favorite: true),
-    Type(id: 4, eventName: "Event 5", dateString: "7/17/2020", time: "9:00am", location: "CUB", category: "test", favorite: true),
-    Type(id: 5, eventName: "Event 6", dateString: "7/7/2020", time: "10:00am", location: "Elizabeth Hall", category: "test", favorite: false),
-    Type(id: 6, eventName: "Event 7", dateString: "7/18/2020", time: "11:00am", location: "DuPont Ball Library", category: "test", favorite: false),
-    Type(id: 7, eventName: "Event 8", dateString: "7/19/2020", time: "5:00pm", location: "Allen Hall", category: "test", favorite: false),
-    Type(id: 8, eventName: "Event 9", dateString: "7/4/2020", time: "9:00pm", location: "Stetson Green", category: "test", favorite: false),
-    Type(id: 9, eventName: "Event 10", dateString: "7/4/2020", time: "7:00pm", location: "Stetson Green", category: "test", favorite: false)
+    Type(id: 0, eventName: "Event 1", dateString: "7/1/2020", time: "9:00am", location: "CUB", category: "test", favorite: true, trending: false),
+    Type(id: 1, eventName: "Event 2", dateString: "7/1/2020", time: "10:00am", location: "Elizabeth Hall", category: "test", favorite: true, trending: true),
+    Type(id: 2, eventName: "Event 3", dateString: "7/2/2020", time: "11:00am", location: "DuPont Ball Library", category: "test", favorite: true, trending: false),
+    Type(id: 3, eventName: "Event 4", dateString: "7/3/2020", time: "5:00pm", location: "Allen Hall", category: "test", favorite: true, trending: true),
+    Type(id: 4, eventName: "Event 5", dateString: "7/17/2020", time: "9:00am", location: "CUB", category: "test", favorite: true, trending: false),
+    Type(id: 5, eventName: "Event 6", dateString: "7/7/2020", time: "10:00am", location: "Elizabeth Hall", category: "test", favorite: false, trending: true),
+    Type(id: 6, eventName: "Event 7", dateString: "7/18/2020", time: "11:00am", location: "DuPont Ball Library", category: "test", favorite: false, trending: false),
+    Type(id: 7, eventName: "Event 8", dateString: "7/19/2020", time: "5:00pm", location: "Allen Hall", category: "test", favorite: false, trending: true),
+    Type(id: 8, eventName: "Event 9", dateString: "7/4/2020", time: "9:00pm", location: "Stetson Green", category: "test", favorite: false, trending: false),
+    Type(id: 9, eventName: "Event 10", dateString: "7/4/2020", time: "7:00pm", location: "Stetson Green", category: "test", favorite: false, trending: true)
 ]
