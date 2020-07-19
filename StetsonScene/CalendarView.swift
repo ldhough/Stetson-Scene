@@ -5,40 +5,38 @@
 //  Created by Madison Gipson on 7/15/20.
 //  Copyright © 2020 Madison Gipson. All rights reserved.
 //
-
+import Foundation
 import SwiftUI
 
 //MARK: CALENDARVIEW DISPLAYS MONTHCAROUSEL
 struct CalendarView : View {
     @EnvironmentObject var viewRouter: ViewRouter
-    @State var page: String
     @State var selectedDate: Date = Date()
     @State var month = 0
-    @State var detailView: Bool = false
     
     var body: some View {
+        //CALENDAR & SUB-LIST
         VStack(spacing: 0) {
             //horizontal months list
             MonthCarousel(selectedDate: self.$selectedDate, month: self.$month, height: 330).frame(height: 330)
             //event list that corresponds to selected day
             List {
-                ForEach(data) { event in
+                ForEach(viewRouter.events) { event in
                     if self.compareDates(date1: self.selectedDate, date2: self.getEventDate(event: event)) {
-                        if self.page == "Favorites" && event.favorite {
-                            DiscoverListCell(event: event).onTapGesture { self.detailView = true }
-                        } else if self.page == "Discover" {
-                            DiscoverListCell(event: event).onTapGesture { self.detailView = true }
+                        if self.viewRouter.page == "Favorites" && event.favorite {
+                            ListCell(event: event)
+                        } else if self.viewRouter.page == "Discover" {
+                            ListCell(event: event)
                         }
                     }
                 }.padding(.horizontal, 10).listRowBackground(viewRouter.page == "Favorites" ? Color(Constants.accent1) : Color(Constants.bg1))
-            }.frame(alignment: .center).sheet(isPresented: $detailView, content: { EventDetailView() })
-            
+            }.frame(alignment: .center)
         }.background(viewRouter.page == "Favorites" ? Color(Constants.accent1) : Color(Constants.bg1))
     }
     
     //USE THIS IN EVENT INITIALIZATION
-    func getEventDate(event: Type) -> Date {
-        var event: Type = event
+    func getEventDate(event: Event) -> Date {
+        var event: Event = event
         var stringDate: String = event.dateString
         
         //if date has a single digit month, prepare it for dateFormat by adding a second month digit
@@ -53,12 +51,12 @@ struct CalendarView : View {
         
         let calendar = Calendar.current
         let components = calendar.dateComponents([.year, .month, .day, .weekday], from: date)
-
+        
         event.date = calendar.date(from:components)! //full thing
         event.month = String(calendar.component(.month, from: date)) //TODO: get the actual month, not just a number
         event.day = String(calendar.component(.day, from: date))
         event.weekday = String(calendar.component(.weekday, from: date)) //TODO: get the actual weekday, not just a number
-
+        
         return calendar.date(from:components)!
     }
     
@@ -165,7 +163,7 @@ struct Month: View {
                                 Spacer()
                                 if Calendar.current.isDate(column, equalTo: self.firstOfMonth(), toGranularity: .month) {
                                     DateCell(date: column, match: self.compareDates(date1: column, date2: self.selectedDate), cellWidth: self.height/11)
-                                    .onTapGesture { self.selectedDate = column }
+                                        .onTapGesture { self.selectedDate = column }
                                 } else {
                                     Text("").frame(width: self.height/11, height: self.height/11)
                                 }
@@ -196,7 +194,7 @@ struct Month: View {
         components.day = 1
         return Calendar.current.date(byAdding: offset, to: Calendar.current.date(from: components)!)!
     }
-     
+    
     //MONTH ARRAY
     func monthArray() -> [[Date]] {
         var rowArray = [[Date]]()
@@ -249,16 +247,16 @@ struct DateCell: View {
     }
     
     func getDate(date: Date) -> String {
-//        //Colors
-//        if match { //if date is selected
-//            if viewRouter.page == "Favorites" {
-//                bgColor = Color(Constants.accent1) //circle should be accent since cal is a bg color
-//                textColor = Color(Constants.bg2) //text should be the bg color
-//            }
-//            bgColor = Color(Constants.bg2) //circle should be bg color since cal is accent
-//            textColor = Color(Constants.accent1) //text should be the accent color
-//        }
-//        textColor = Color(Constants.text1) //if date isn't selected, it should be the main text color
+        //        //Colors
+        //        if match { //if date is selected
+        //            if viewRouter.page == "Favorites" {
+        //                bgColor = Color(Constants.accent1) //circle should be accent since cal is a bg color
+        //                textColor = Color(Constants.bg2) //text should be the bg color
+        //            }
+        //            bgColor = Color(Constants.bg2) //circle should be bg color since cal is accent
+        //            textColor = Color(Constants.accent1) //text should be the accent color
+        //        }
+        //        textColor = Color(Constants.text1) //if date isn't selected, it should be the main text color
         
         //Date
         let formatter = DateFormatter()

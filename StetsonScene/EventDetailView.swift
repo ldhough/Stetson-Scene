@@ -12,10 +12,11 @@ import SwiftUI
 struct EventDetailView : View {
     
     @EnvironmentObject var viewRouter: ViewRouter
+    var event: Event
     
     var body: some View {
         VStack {
-            Text("Event Detail View")
+            Text(event.name)
         }
     }
 }
