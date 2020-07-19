@@ -29,16 +29,16 @@ class ViewRouter: ObservableObject {
     }
     
     var events = [
-        Event(id: 0, name: "Event 1", dateString: "7/1/2020", time: "9:00am", location: "CUB", category: "test", favorite: true, trending: false),
-        Event(id: 1, name: "Event 2", dateString: "7/1/2020", time: "10:00am", location: "Elizabeth Hall", category: "test", favorite: true, trending: true),
-        Event(id: 2, name: "Event 3", dateString: "7/2/2020", time: "11:00am", location: "DuPont Ball Library", category: "test", favorite: true, trending: false),
-        Event(id: 3, name: "Event 4", dateString: "7/3/2020", time: "5:00pm", location: "Allen Hall", category: "test", favorite: true, trending: true),
-        Event(id: 4, name: "Event 5", dateString: "7/17/2020", time: "9:00am", location: "CUB", category: "test", favorite: true, trending: false),
-        Event(id: 5, name: "Event 6", dateString: "7/7/2020", time: "10:00am", location: "Elizabeth Hall", category: "test", favorite: false, trending: true),
-        Event(id: 6, name: "Event 7", dateString: "7/18/2020", time: "11:00am", location: "DuPont Ball Library", category: "test", favorite: false, trending: false),
-        Event(id: 7, name: "Event 8", dateString: "7/19/2020", time: "5:00pm", location: "Allen Hall", category: "test", favorite: false, trending: true),
-        Event(id: 8, name: "Event 9", dateString: "7/4/2020", time: "9:00pm", location: "Stetson Green", category: "test", favorite: false, trending: false),
-        Event(id: 9, name: "Event 10", dateString: "7/4/2020", time: "7:00pm", location: "Stetson Green", category: "test", favorite: false, trending: true)
+        Event(id: 0, name: "Event 1", dateString: "7/1/2020", time: "9:00am", location: "CUB", attCount: 12, description: "testing testing testing event 1 testing testing testing testing testing testing", culturalCredit: false, favorite: true, trending: false),
+        Event(id: 1, name: "Event 2", dateString: "7/1/2020", time: "10:00am", location: "Elizabeth Hall", attCount: 100, description: "testing testing testing testing testing testing testing testing testing", culturalCredit: false, favorite: true, trending: true),
+        Event(id: 2, name: "Event 3", dateString: "7/2/2020", time: "11:00am", location: "DuPont Ball Library", attCount: 12, description: "testing testing testing testing testing testing testing testing testing event 3", culturalCredit: false, favorite: true, trending: false),
+        Event(id: 3, name: "Event 4", dateString: "7/3/2020", time: "5:00pm", location: "Allen Hall", attCount: 5, description: "testing testing testing", culturalCredit: false, favorite: true, trending: true),
+        Event(id: 4, name: "Event 5", dateString: "7/17/2020", time: "9:00am", location: "CUB", attCount: 12, description: "testing testing testing testing testing testing testing testing testing testing testing testing event 5", culturalCredit: true, favorite: true, trending: false),
+        Event(id: 5, name: "Event 6", dateString: "7/7/2020", time: "10:00am", location: "Elizabeth Hall", attCount: 12, description: "testing testing testing  testing testing testingtesting testing testing testing testing testing event 6", culturalCredit: false, favorite: false, trending: true),
+        Event(id: 6, name: "Event 7", dateString: "7/18/2020", time: "11:00am", location: "DuPont Ball Library", attCount: 1, description: "testing testing testing testing testing testing testing testing testing testing testing testing", culturalCredit: true, favorite: false, trending: false),
+        Event(id: 7, name: "Event 8", dateString: "7/19/2020", time: "5:00pm", location: "Allen Hall", attCount: 50, description: "testing testing testing testing testing testing testing testing testing testing testing testing testing testing testing", culturalCredit: true, favorite: false, trending: true),
+        Event(id: 8, name: "Event 9", dateString: "7/4/2020", time: "9:00pm", location: "Stetson Green", attCount: 0, description: "testing testing testing testing testing testing testing testing testing testing testing testing testing testing testing testing testing testing", culturalCredit: true, favorite: false, trending: false),
+        Event(id: 9, name: "Event 10", dateString: "7/4/2020", time: "7:00pm", location: "Stetson Green", attCount: 12, description: "testing testing testing testing testing testing testing testing testing testing testing testing testing testing testing testing testing testing", culturalCredit: true, favorite: false, trending: true)
         ] {
         didSet {
             objectWillChange.send(self)
@@ -56,7 +56,9 @@ struct Event : Identifiable {
     var weekday: String?
     var time : String
     var location : String
-    var category : String
+    var attCount: Int
+    var description: String?
+    var culturalCredit : Bool
     var favorite: Bool
     var trending: Bool
 }

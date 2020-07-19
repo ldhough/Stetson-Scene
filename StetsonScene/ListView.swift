@@ -47,7 +47,7 @@ struct ListCell : View {
                 
                 //Name & Location, Right Side
                 VStack(alignment: .leading) {
-                    Text(event.name).fontWeight(.medium).font(.system(size: viewRouter.subPage == "List" ? 22 : 16)).lineLimit(1).foregroundColor(Color(Constants.text1)).padding(.vertical, viewRouter.subPage == "List" ? 5 : 2)
+                    Text(event.name).fontWeight(.medium).font(.system(size: viewRouter.subPage == "List" ? 22 : 16)).lineLimit(1).foregroundColor(event.culturalCredit ? Color(Constants.accent1) :  Color(Constants.text1)).padding(.vertical, viewRouter.subPage == "List" ? 5 : 2)
                     Text(event.location).fontWeight(.light).font(.system(size: viewRouter.subPage == "List" ? 16 : 12)).foregroundColor(Color(Constants.text2).opacity(0.5)).padding(.bottom, viewRouter.subPage == "List" ? 5 : 2)
                 }
                 

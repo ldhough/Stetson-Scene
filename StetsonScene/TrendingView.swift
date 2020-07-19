@@ -129,7 +129,7 @@ struct Cards : View {
                             }.frame(width: self.cardWidth, height: self.height*0.6)
                             //Text
                             VStack (alignment: .leading) {
-                                Text(event.name).fontWeight(.medium).font(.system(size: 40)).padding(.top, 10).foregroundColor(Color(Constants.text1))
+                                Text(event.name).fontWeight(.medium).font(.system(size: 40)).padding(.top, 10).foregroundColor(event.culturalCredit ? Color(Constants.accent1) : Color(Constants.text1))
                                 //TODO: CHANGE DATESTRING TO MONTH + DAY
                                 Text(event.dateString + " | " + event.time).fontWeight(.light).font(.system(size: 25)).padding(.top, 5).padding(.bottom, 5).foregroundColor(Color(Constants.text2))
                                 Text(event.location).fontWeight(.light).font(.system(size: 25)).padding(.bottom, 10).foregroundColor(Color(Constants.text2))
@@ -141,6 +141,8 @@ struct Cards : View {
                         .frame(width: self.cardWidth, height: self.height)
                         .cornerRadius(20)
                         .shadow(radius: 5)
+                        .onTapGesture { self.detailView = true }
+                        .sheet(isPresented: self.$detailView, content: { EventDetailView(event: event) })
                 }.frame(width: Constants.width).animation(.default) //end of vstack
             } //end of foreach
         } //end of hstack
