@@ -12,6 +12,12 @@ import Combine
 
 class ViewRouter: ObservableObject {
     let objectWillChange = PassthroughSubject<ViewRouter,Never>()
+    var eventViewModel:EventViewModel
+    
+    init(_ viewModel: EventViewModel) {
+        self.eventViewModel = viewModel
+    }
+    
     var page: String = "Trending" {
         didSet {
             objectWillChange.send(self)

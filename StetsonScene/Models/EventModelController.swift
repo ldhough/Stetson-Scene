@@ -57,6 +57,37 @@ class EventViewModel: ObservableObject {
         case invalid
     }
     
+    func insertEvent(_ event: EventInstance) {
+        if self.eventList.count == 0 {
+            self.eventList.append(event)
+            return
+        }
+        for i in 0 ..< self.eventList.count {
+            if !compareEventDates(dateTimeOne: event.startDateTimeInfo, dateTimeTwo: event.endDateTimeInfo) {
+                self.eventList.insert(event, at: i)
+                return
+            }
+        }
+    }
+    
+    func retrieveFirebaseData(daysIntoYear: Int, doFilter: Bool, searchEngine: EventSearchEngine) {
+        self.eventList = []
+        AppDelegate.shared().eventListRef.queryOrdered(byChild: "daysIntoYear").queryEnding(atValue: daysIntoYear).observe(.value, with: { snapshot in
+            let fullEventList = snapshot.value as? Dictionary<String, Dictionary<String, Any>>
+            //print(fullEventList)
+            for (_, v) in fullEventList! {
+                var newInstanceCheck = self.readEventData(eventData: v)
+                if newInstanceCheck.1 == .invalid {
+                    print("not doing a thing")
+                    continue
+                } else {
+                    print("doing a thing")
+                    self.insertEvent(newInstanceCheck.0)
+                }
+            }
+        })
+    }
+    
     func readEventData(eventData: Dictionary<String, Any>) -> (EventInstance, DataState) {
         let newInstance = EventInstance()
         for (k, v) in eventData {
@@ -65,7 +96,7 @@ class EventViewModel: ObservableObject {
                 newInstance.absolutePosition = (v as? Int)!
             case "guid":
                 newInstance.guid = (v as? String) ?? "" //Highly unlikely to occur
-                return (newInstance, .invalid)
+                if newInstance.guid == "" { return (newInstance, .invalid) }
             case "name":
                 newInstance.name = (v as? String) ?? "Default name"
             case "time":
@@ -126,6 +157,7 @@ class EventViewModel: ObservableObject {
         let dateTimeInfoEnd = makeDateTimeInfo(dateStr: newInstance.endDate, timeStr: newInstance.endTime)
         
         if !dateTimeInfoStart.1 || !dateTimeInfoEnd.1 {
+            print("Invalid event data!")
             return (newInstance, .invalid)
         } else {
             newInstance.startDateTimeInfo = dateTimeInfoStart.0
@@ -133,7 +165,7 @@ class EventViewModel: ObservableObject {
         }
         
         //Add logic here to determine if the event is favorited, in the calendar, or if the user is attending
-        
+        print("Valid event data!")
         return (newInstance, .valid)
     }
     
@@ -249,6 +281,8 @@ func getInt(_ data: String) throws -> Int {
 }
 
 class EventSearchEngine {
+    
+    var applyFilter = false //
     
     struct EventType {
         let name:String

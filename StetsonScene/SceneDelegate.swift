@@ -40,7 +40,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     ///Establishes our Model Controller & Root View.  Starts the passing of our model controller around our views.
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
-        self.viewRouter = ViewRouter()
+        //ViewModel Initiation
+        let vm = EventViewModel()
+        let se = EventSearchEngine()
+        vm.retrieveFirebaseData(daysIntoYear: vm.getDaysIntoYear(nowPlusWeeks: 1), doFilter: false, searchEngine: se)
+        print(vm.eventList)
+        self.viewRouter = ViewRouter(vm)
         
         //Keeps List views from having cell dividers
         //UITableView.appearance().allowsSelection = false
@@ -49,36 +54,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         UITableView.appearance().backgroundColor = viewRouter.page == "Favorites" ? Constants.accent1 : UIColor.clear
         //UITableView.appearance().separatorColor = .clear
         
-        //Model Controller initiation
-        //self.eventModelController = EventModelController(eventList: AppDelegate.shared().eventList,
-        //eventTypeList: AppDelegate.shared().eventTypesList,
-        //locationList: AppDelegate.shared().locationList)
-        //self.event = EventInstance()
         
-        //let tapGesture = AnyGestureRecognizer(target: window, action:#selector(UIView.endEditing))
-        //tapGesture.requiresExclusiveTouchType = false
-        //tapGesture.cancelsTouchesInView = false
-        //tapGesture.delegate = self //I don't use window as delegate to minimize possible side effects
-        //window!.addGestureRecognizer(tapGesture)
-        //        let tapGesture = UITapGestureRecognizer()
-        //        tapGesture.requiresExclusiveTouchType = false
-        //        tapGesture.cancelsTouchesInView = false
-        //        window?.addGestureRecognizer(tapGesture)
-        //        AppDelegate.shared().eventModelController = eventModelController
-        //        let buildingModelController:BuildingModelController = BuildingModelController()
-        //        self.eventModelController.buildingModelController = buildingModelController
-        //        self.eventModelController.buildingModelController.retrieveFirebaseDataBuildings()
-        //BuildingModelController.retrieveFirebaseDataBuildings()
-        
-        //Initiates parsing of Firebase data with one week's worth of events
-        //        self.eventModelController.retrieveFirebaseData(daysIntoYear: self.eventModelController.getDaysIntoYear(nowPlusWeeks: 1))
-        //        let recommendationEngine = RecommendationEngine(eventModelController: self.eventModelController)
-        //        self.eventModelController.recommendationEngine = recommendationEngine
-        //        self.eventModelController.testFirebaseConnection()
-        //
-        //self.wheelNavigation = WheelNavigation()
-        //map initialization
-        //var landmarkSupport:LandmarkSupport = LandmarkSupport() //new
         
         //SwiftUI root view
         //let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -90,7 +66,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             //            window.rootViewController = UIHostingController(rootView: contentView.onTapGesture(count: 2, perform: {
             //                window.endEditing(true)
             //            }))
-            window.rootViewController = UIHostingController(rootView: MainView().environmentObject(ViewRouter()))
+            window.rootViewController = UIHostingController(rootView: MainView().environmentObject(ViewRouter(vm)))
             self.window = window
             window.makeKeyAndVisible()
         }
