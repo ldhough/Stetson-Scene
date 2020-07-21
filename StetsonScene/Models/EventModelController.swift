@@ -62,12 +62,27 @@ class EventViewModel: ObservableObject {
             self.eventList.append(event)
             return
         }
+        if self.eventList.count == 1 {
+            if !compareEventDates(dateTimeOne: event.startDateTimeInfo, dateTimeTwo: self.eventList[0].startDateTimeInfo) {
+                self.eventList.insert(event, at: 0)
+                print("inserted at 0")
+                return
+            } else {
+                self.eventList.append(event)
+                print("appended")
+                return
+            }
+        }
         for i in 0 ..< self.eventList.count {
-            if !compareEventDates(dateTimeOne: event.startDateTimeInfo, dateTimeTwo: event.endDateTimeInfo) {
+            //compareEventDates returns true if first date/time is later than second date, false if else
+            if !compareEventDates(dateTimeOne: event.startDateTimeInfo, dateTimeTwo: self.eventList[i].startDateTimeInfo) {
+                print("inserted")
                 self.eventList.insert(event, at: i)
                 return
             }
         }
+        print("fallback")
+        self.eventList.append(event)
     }
     
     func retrieveFirebaseData(daysIntoYear: Int, doFilter: Bool, searchEngine: EventSearchEngine) {
@@ -83,6 +98,11 @@ class EventViewModel: ObservableObject {
                 } else {
                     print("doing a thing")
                     self.insertEvent(newInstanceCheck.0)
+                    print("==========")
+                    for event in self.eventList {
+                        print(event.date!)
+                    }
+                    print("==========")
                 }
             }
         })
@@ -200,7 +220,7 @@ class EventViewModel: ObservableObject {
         if !dateComponents.3 || !timeComponents.3 {
             return (DateTimeInfo(year: 0, month: 0, day: 0, hour: 0, minute: 0, am_pm: .pm), false)
         }
-        return (DateTimeInfo(year: dateComponents.0, month: dateComponents.1, day: dateComponents.2, hour: timeComponents.0, minute: timeComponents.1, am_pm: timeComponents.2), true)
+        return (DateTimeInfo(year: dateComponents.2, month: dateComponents.0, day: dateComponents.1, hour: timeComponents.0, minute: timeComponents.1, am_pm: timeComponents.2), true)
     }
     
     func testFirebaseConnection() {
@@ -226,12 +246,16 @@ class EventViewModel: ObservableObject {
     
     //Returns true if first date/time is later than second date, false if else
     func compareEventDates(dateTimeOne: DateTimeInfo, dateTimeTwo: DateTimeInfo) -> Bool {
-        if dateTimeOne.year > dateTimeTwo.year { return true }
-        if dateTimeOne.month > dateTimeTwo.year { return true }
-        if dateTimeOne.day > dateTimeOne.day { return true }
-        if dateTimeOne.am_pm.rawValue > dateTimeTwo.am_pm.rawValue { return true }
-        if dateTimeOne.hour > dateTimeTwo.hour { return true }
-        if dateTimeOne.minute > dateTimeTwo.minute { return true }
+        print("****")
+        print(String(dateTimeOne.month) + "/" + String(dateTimeOne.day) + "/" + String(dateTimeOne.year))
+        print(String(dateTimeTwo.month) + "/" + String(dateTimeTwo.day) + "/" + String(dateTimeTwo.year))
+        print("****")
+        if dateTimeOne.year > dateTimeTwo.year { print("year greater"); return true } else if dateTimeOne.year < dateTimeTwo.year { return false }
+        if dateTimeOne.month > dateTimeTwo.month { print("month greater"); return true } else if dateTimeOne.month < dateTimeTwo.month { return false }
+        if dateTimeOne.day > dateTimeTwo.day { print("day greater"); return true } else if dateTimeOne.day < dateTimeTwo.day { return false }
+        if dateTimeOne.am_pm.rawValue > dateTimeTwo.am_pm.rawValue { return true } else if dateTimeOne.am_pm.rawValue < dateTimeTwo.am_pm.rawValue { return false }
+        if dateTimeOne.hour > dateTimeTwo.hour { return true } else if dateTimeOne.hour < dateTimeTwo.hour { return false }
+        if dateTimeOne.minute > dateTimeTwo.minute { return true } else if dateTimeOne.minute < dateTimeTwo.minute { return false }
         return false
     }
     

@@ -16,8 +16,8 @@ struct ListView : View {
         VStack(spacing: 0) {
             //LIST
             List {
-                ForEach(viewRouter.events) { event in
-                    if self.viewRouter.page == "Favorites" && event.favorite { //only list favorites on Favorites screen
+                ForEach(viewRouter.eventViewModel.eventList) { event in
+                    if self.viewRouter.page == "Favorites" && event.isFavorite { //only list favorites on Favorites screen
                         ListCell(event: event)
                     } else if self.viewRouter.page == "Discover" {
                         ListCell(event: event)
@@ -31,7 +31,7 @@ struct ListView : View {
 //CONTENTS OF EACH EVENT CELL
 struct ListCell : View {
     @EnvironmentObject var viewRouter: ViewRouter
-    var event: Event
+    var event: EventInstance
     @State var detailView: Bool = false
     
     var body: some View {
@@ -40,14 +40,14 @@ struct ListCell : View {
                 //Date & Time, Left Side
                 VStack(alignment: .trailing) {
                     //TODO: CHANGE DATESTRING TO MONTH + DAY
-                    Text(event.dateString).fontWeight(.medium).font(.system(size: viewRouter.subPage == "List" ? 16 : 12)).foregroundColor(Color(Constants.accent1)).padding(.vertical, viewRouter.subPage == "List" ? 5 : 2)
+                    Text(event.date).fontWeight(.medium).font(.system(size: viewRouter.subPage == "List" ? 16 : 12)).foregroundColor(Color(Constants.accent1)).padding(.vertical, viewRouter.subPage == "List" ? 5 : 2)
                     Text(event.time).fontWeight(.medium).font(.system(size: viewRouter.subPage == "List" ? 12 : 10)).foregroundColor(Color(Constants.text2).opacity(0.5)).padding(.bottom, viewRouter.subPage == "List" ? 5 : 2)
                     //Duration?
                 }.padding(.horizontal, 5)
                 
                 //Name & Location, Right Side
                 VStack(alignment: .leading) {
-                    Text(event.name).fontWeight(.medium).font(.system(size: viewRouter.subPage == "List" ? 22 : 16)).lineLimit(1).foregroundColor(event.culturalCredit ? Color(Constants.accent1) :  Color(Constants.text1)).padding(.vertical, viewRouter.subPage == "List" ? 5 : 2)
+                    Text(event.name).fontWeight(.medium).font(.system(size: viewRouter.subPage == "List" ? 22 : 16)).lineLimit(1).foregroundColor(event.hasCultural ? Color(Constants.accent1) :  Color(Constants.text1)).padding(.vertical, viewRouter.subPage == "List" ? 5 : 2)
                     Text(event.location).fontWeight(.light).font(.system(size: viewRouter.subPage == "List" ? 16 : 12)).foregroundColor(Color(Constants.text2).opacity(0.5)).padding(.bottom, viewRouter.subPage == "List" ? 5 : 2)
                 }
                 

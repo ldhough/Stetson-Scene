@@ -25,14 +25,14 @@ struct TrendingView : View {
         }
     }
     
-    func trendingList() -> [Event] {
-        var allTrending: [Event] = []
-        var selectTrending: [Event] = []
+    func trendingList() -> [EventInstance] {
+        var allTrending: [EventInstance] = []
+        var selectTrending: [EventInstance] = []
         var id = 0
         
         //pick out trending events
-        for event in viewRouter.events {
-            if event.trending {
+        for event in viewRouter.eventViewModel.eventList {
+            if event.isTrending {
                 allTrending.append(event)
             }
         }
@@ -41,7 +41,7 @@ struct TrendingView : View {
         for event in allTrending.shuffled() {
             if id<10 {
                 selectTrending.append(event)
-                selectTrending[id].id = id
+                //selectTrending[id].id = id
                 id += 1
             }
         }
@@ -53,7 +53,7 @@ struct TrendingView : View {
 //Uses a UIScrollView to detect card offset and tells the UIView when the card changes through @Binding card
 //@Binding card then updates in the rest of the structs that use it so the correct card is displayed
 struct Carousel : UIViewRepresentable {
-    var trendingList: [Event]
+    var trendingList: [EventInstance]
     @Binding var card : Int
     var height : CGFloat
     
@@ -103,7 +103,7 @@ struct Carousel : UIViewRepresentable {
 
 //CARDS: create a card for each event in the list
 struct Cards : View {
-    var trendingList: [Event]
+    var trendingList: [EventInstance]
     var height : CGFloat
     let cardWidth = Constants.width*0.9
     @State var detailView: Bool = false
@@ -129,9 +129,9 @@ struct Cards : View {
                             }.frame(width: self.cardWidth, height: self.height*0.6)
                             //Text
                             VStack (alignment: .leading) {
-                                Text(event.name).fontWeight(.medium).font(.system(size: 40)).padding(.top, 10).foregroundColor(event.culturalCredit ? Color(Constants.accent1) : Color(Constants.text1))
+                                Text(event.name).fontWeight(.medium).font(.system(size: 40)).padding(.top, 10).foregroundColor(event.hasCultural ? Color(Constants.accent1) : Color(Constants.text1))
                                 //TODO: CHANGE DATESTRING TO MONTH + DAY
-                                Text(event.dateString + " | " + event.time).fontWeight(.light).font(.system(size: 25)).padding(.top, 5).padding(.bottom, 5).foregroundColor(Color(Constants.text2))
+                                Text(event.date + " | " + event.time).fontWeight(.light).font(.system(size: 25)).padding(.top, 5).padding(.bottom, 5).foregroundColor(Color(Constants.text2))
                                 Text(event.location).fontWeight(.light).font(.system(size: 25)).padding(.bottom, 10).foregroundColor(Color(Constants.text2))
                             }.padding([.horizontal, .vertical])
                                 .frame(width: self.cardWidth, height: self.height*0.4, alignment: .leading)
@@ -152,7 +152,7 @@ struct Cards : View {
 
 //CARDCONTROL: shows which card is currently displayed
 struct CardControl : UIViewRepresentable {
-    var trendingList: [Event]
+    var trendingList: [EventInstance]
     @Binding var card : Int
     
     func makeUIView(context: Context) -> UIPageControl {

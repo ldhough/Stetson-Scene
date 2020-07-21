@@ -54,5 +54,6 @@ class EventInstance: Identifiable, ObservableObject {
     @Published var numAttending:Int!
     @Published var filteredOn:Bool = true //Default is true, updated as search criteria are changed to determine if an event should show up in a list
     @Published var filteredOnLocation:Bool = true //
+    @Published var isTrending:Bool = false
 }
 
