@@ -8,67 +8,6 @@
 import Foundation
 import SwiftUI
 import UIKit
-import Combine
-
-class ViewRouter: ObservableObject {
-    let objectWillChange = PassthroughSubject<ViewRouter,Never>()
-    var eventViewModel:EventViewModel
-    
-    init(_ viewModel: EventViewModel) {
-        self.eventViewModel = viewModel
-    }
-    
-    var page: String = "Trending" {
-        didSet {
-            objectWillChange.send(self)
-        }
-    }
-    var subPage: String = "List" {
-        didSet {
-            objectWillChange.send(self)
-        }
-    }
-    var showOptions: Bool = false {
-        didSet {
-            objectWillChange.send(self)
-        }
-    }
-    
-    var events = [
-        Event(id: 0, name: "Event 1", dateString: "7/1/2020", time: "9:00am", location: "CUB", attCount: 12, description: "testing testing testing event 1 testing testing testing testing testing testing", culturalCredit: false, favorite: true, trending: false),
-        Event(id: 1, name: "Event 2", dateString: "7/1/2020", time: "10:00am", location: "Elizabeth Hall", attCount: 100, description: "testing testing testing testing testing testing testing testing testing", culturalCredit: false, favorite: true, trending: true),
-        Event(id: 2, name: "Event 3", dateString: "7/2/2020", time: "11:00am", location: "DuPont Ball Library", attCount: 12, description: "testing testing testing testing testing testing testing testing testing event 3", culturalCredit: false, favorite: true, trending: false),
-        Event(id: 3, name: "Event 4", dateString: "7/3/2020", time: "5:00pm", location: "Allen Hall", attCount: 5, description: "testing testing testing", culturalCredit: false, favorite: true, trending: true),
-        Event(id: 4, name: "Event 5", dateString: "7/17/2020", time: "9:00am", location: "CUB", attCount: 12, description: "testing testing testing testing testing testing testing testing testing testing testing testing event 5", culturalCredit: true, favorite: true, trending: false),
-        Event(id: 5, name: "Event 6", dateString: "7/7/2020", time: "10:00am", location: "Elizabeth Hall", attCount: 12, description: "testing testing testing  testing testing testingtesting testing testing testing testing testing event 6", culturalCredit: false, favorite: false, trending: true),
-        Event(id: 6, name: "Event 7", dateString: "7/18/2020", time: "11:00am", location: "DuPont Ball Library", attCount: 1, description: "testing testing testing testing testing testing testing testing testing testing testing testing", culturalCredit: true, favorite: false, trending: false),
-        Event(id: 7, name: "Event 8", dateString: "7/19/2020", time: "5:00pm", location: "Allen Hall", attCount: 50, description: "testing testing testing testing testing testing testing testing testing testing testing testing testing testing testing", culturalCredit: true, favorite: false, trending: true),
-        Event(id: 8, name: "Event 9", dateString: "7/4/2020", time: "9:00pm", location: "Stetson Green", attCount: 0, description: "testing testing testing testing testing testing testing testing testing testing testing testing testing testing testing testing testing testing", culturalCredit: true, favorite: false, trending: false),
-        Event(id: 9, name: "Event 10", dateString: "7/4/2020", time: "7:00pm", location: "Stetson Green", attCount: 12, description: "testing testing testing testing testing testing testing testing testing testing testing testing testing testing testing testing testing testing", culturalCredit: true, favorite: false, trending: true)
-        ] {
-        didSet {
-            objectWillChange.send(self)
-        }
-    }
-}
-
-struct Event : Identifiable {
-    var id : Int
-    var name : String
-    var dateString : String
-    var date: Date?
-    var month: String?
-    var day: String?
-    var weekday: String?
-    var time : String
-    var location : String
-    var attCount: Int
-    var description: String?
-    var culturalCredit : Bool
-    var favorite: Bool
-    var trending: Bool
-}
-
 
 struct NavigationIndicator: UIViewControllerRepresentable {
     typealias UIViewControllerType = ARView
@@ -81,24 +20,24 @@ struct NavigationIndicator: UIViewControllerRepresentable {
 
 
 struct MainView : View {
-    @EnvironmentObject var viewRouter: ViewRouter
+    @EnvironmentObject var config: Configuration
     
     var body: some View {
-        ZStack {
-            Color(viewRouter.page == "Favorites" ? Constants.accent1 : Constants.bg1).edgesIgnoringSafeArea(.all)
+        ZStack { 
+            Color(config.page == "Favorites" ? config.accentUIColor : UIColor.secondarySystemBackground).edgesIgnoringSafeArea(.all)
             VStack(spacing: 0){
-                if viewRouter.page == "Trending" {
-                    TrendingView()
-                } else if viewRouter.page == "Discover" || viewRouter.page == "Favorites" {
-                    if viewRouter.subPage == "List" || viewRouter.subPage == "Calendar" {
-                        DiscoverFavoritesView().blur(radius: viewRouter.showOptions ? 5 : 0)
-                    } else if viewRouter.subPage == "AR" {
-                        NavigationIndicator().blur(radius: viewRouter.showOptions ? 5 : 0).edgesIgnoringSafeArea(.top)
-                    } else if viewRouter.subPage == "Map" {
-                        MapView().blur(radius: viewRouter.showOptions ? 5 : 0).edgesIgnoringSafeArea(.top)
+                if config.page == "Trending" {
+                    TrendingView().disabled(config.showOptions ? true : false)
+                } else if config.page == "Discover" || config.page == "Favorites" {
+                    if config.subPage == "List" || config.subPage == "Calendar" {
+                        DiscoverFavoritesView().blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false)
+                    } else if config.subPage == "AR" {
+                        NavigationIndicator().blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false).edgesIgnoringSafeArea(.top)
+                    } else if config.subPage == "Map" {
+                        MapView().blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false).edgesIgnoringSafeArea(.top)
                     }
-                } else if viewRouter.page == "Information" {
-                    InformationView().blur(radius: viewRouter.showOptions ? 5 : 0)
+                } else if config.page == "Information" {
+                    InformationView().blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false)
                 }
                 
                 TabBar()
@@ -110,71 +49,71 @@ struct MainView : View {
 }
 
 struct TabBar : View {
-    @EnvironmentObject var viewRouter: ViewRouter
+    @EnvironmentObject var config: Configuration
     
     var body: some View {
         ZStack {
             HStack(spacing: 20){
                 //Trending
                 HStack {
-                    Image(systemName: "hand.thumbsup").resizable().frame(width: 20, height: 20).foregroundColor(viewRouter.page == "Trending" ? Color(Constants.bg2) : Color(Constants.text2))
-                    Text(viewRouter.page == "Trending" ? viewRouter.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color(Constants.bg2))
+                    Image(systemName: "hand.thumbsup").resizable().frame(width: 20, height: 20).foregroundColor(config.page == "Trending" ? Color.white : Color.secondaryLabel)
+                    Text(config.page == "Trending" ? config.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color.white)
                 }.padding(15)
-                    .background(viewRouter.page == "Trending" ? Color(Constants.accent1) : Color.clear)
+                    .background(config.page == "Trending" ? config.accent : Color.clear)
                     .clipShape(Capsule())
                     .onTapGesture {
-                        self.viewRouter.page = "Trending"
-                        self.viewRouter.showOptions = false
+                        self.config.page = "Trending"
+                        self.config.showOptions = false
                 }
                 //Discover
                 HStack {
-                    Image(systemName: "magnifyingglass").resizable().frame(width: 20, height: 20).foregroundColor(viewRouter.page == "Discover" ? Color(Constants.bg2) : Color(Constants.text2))
-                    Text(viewRouter.page == "Discover" ? viewRouter.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color(Constants.bg2))
+                    Image(systemName: "magnifyingglass").resizable().frame(width: 20, height: 20).foregroundColor(config.page == "Discover" ? Color.white : Color.secondaryLabel)
+                    Text(config.page == "Discover" ? config.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color.white)
                 }.padding(15)
-                    .background(viewRouter.page == "Discover" ? Color(Constants.accent1) : Color.clear)
+                    .background(config.page == "Discover" ? config.accent : Color.clear)
                     .clipShape(Capsule())
                     .onTapGesture {
-                        if self.viewRouter.page == "Discover" {
-                            self.viewRouter.showOptions.toggle()
+                        if self.config.page == "Discover" {
+                            self.config.showOptions.toggle()
                         } else {
-                            self.viewRouter.showOptions = true
+                            self.config.showOptions = true
                         }
-                        self.viewRouter.page = "Discover"
+                        self.config.page = "Discover"
                 }
                 //Favorites
                 HStack {
-                    Image(systemName: "heart").resizable().frame(width: 20, height: 20).foregroundColor(viewRouter.page == "Favorites" ? Color(Constants.bg2) : Color(Constants.text2))
-                    Text(viewRouter.page == "Favorites" ? viewRouter.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color(Constants.bg2))
+                    Image(systemName: "heart").resizable().frame(width: 20, height: 20).foregroundColor(config.page == "Favorites" ? Color.white : Color.secondaryLabel)
+                    Text(config.page == "Favorites" ? config.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color.white)
                 }.padding(15)
-                    .background(viewRouter.page == "Favorites" ? Color(Constants.accent1) : Color.clear)
+                    .background(config.page == "Favorites" ? config.accent : Color.clear)
                     .clipShape(Capsule())
                     .onTapGesture {
-                        if self.viewRouter.page == "Favorites" {
-                            self.viewRouter.showOptions.toggle()
+                        if self.config.page == "Favorites" {
+                            self.config.showOptions.toggle()
                         } else {
-                            self.viewRouter.showOptions = true
+                            self.config.showOptions = true
                         }
-                        self.viewRouter.page = "Favorites"
+                        self.config.page = "Favorites"
                 }
                 //Info
                 HStack {
-                    Image(systemName: "info.circle").resizable().frame(width: 20, height: 20).foregroundColor(viewRouter.page == "Information" ? Color(Constants.bg2) : Color(Constants.text2))
-                    Text(viewRouter.page == "Information" ? viewRouter.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color(Constants.bg2))
+                    Image(systemName: "info.circle").resizable().frame(width: 20, height: 20).foregroundColor(config.page == "Information" ? Color.white : Color.secondaryLabel)
+                    Text(config.page == "Information" ? config.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color.white)
                 }.padding(15)
-                    .background(viewRouter.page == "Information" ? Color(Constants.accent1) : Color.clear)
+                    .background(config.page == "Information" ? config.accent : Color.clear)
                     .clipShape(Capsule())
                     .onTapGesture {
-                        self.viewRouter.page = "Information"
-                        self.viewRouter.showOptions = false
+                        self.config.page = "Information"
+                        self.config.showOptions = false
                 }
             }.padding(.vertical, 5)
                 .frame(width: Constants.width)
-                .background(Color(Constants.bg2))
+                .background(Color.tertiarySystemBackground)
                 .animation(.default) //hstack end
             
             //other tabs
-            if self.viewRouter.showOptions {
-                TabOptions().offset(x: self.viewRouter.page == "Discover" ? -30 : 30, y: -60)
+            if self.config.showOptions {
+                TabOptions().offset(x: self.config.page == "Discover" ? -30 : 30, y: -60)
             }
             
         }//zstack end
@@ -182,79 +121,107 @@ struct TabBar : View {
 }
 
 struct TabOptions: View {
-    @EnvironmentObject var viewRouter: ViewRouter
+    @EnvironmentObject var config: Configuration
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         HStack {
             //List
             ZStack {
                 Circle()
-                    .stroke(self.viewRouter.subPage == "List" ? Color(Constants.bg2) : Color(Constants.accent1))
-                    .background(self.viewRouter.subPage == "List" ? Color(Constants.accent1) : Color(Constants.bg2))
+                    .stroke(self.config.subPage == "List" ? selectedColor(element: "stroke") : nonselectedColor(element: "stroke"))
+                    .background(self.config.subPage == "List" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "list.bullet")
                     .resizable().frame(width: 20, height: 20)
-                    .foregroundColor(self.viewRouter.subPage == "List" ? Color(Constants.bg2) : Color(Constants.accent1))
+                    .foregroundColor(self.config.subPage == "List" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
             }.frame(width: 50, height: 50)
                 .offset(x: 10)
                 .onTapGesture {
                     withAnimation {
-                        self.viewRouter.subPage = "List"
-                        self.viewRouter.showOptions = false
+                        self.config.subPage = "List"
+                        self.config.showOptions = false
                     }
             }
             //Calendar
             ZStack {
                 Circle()
-                    .stroke(self.viewRouter.subPage == "Calendar" ? Color(Constants.bg2) : Color(Constants.accent1))
-                    .background(self.viewRouter.subPage == "Calendar" ? Color(Constants.accent1) : Color(Constants.bg2))
+                    .stroke(self.config.subPage == "Calendar" ? selectedColor(element: "stroke") : nonselectedColor(element: "stroke"))
+                    .background(self.config.subPage == "Calendar" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "calendar")
                     .resizable().frame(width: 20, height: 20)
-                    .foregroundColor(self.viewRouter.subPage == "Calendar" ? Color(Constants.bg2) : Color(Constants.accent1))
+                    .foregroundColor(self.config.subPage == "Calendar" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
             }.frame(width: 50, height: 50)
                 .offset(y: -30)
                 .onTapGesture {
                     withAnimation {
-                        self.viewRouter.subPage = "Calendar"
-                        self.viewRouter.showOptions = false
+                        self.config.subPage = "Calendar"
+                        self.config.showOptions = false
                     }
             }
             //AR
             ZStack {
                 Circle()
-                    .stroke(self.viewRouter.subPage == "AR" ? Color(Constants.bg2) : Color(Constants.accent1))
-                    .background(self.viewRouter.subPage == "AR" ? Color(Constants.accent1) : Color(Constants.bg2))
+                    .stroke(self.config.subPage == "AR" ? selectedColor(element: "stroke") : nonselectedColor(element: "stroke"))
+                    .background(self.config.subPage == "AR" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "camera")
                     .resizable().frame(width: 22, height: 18)
-                    .foregroundColor(self.viewRouter.subPage == "AR" ? Color(Constants.bg2) : Color(Constants.accent1))
+                    .foregroundColor(self.config.subPage == "AR" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
             }.frame(width: 50, height: 50)
                 .offset(y: -30)
                 .onTapGesture {
                     withAnimation {
-                        self.viewRouter.subPage = "AR"
-                        self.viewRouter.showOptions = false
+                        self.config.subPage = "AR"
+                        self.config.showOptions = false
                     }
             }
             //Map
             ZStack {
                 Circle()
-                    .stroke(self.viewRouter.subPage == "Map" ? Color(Constants.bg2) : Color(Constants.accent1))
-                    .background(self.viewRouter.subPage == "Map" ? Color(Constants.accent1) : Color(Constants.bg2))
+                    .stroke(self.config.subPage == "Map" ? selectedColor(element: "stroke") : nonselectedColor(element: "stroke"))
+                    .background(self.config.subPage == "Map" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "mappin.and.ellipse")
                     .resizable().frame(width: 20, height: 22)
-                    .foregroundColor(self.viewRouter.subPage == "Map" ? Color(Constants.bg2) : Color(Constants.accent1))
+                    .foregroundColor(self.config.subPage == "Map" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
             }.frame(width: 50, height: 50)
                 .offset(x: -10)
                 .onTapGesture {
                     withAnimation {
-                        self.viewRouter.subPage = "Map"
-                        self.viewRouter.showOptions = false
+                        self.config.subPage = "Map"
+                        self.config.showOptions = false
                     }
             }
         }.transition(.scale) //hstack
+    }
+    
+    func selectedColor(element: String) -> Color {
+        if element == "background" {
+            return config.accent
+        }
+        //if element == stroke or foreground
+        if colorScheme == .light {
+            return Color.tertiarySystemBackground
+        } else if colorScheme == .dark {
+            return Color.secondaryLabel
+        }
+        
+        return config.accent //absolute default
+    }
+    
+    func nonselectedColor(element: String) -> Color {
+        if element == "stroke" || element == "foreground" {
+            return config.accent
+        } else if element == "background" {
+            if colorScheme == .light {
+                return Color.tertiarySystemBackground
+            } else if colorScheme == .dark {
+                return Color.secondaryLabel
+            }
+        }
+        return config.accent //absolute default
     }
 }
 

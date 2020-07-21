@@ -11,7 +11,7 @@ import SwiftUI
 
 struct FilterView : View {
     
-    @EnvironmentObject var viewRouter: ViewRouter
+    @EnvironmentObject var config: Configuration
     
     var body: some View {
         VStack {

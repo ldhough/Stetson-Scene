@@ -18,7 +18,7 @@
 		3C22171A23E22776003CC5C3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3C22171823E22776003CC5C3 /* Main.storyboard */; };
 		3C22171C23E22778003CC5C3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3C22171B23E22778003CC5C3 /* Assets.xcassets */; };
 		3C22171F23E22778003CC5C3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3C22171D23E22778003CC5C3 /* LaunchScreen.storyboard */; };
-		3C23C9CA24699902003E254D /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C23C9C924699902003E254D /* Constants.swift */; };
+		3C23C9CA24699902003E254D /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C23C9C924699902003E254D /* Configuration.swift */; };
 		3C290C1F24BFCE54008D83F0 /* FilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C290C1E24BFCE54008D83F0 /* FilterView.swift */; };
 		3C290C2124BFCEE1008D83F0 /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C290C2024BFCEE1008D83F0 /* EventDetailView.swift */; };
 		3C290C2324BFD677008D83F0 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C290C2224BFD677008D83F0 /* CalendarView.swift */; };
@@ -58,7 +58,7 @@
 		3C22171923E22776003CC5C3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		3C22171B23E22778003CC5C3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3C22171E23E22778003CC5C3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		3C23C9C924699902003E254D /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		3C23C9C924699902003E254D /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		3C290C1E24BFCE54008D83F0 /* FilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterView.swift; sourceTree = "<group>"; };
 		3C290C2024BFCEE1008D83F0 /* EventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailView.swift; sourceTree = "<group>"; };
 		3C290C2224BFD677008D83F0 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
@@ -146,7 +146,7 @@
 				3C732FB924C39C6A005C0FA6 /* ARView.swift */,
 				3C3A46F324C4BC75004B2785 /* MapView.swift */,
 				3C7A741224BF68E8005DA0B1 /* InformationView.swift */,
-				3C23C9C924699902003E254D /* Constants.swift */,
+				3C23C9C924699902003E254D /* Configuration.swift */,
 				4898798123F1A9FD00062714 /* PersistentData.xcdatamodeld */,
 				3C0F523023EDC0B600C91790 /* Event List */,
 				48D22135240614B90051A66D /* Map */,
@@ -310,7 +310,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3C290C2124BFCEE1008D83F0 /* EventDetailView.swift in Sources */,
-				3C23C9CA24699902003E254D /* Constants.swift in Sources */,
+				3C23C9CA24699902003E254D /* Configuration.swift in Sources */,
 				3C0F520823EBA72600C91790 /* AppDelegate.swift in Sources */,
 				48D30A14246A3D49004E84A6 /* BuildingInstance.swift in Sources */,
 				48D30A16246A4C53004E84A6 /* BuildingModelController.swift in Sources */,
@@ -485,7 +485,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = NXHV9N6K45;
+				DEVELOPMENT_TEAM = UVSFW3HDBB;
 				INFOPLIST_FILE = StetsonScene/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -506,7 +506,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = NXHV9N6K45;
+				DEVELOPMENT_TEAM = UVSFW3HDBB;
 				INFOPLIST_FILE = StetsonScene/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = (

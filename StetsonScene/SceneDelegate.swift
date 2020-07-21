@@ -32,7 +32,7 @@ extension SceneDelegate: UIGestureRecognizerDelegate {
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
-    var viewRouter: ViewRouter!
+    var config: Configuration!
     //var eventModelController:EventModelController!
     //var event:EventInstance!
     //var wheelNavigation:WheelNavigation!
@@ -45,13 +45,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let se = EventSearchEngine()
         vm.retrieveFirebaseData(daysIntoYear: vm.getDaysIntoYear(nowPlusWeeks: 1), doFilter: false, searchEngine: se)
         print(vm.eventList)
-        self.viewRouter = ViewRouter(vm)
+        self.config = Configuration(vm)
         
         //Keeps List views from having cell dividers
         //UITableView.appearance().allowsSelection = false
         //UITableViewCell.appearance().selectionStyle = .none
         UITableView.appearance().separatorStyle = .none
-        UITableView.appearance().backgroundColor = viewRouter.page == "Favorites" ? Constants.accent1 : UIColor.clear
+        UITableView.appearance().backgroundColor = config.page == "Favorites" ? config.accentUIColor : UIColor.clear
         //UITableView.appearance().separatorColor = .clear
         
         
@@ -66,7 +66,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             //            window.rootViewController = UIHostingController(rootView: contentView.onTapGesture(count: 2, perform: {
             //                window.endEditing(true)
             //            }))
-            window.rootViewController = UIHostingController(rootView: MainView().environmentObject(ViewRouter(vm)))
+            window.rootViewController = UIHostingController(rootView: MainView().environmentObject(Configuration(vm)))
             self.window = window
             window.makeKeyAndVisible()
         }

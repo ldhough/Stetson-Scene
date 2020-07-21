@@ -10,7 +10,7 @@ import SwiftUI
 
 //MARK: CALENDARVIEW DISPLAYS MONTHCAROUSEL
 struct CalendarView : View {
-    @EnvironmentObject var viewRouter: ViewRouter
+    @EnvironmentObject var config: Configuration
     @State var selectedDate: Date = Date()
     @State var month = 0
     
@@ -21,22 +21,22 @@ struct CalendarView : View {
             MonthCarousel(selectedDate: self.$selectedDate, month: self.$month, height: 330).frame(height: 330)
             //event list that corresponds to selected day
             List {
-                ForEach(viewRouter.eventViewModel.eventList) { event in
-                    //if self.compareDates(date1: self.selectedDate, date2: self.getEventDate(event: event)) {
-                        if self.viewRouter.page == "Favorites" && event.isFavorite {
+                ForEach(config.eventViewModel.eventList) { event in
+                //if self.compareDates(date1: self.selectedDate, date2: self.getEventDate(event: event)) {
+                    if self.config.page == "Favorites" && event.isFavorite {
                             ListCell(event: event)
-                        } else if self.viewRouter.page == "Discover" {
+                        } else if self.config.page == "Discover" {
                             ListCell(event: event)
                         }
                     //}
-                }.padding(.horizontal, 10).listRowBackground(viewRouter.page == "Favorites" ? Color(Constants.accent1) : Color(Constants.bg1))
+                }.padding(.horizontal, 10).listRowBackground(config.page == "Favorites" ? config.accent : Color.secondarySystemBackground)
             }.frame(alignment: .center)
-        }.background(viewRouter.page == "Favorites" ? Color(Constants.accent1) : Color(Constants.bg1))
+        }.background(config.page == "Favorites" ? config.accent : Color.secondarySystemBackground)
     }
     
     //USE THIS IN EVENT INITIALIZATION
-//    func getEventDate(event: EventInstance) -> Date {
-//        var event: EventInstance = event
+//    func getEventDate(event: Event) -> Date {
+//        var event: Event = event
 //        var stringDate: String = event.dateString
 //
 //        //if date has a single digit month, prepare it for dateFormat by adding a second month digit
@@ -74,7 +74,7 @@ struct CalendarView : View {
 
 //MARK: MONTHCAROUSEL DISPLAYS EACH MONTH IN A HORIZONTAL CAROUSEL
 struct MonthCarousel : UIViewRepresentable {
-    @EnvironmentObject var viewRouter: ViewRouter
+    @EnvironmentObject var config: Configuration
     @Binding var selectedDate: Date
     @Binding var month : Int
     var height : CGFloat
@@ -93,7 +93,7 @@ struct MonthCarousel : UIViewRepresentable {
         //make the Months SwiftUI View into a UIView (essentially)
         let uiMonthView = UIHostingController(rootView: Months(selectedDate: self.$selectedDate, height: self.height, numMonths: numberOfMonths()))
         uiMonthView.view.frame = CGRect(x: 0, y: 0, width: carouselWidth, height: self.height)
-        uiMonthView.view.backgroundColor = viewRouter.page == "Favorites" ? Constants.accent1 : Constants.bg1
+        uiMonthView.view.backgroundColor = config.page == "Favorites" ? config.accentUIColor : UIColor.secondarySystemBackground
         
         //add the uiMonthView as a subview of the scrollview
         //(effectively embeds the Months SwiftUI View into the Carousel UIScrollView)
@@ -132,8 +132,9 @@ struct Months: View {
 //MARK: MONTH DISPLAYS EACH MONTH FOR THE NEXT YEAR AND ALLOWS SELECTION OF EVENTS ON THAT DAY
 //USES A SYSTEM CALENDAR TO DETERMINE THE CALENDAR VIEW
 struct Month: View {
-    @EnvironmentObject var viewRouter: ViewRouter
+    @EnvironmentObject var config: Configuration
     @Binding var selectedDate: Date
+    @Environment(\.colorScheme) var colorScheme
     var height: CGFloat //used for cellWidth
     let monthOffset: Int
     let calendarUnitYMD = Set<Calendar.Component>([.year, .month, .day])
@@ -144,12 +145,12 @@ struct Month: View {
         //Discover
         //back: blue
         VStack(alignment: HorizontalAlignment.center, spacing: 10) {
-            Text(getMonthHeader()).fontWeight(.medium).font(.system(size: 30)).foregroundColor(viewRouter.page == "Favorites" ? Color(Constants.accent1) : Color(Constants.bg1)).padding(.top, 15)
+            Text(getMonthHeader()).fontWeight(.medium).font(.system(size: 30)).foregroundColor((config.page == "Favorites" || self.colorScheme == .dark) ? Color.label : Color.secondarySystemBackground).padding(.top, 15)
             //weekday header
             HStack {
                 ForEach(weekdaysArray, id: \.self) { weekday in
                     Text(weekday).fontWeight(Font.Weight.light).font(.system(size: 18))
-                        .foregroundColor(self.viewRouter.page == "Favorites" ? Color(Constants.text2).opacity(0.5) : Color(Constants.bg2).opacity(0.5)).frame(minWidth: 0, maxWidth: .infinity)
+                        .foregroundColor((self.config.page == "Favorites" || self.colorScheme == .dark) ? Color.secondaryLabel : Color.tertiarySystemBackground).frame(minWidth: 0, maxWidth: .infinity)
                 }
             }
             //month
@@ -173,7 +174,7 @@ struct Month: View {
                     }
                 }
             }.frame(minWidth: 0, maxWidth: .infinity).padding(.bottom, 15)
-        }.background(RoundedRectangle(cornerRadius: 10)).foregroundColor(viewRouter.page == "Favorites" ? Color(Constants.bg1) : Color(Constants.accent1))
+        }.background(RoundedRectangle(cornerRadius: 10)).foregroundColor(config.page == "Favorites" ? Color.tertiarySystemBackground : config.accent)
     }
     
     func compareDates(date1: Date, date2: Date) -> Bool {
@@ -230,7 +231,7 @@ struct Month: View {
 
 //MARK: FORMATTING FOR A SINGLE DATE CELL IN CALENDAR VIEW
 struct DateCell: View {
-    @EnvironmentObject var viewRouter: ViewRouter
+    @EnvironmentObject var config: Configuration
     var date: Date
     var match: Bool
     var cellWidth: CGFloat
@@ -239,26 +240,14 @@ struct DateCell: View {
     var body: some View {
         Text(self.getDate(date: date))
             .fontWeight(Font.Weight.light)
-            .foregroundColor(match ? (viewRouter.page == "Favorites" ? Color(Constants.bg2) : Color(Constants.accent1)) : Color(Constants.text1))
+            .foregroundColor(match ? (config.page == "Favorites" ? Color.tertiarySystemBackground : config.accent) : Color.label)
             .frame(width: cellWidth, height: cellWidth)
             .font(.system(size: 18))
-            .background(match ? (viewRouter.page == "Favorites" ? Color(Constants.accent1) : Color(Constants.bg2)) : Color.clear)
+            .background(match ? (config.page == "Favorites" ? config.accent : Color.white) : Color.clear)
             .clipShape(Circle())
     }
     
     func getDate(date: Date) -> String {
-        //        //Colors
-        //        if match { //if date is selected
-        //            if viewRouter.page == "Favorites" {
-        //                bgColor = Color(Constants.accent1) //circle should be accent since cal is a bg color
-        //                textColor = Color(Constants.bg2) //text should be the bg color
-        //            }
-        //            bgColor = Color(Constants.bg2) //circle should be bg color since cal is accent
-        //            textColor = Color(Constants.accent1) //text should be the accent color
-        //        }
-        //        textColor = Color(Constants.text1) //if date isn't selected, it should be the main text color
-        
-        //Date
         let formatter = DateFormatter()
         formatter.locale = .current
         formatter.dateFormat = "d"

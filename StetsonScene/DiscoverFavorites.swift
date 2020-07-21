@@ -10,7 +10,8 @@ import Foundation
 import SwiftUI
 
 struct DiscoverFavoritesView : View {
-    @EnvironmentObject var viewRouter: ViewRouter
+    @EnvironmentObject var config: Configuration
+    @Environment(\.colorScheme) var colorScheme
     @State var filterApplied: Bool = false
     @State var filterView: Bool = false
     
@@ -19,13 +20,13 @@ struct DiscoverFavoritesView : View {
             //HEADER
             HStack {
                 //Title
-                Text(viewRouter.page).fontWeight(.heavy).font(.system(size: 50)).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(viewRouter.page == "Favorites" ? Color(Constants.bg2) : Color(Constants.text1))
+                Text(config.page).fontWeight(.heavy).font(.system(size: 50)).frame(maxWidth: .infinity, alignment: .leading).foregroundColor((config.page == "Favorites" && colorScheme == .light) ? Color.tertiarySystemBackground : Color.label)
                 
                 //Filter Button
-                if viewRouter.page == "Discover" {
+                if config.page == "Discover" {
                     Image(systemName: "line.horizontal.3.decrease.circle")
                         .resizable().frame(width: 25, height: 25).padding(.trailing, 10)
-                        .foregroundColor(filterApplied ? Color(Constants.accent1) : Color(Constants.text2))
+                        .foregroundColor(filterApplied ? config.accent : Color.secondaryLabel)
                         .onTapGesture { self.filterView = true }
                         .sheet(isPresented: $filterView, content: { FilterView() })
                 }
@@ -33,14 +34,14 @@ struct DiscoverFavoritesView : View {
                 //Quick Search Button
                 Image(systemName: "magnifyingglass")
                     .resizable().frame(width: 25, height: 25).padding(.trailing, 10)
-                    .foregroundColor(viewRouter.page == "Favorites" ? Color(Constants.bg1) : Color(Constants.text2))
+                    .foregroundColor((config.page == "Favorites" && colorScheme == .light) ? Color.secondarySystemBackground : Color.secondaryLabel)
                 
             }.padding([.vertical, .horizontal])
             
             //LIST OR CALENDAR
-            if viewRouter.subPage == "List" {
+            if config.subPage == "List" {
                 ListView()
-            } else if viewRouter.subPage == "Calendar" {
+            } else if config.subPage == "Calendar" {
                 CalendarView()
             }
             
