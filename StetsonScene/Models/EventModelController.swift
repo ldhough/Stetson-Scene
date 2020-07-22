@@ -63,25 +63,21 @@ class EventViewModel: ObservableObject {
             return
         }
         if self.eventList.count == 1 {
-            if !compareEventDates(dateTimeOne: event.startDateTimeInfo, dateTimeTwo: self.eventList[0].startDateTimeInfo) {
+            if !(event.startDateTimeInfo > self.eventList[0].startDateTimeInfo) {
                 self.eventList.insert(event, at: 0)
-                print("inserted at 0")
                 return
             } else {
                 self.eventList.append(event)
-                print("appended")
                 return
             }
         }
         for i in 0 ..< self.eventList.count {
-            //compareEventDates returns true if first date/time is later than second date, false if else
-            if !compareEventDates(dateTimeOne: event.startDateTimeInfo, dateTimeTwo: self.eventList[i].startDateTimeInfo) {
-                print("inserted")
+            // > returns true if first date/time is later than second date, false if else
+            if !(event.startDateTimeInfo > self.eventList[i].startDateTimeInfo) {
                 self.eventList.insert(event, at: i)
                 return
             }
         }
-        print("fallback")
         self.eventList.append(event)
     }
     
@@ -91,18 +87,14 @@ class EventViewModel: ObservableObject {
             let fullEventList = snapshot.value as? Dictionary<String, Dictionary<String, Any>>
             //print(fullEventList)
             for (_, v) in fullEventList! {
-                var newInstanceCheck = self.readEventData(eventData: v)
+                let newInstanceCheck = self.readEventData(eventData: v)
                 if newInstanceCheck.1 == .invalid {
-                    print("not doing a thing")
                     continue
                 } else {
-                    print("doing a thing")
                     self.insertEvent(newInstanceCheck.0)
-                    print("==========")
-                    for event in self.eventList {
-                        print(event.date!)
-                    }
-                    print("==========")
+//                    for event in self.eventList {
+//                        print(event.date!)
+//                    }
                 }
             }
         })
@@ -177,7 +169,6 @@ class EventViewModel: ObservableObject {
         let dateTimeInfoEnd = makeDateTimeInfo(dateStr: newInstance.endDate, timeStr: newInstance.endTime)
         
         if !dateTimeInfoStart.1 || !dateTimeInfoEnd.1 {
-            print("Invalid event data!")
             return (newInstance, .invalid)
         } else {
             newInstance.startDateTimeInfo = dateTimeInfoStart.0
@@ -185,7 +176,6 @@ class EventViewModel: ObservableObject {
         }
         
         //Add logic here to determine if the event is favorited, in the calendar, or if the user is attending
-        print("Valid event data!")
         return (newInstance, .valid)
     }
     
@@ -245,19 +235,15 @@ class EventViewModel: ObservableObject {
     // ===== SUPPORT FUNCTIONS ===== //
     
     //Returns true if first date/time is later than second date, false if else
-    func compareEventDates(dateTimeOne: DateTimeInfo, dateTimeTwo: DateTimeInfo) -> Bool {
-        print("****")
-        print(String(dateTimeOne.month) + "/" + String(dateTimeOne.day) + "/" + String(dateTimeOne.year))
-        print(String(dateTimeTwo.month) + "/" + String(dateTimeTwo.day) + "/" + String(dateTimeTwo.year))
-        print("****")
-        if dateTimeOne.year > dateTimeTwo.year { print("year greater"); return true } else if dateTimeOne.year < dateTimeTwo.year { return false }
-        if dateTimeOne.month > dateTimeTwo.month { print("month greater"); return true } else if dateTimeOne.month < dateTimeTwo.month { return false }
-        if dateTimeOne.day > dateTimeTwo.day { print("day greater"); return true } else if dateTimeOne.day < dateTimeTwo.day { return false }
-        if dateTimeOne.am_pm.rawValue > dateTimeTwo.am_pm.rawValue { return true } else if dateTimeOne.am_pm.rawValue < dateTimeTwo.am_pm.rawValue { return false }
-        if dateTimeOne.hour > dateTimeTwo.hour { return true } else if dateTimeOne.hour < dateTimeTwo.hour { return false }
-        if dateTimeOne.minute > dateTimeTwo.minute { return true } else if dateTimeOne.minute < dateTimeTwo.minute { return false }
-        return false
-    }
+//    func compareEventDates(dateTimeOne: DateTimeInfo, dateTimeTwo: DateTimeInfo) -> Bool {
+//        if dateTimeOne.year > dateTimeTwo.year { return true } else if dateTimeOne.year < dateTimeTwo.year { return false }
+//        if dateTimeOne.month > dateTimeTwo.month { return true } else if dateTimeOne.month < dateTimeTwo.month { return false }
+//        if dateTimeOne.day > dateTimeTwo.day { return true } else if dateTimeOne.day < dateTimeTwo.day { return false }
+//        if dateTimeOne.am_pm.rawValue > dateTimeTwo.am_pm.rawValue { return true } else if dateTimeOne.am_pm.rawValue < dateTimeTwo.am_pm.rawValue { return false }
+//        if dateTimeOne.hour > dateTimeTwo.hour { return true } else if dateTimeOne.hour < dateTimeTwo.hour { return false }
+//        if dateTimeOne.minute > dateTimeTwo.minute { return true } else if dateTimeOne.minute < dateTimeTwo.minute { return false }
+//        return false
+//    }
     
     ///Method takes current number of days into the year from system & adds additional days in multiples of 7 depending on how many weeks the user wants to advance.  Helper search function.
     func getDaysIntoYear(nowPlusWeeks: Int) -> Int { //we don't have to worry about getting old events because old events are never read or put into FB
@@ -292,6 +278,24 @@ struct DateTimeInfo {
     let hour:Int
     let minute:Int
     let am_pm:AM_PM
+    
+    //Returns true if first date/time is later than second date, false if else
+    static func >(dateTimeOne: DateTimeInfo, dateTimeTwo: DateTimeInfo) -> Bool {
+        if dateTimeOne.year > dateTimeTwo.year { return true } else if dateTimeOne.year < dateTimeTwo.year { return false }
+        if dateTimeOne.month > dateTimeTwo.month { return true } else if dateTimeOne.month < dateTimeTwo.month { return false }
+        if dateTimeOne.day > dateTimeTwo.day { return true } else if dateTimeOne.day < dateTimeTwo.day { return false }
+        if dateTimeOne.am_pm.rawValue > dateTimeTwo.am_pm.rawValue { return true } else if dateTimeOne.am_pm.rawValue < dateTimeTwo.am_pm.rawValue { return false }
+        if dateTimeOne.hour > dateTimeTwo.hour { return true } else if dateTimeOne.hour < dateTimeTwo.hour { return false }
+        if dateTimeOne.minute > dateTimeTwo.minute { return true } else if dateTimeOne.minute < dateTimeTwo.minute { return false }
+        return false
+    }
+    
+    static func ==(dateTimeOne: DateTimeInfo, dateTimeTwo: DateTimeInfo) -> Bool {
+        if (dateTimeOne.year == dateTimeTwo.year) && (dateTimeOne.month == dateTimeTwo.month) && (dateTimeOne.day == dateTimeTwo.day) {
+            return true
+        }
+        return false
+    }
 }
 
 enum MyError: Error {

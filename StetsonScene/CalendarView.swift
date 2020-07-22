@@ -22,54 +22,53 @@ struct CalendarView : View {
             //event list that corresponds to selected day
             List {
                 ForEach(config.eventViewModel.eventList) { event in
-                //if self.compareDates(date1: self.selectedDate, date2: self.getEventDate(event: event)) {
-                    if self.config.page == "Favorites" && event.isFavorite {
+                    if self.compareDates(date1: self.selectedDate, date2: self.getEventDate(event: event)) {
+                        if self.config.page == "Favorites" && event.isFavorite {
                             ListCell(event: event)
                         } else if self.config.page == "Discover" {
                             ListCell(event: event)
                         }
-                    //}
+                    }
                 }.padding(.horizontal, 10).listRowBackground(config.page == "Favorites" ? config.accent : Color.secondarySystemBackground)
             }.frame(alignment: .center)
         }.background(config.page == "Favorites" ? config.accent : Color.secondarySystemBackground)
     }
     
-    //USE THIS IN EVENT INITIALIZATION
-//    func getEventDate(event: Event) -> Date {
-//        var event: Event = event
-//        var stringDate: String = event.dateString
-//
-//        //if date has a single digit month, prepare it for dateFormat by adding a second month digit
-//        if stringDate.count != 10 {
-//            stringDate = "0" + stringDate
-//        }
-//
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
-//        dateFormatter.dateFormat = "MM/dd/yyyy"
-//        let date = dateFormatter.date(from: stringDate)!
-//
-//        let calendar = Calendar.current
-//        let components = calendar.dateComponents([.year, .month, .day, .weekday], from: date)
-//
+    func getEventDate(event: EventInstance) -> Date {
+        //var event: EventInstance = event
+        var stringDate: String = event.date ?? "1/1/0001"
+
+        //if date has a single digit month, prepare it for dateFormat by adding a second month digit
+        if stringDate.count != 10 {
+            stringDate = "0" + stringDate
+        }
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
+        dateFormatter.dateFormat = "MM/dd/yyyy"
+        let date = dateFormatter.date(from: stringDate)!
+
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month, .day, .weekday], from: date)
+
 //        event.date = calendar.date(from:components)! //full thing
 //        event.month = String(calendar.component(.month, from: date)) //TODO: get the actual month, not just a number
 //        event.day = String(calendar.component(.day, from: date))
 //        event.weekday = String(calendar.component(.weekday, from: date)) //TODO: get the actual weekday, not just a number
-//
-//        return calendar.date(from:components)!
-//    }
-//
-//    //REMOVES TIME- USED ALSO IN MONTH CAROUSEL, MAKE IT GLOBAL IF POSSIBLE
-//    func compareDates(date1: Date, date2: Date) -> Bool {
-//        let dateFormatter = DateFormatter()
-//        dateFormatter.dateStyle = .short
-//        if dateFormatter.string(from: date1) == dateFormatter.string(from: date2) {
-//            return true
-//        } else {
-//            return false
-//        }
-//    }
+
+        return calendar.date(from:components)!
+    }
+
+    //REMOVES TIME- USED ALSO IN MONTH CAROUSEL, MAKE IT GLOBAL IF POSSIBLE
+    func compareDates(date1: Date, date2: Date) -> Bool {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        if dateFormatter.string(from: date1) == dateFormatter.string(from: date2) {
+            return true
+        } else {
+            return false
+        }
+    }
 }
 
 //MARK: MONTHCAROUSEL DISPLAYS EACH MONTH IN A HORIZONTAL CAROUSEL
