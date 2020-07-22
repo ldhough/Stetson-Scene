@@ -128,7 +128,7 @@ class EventViewModel: ObservableObject {
     }
     
     //Modifies event representations in persistent data.
-    func updateFavoriteData(guidToUpdate: String, favoriteTrueFalse: Bool, calendarTrueFalse: Bool) {
+    func updatePersistentData(guidToUpdate: String, favoriteTrueFalse: Bool, calendarTrueFalse: Bool) {
         let appDelegate = AppDelegate.shared()
         let managedContext = appDelegate.persistentContainer.viewContext
         let fetchReq = NSFetchRequest<NSFetchRequestResult>(entityName: "SigEventData")
@@ -180,12 +180,11 @@ class EventViewModel: ObservableObject {
         return (self.significantDictionary[guid]!.isAttending, self.significantDictionary[guid]!.isFavorite, self.significantDictionary[guid]!.isInCalendar)
     }
     
-    func updatePersistentData(guidToUpdate: String, favoriteTrueFalse: Bool, calendarTrueFalse: Bool) {
-        
-    }
-    
     func manageAttendingProperties(_ eventInstance: EventInstance, updateFavoriteState: Bool, updateCalendarState: Bool) {
         eventInstance.isFavorite = true
+        //If does not exist in persistent data and attending, add to persistent
+        //If already in persistent data with different data, modify persistent
+        //If in persistent data but now user is not attending, remove from persistent
     }
     
     // ===== FIREBASE FUNCTIONS ===== //
@@ -433,24 +432,4 @@ func getInt(_ data: String) throws -> Int {
     guard let result = Int(data) else { throw MyError.conversionError }
     return result
 
-}
-
-class EventSearchEngine {
-    
-    var applyFilter = false //
-    
-    struct EventType {
-        let name:String
-        let selected:Bool
-    }
-    
-    struct Location {
-        let name:String
-        let selected:Bool
-    }
-    
-    var eventTypeList:[EventType] = []
-    var locationList:[Location] = []
-    
-    
 }
