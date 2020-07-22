@@ -46,7 +46,7 @@ class EventInstance: Identifiable, ObservableObject {
     var mainEventType:String!
     var eventType:[String]! = [] //contains other event types in case an event falls into multiple categories
 
-    var isFavorite:Bool = false
+    var isFavorite:Bool = false //Might need to be published
     var isAttending:Bool = false
     var isInCalendar:Bool = false
     

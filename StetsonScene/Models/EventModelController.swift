@@ -17,6 +17,18 @@ class EventViewModel: ObservableObject {
     
     //List of EventInstance objects representing live events loaded into the app from the backend
     @Published var eventList:[EventInstance] = []
+    //Dictionary of all EventInstance objects
+    var eventDictionary:Dictionary<String, EventInstance> = [:] //Allows directly accessing EventInstance objects by guid
+    
+    //Persistent event data only stores data for certain properties for simplicity and other practical reasons.  These are properties that are only relevant to the user's version of these events, other properties might change by event organizers or other app users.  This struct mimics the SigEventData entity model used in Core Data.
+    struct SigEventData {
+        let guid:String
+        let isAttending:Bool
+        let isFavorite:Bool
+        let isInCalendar:Bool
+    }
+    
+    var significantDictionary:Dictionary<String, SigEventData> = [:] //Set of representations of persistent event data.  Reading from Core Data will write to this set.  After data is read from the database the event representation will be cross-referenced against this for persistent information.
     
     //Dictionaries that associate sublocations and event subtypes with their parent types
     //ex: Room 210 is a sublocation for Elizabeth Hall
@@ -48,6 +60,132 @@ class EventViewModel: ObservableObject {
             }
         }
         return childType
+    }
+    
+    // ===== FAVORITE / CALENDAR FUNCTIONS & EVENT DATA PERSISTENCE ===== //
+    
+    /*
+     Favoriting an event or adding an event to the calendar app should result in number attending going up locally and updating the database with a new attendee.  If the user cannot connect to the database, store this information and change the database later.  If isFavorite or isInCalendar is true, isAttending should also be true.  Favorite/calendar events will be loaded into the app regardless of other time constraints so that they can be displayed in the user's favorite list - they are directly queried.
+     */
+    
+    //Loads stored persistent data into significantDictionary object
+    func loadPersistentEventData() {
+        let appDelegate = AppDelegate.shared()
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let fetchReq = NSFetchRequest<NSFetchRequestResult>(entityName: "SigEventData")
+        do {
+            let result = try managedContext.fetch(fetchReq)
+            for data in result as! [NSManagedObject] {
+                let guid = data.value(forKey: "guid") as? String
+                let isAttending = data.value(forKey: "isAttending") as? Bool
+                let isInCalendar = data.value(forKey: "isInCalendar") as? Bool
+                let isFavorite = data.value(forKey: "isFavorite") as? Bool
+                self.significantDictionary[guid!] = SigEventData(guid: guid!, isAttending: isAttending!, isFavorite: isFavorite!, isInCalendar: isInCalendar!)
+            }
+        } catch {
+            print("Failed to load persistent data!")
+            print(error)
+        }
+    }
+    
+    //Function is called to add an event representation to persistent data - the logic of when this should happen is handled in manageAttendingProperties.
+    func createPersistentData(eI: EventInstance) {
+        let appDelegate = AppDelegate.shared()
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let newPersistentEntity = NSEntityDescription.entity(forEntityName: "SigEventData", in: managedContext)!
+        let newPersistent = NSManagedObject(entity: newPersistentEntity, insertInto: managedContext)
+        newPersistent.setValue(eI.isFavorite, forKey: "isFavorite")
+        newPersistent.setValue(eI.isInCalendar, forKey: "isInCalendar")
+        newPersistent.setValue(eI.isAttending, forKey: "isAttending")
+        newPersistent.setValue(eI.guid, forKey: "guid")
+        do {
+            try managedContext.save()
+        } catch let error as NSError {
+            print("Could not save. \(error)")
+        }
+    }
+    
+    //Function is called to remove an event representation from persistent data - the logic of when this should happen is handled in manageAttendingProperties.
+    func removePersistentData(guid: String) {
+        let appDelegate = AppDelegate.shared()
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let fetchReq = NSFetchRequest<NSFetchRequestResult>(entityName: "SigEventData")
+        //Only fetches entities with guid matching the guid of the event we want to remove
+        fetchReq.predicate = NSPredicate(format: "guid = %@", guid)
+        do {
+            let test = try managedContext.fetch(fetchReq)
+            //test is an array, but because we are filtering by guid it should only contain one element at [0]
+            let toDelete = test[0] as! NSManagedObject
+            managedContext.delete(toDelete)
+            do {
+                try managedContext.save()
+            } catch {
+                print(error)
+            }
+        } catch {
+            print(error)
+        }
+    }
+    
+    //Modifies event representations in persistent data.
+    func updateFavoriteData(guidToUpdate: String, favoriteTrueFalse: Bool, calendarTrueFalse: Bool) {
+        let appDelegate = AppDelegate.shared()
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let fetchReq = NSFetchRequest<NSFetchRequestResult>(entityName: "SigEventData")
+        //Only fetches entities with guid matching the guid of the event we want to modify
+        fetchReq.predicate = NSPredicate(format: "guid = %@", guidToUpdate)
+        do {
+            let test = try managedContext.fetch(fetchReq)
+            let toModify = test[0] as! NSManagedObject
+            toModify.setValue(favoriteTrueFalse, forKey: "isFavorite")
+            toModify.setValue(calendarTrueFalse, forKey: "isInCalendar")
+            if favoriteTrueFalse || calendarTrueFalse {
+                //if this event has been favorited OR added to calendar, persistent "isAttending" should be made true
+                toModify.setValue(true, forKey: "isAttending")
+            } else {
+                toModify.setValue(false, forKey: "isAttending")
+            }
+            do {
+                try managedContext.save()
+            } catch {
+                print(error)
+            }
+        } catch {
+            print(error)
+        }
+    }
+    
+    //Checks if an event has a representation in persistent data already
+    func isInPersistentData(guid: String) -> Bool {
+        let appDelegate = AppDelegate.shared()
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let fetchReq = NSFetchRequest<NSFetchRequestResult>(entityName: "SigEventData")
+        fetchReq.predicate = NSPredicate(format: "guid = %@", guid)
+        do {
+            let test = try managedContext.fetch(fetchReq)
+            if test.isEmpty {
+                return false
+            } else {
+                return true
+            }
+        } catch {
+            print("Failed to fetch an event representation with specified guid!")
+            print(error)
+        }
+        return false
+    }
+    
+    //Returns significant data from the persistent dictionary in the form of an attending, favorite, calendar tuple
+    func returnSigPersistentData(guid: String) -> (Bool, Bool, Bool) {
+        return (self.significantDictionary[guid]!.isAttending, self.significantDictionary[guid]!.isFavorite, self.significantDictionary[guid]!.isInCalendar)
+    }
+    
+    func updatePersistentData(guidToUpdate: String, favoriteTrueFalse: Bool, calendarTrueFalse: Bool) {
+        
+    }
+    
+    func manageAttendingProperties(_ eventInstance: EventInstance, updateFavoriteState: Bool, updateCalendarState: Bool) {
+        eventInstance.isFavorite = true
     }
     
     // ===== FIREBASE FUNCTIONS ===== //
@@ -179,6 +317,27 @@ class EventViewModel: ObservableObject {
         return (newInstance, .valid)
     }
     
+    func testFirebaseConnection() {
+        var lastState:Bool = false
+        AppDelegate.shared().connectedRef.observe(.value, with: { snapshot in
+            if snapshot.value as? Bool ?? false {
+                print("App is connected to FB.")
+                self.hasFirebaseConnection = true
+                lastState = true
+            } else {
+                print("App is not connected to FB.")
+                lastState = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5) { //Give some time to attempt connection.
+                    if !lastState {
+                        self.hasFirebaseConnection = false
+                    }
+                }
+            }
+        })
+    }
+    
+    // ===== SUPPORT FUNCTIONS ===== //
+    
     func makeDateTimeInfo(dateStr: String, timeStr: String) -> (DateTimeInfo, Bool) {
         let dateComponents:(Int, Int, Int, Bool) = {
             let strComp = dateStr.components(separatedBy: "/") // ["3", "14", "2000")
@@ -212,38 +371,6 @@ class EventViewModel: ObservableObject {
         }
         return (DateTimeInfo(year: dateComponents.2, month: dateComponents.0, day: dateComponents.1, hour: timeComponents.0, minute: timeComponents.1, am_pm: timeComponents.2), true)
     }
-    
-    func testFirebaseConnection() {
-        var lastState:Bool = false
-        AppDelegate.shared().connectedRef.observe(.value, with: { snapshot in
-            if snapshot.value as? Bool ?? false {
-                print("App is connected to FB.")
-                self.hasFirebaseConnection = true
-                lastState = true
-            } else {
-                print("App is not connected to FB.")
-                lastState = false
-                DispatchQueue.main.asyncAfter(deadline: .now() + 5) { //Give some time to attempt connection.
-                    if !lastState {
-                        self.hasFirebaseConnection = false
-                    }
-                }
-            }
-        })
-    }
-    
-    // ===== SUPPORT FUNCTIONS ===== //
-    
-    //Returns true if first date/time is later than second date, false if else
-//    func compareEventDates(dateTimeOne: DateTimeInfo, dateTimeTwo: DateTimeInfo) -> Bool {
-//        if dateTimeOne.year > dateTimeTwo.year { return true } else if dateTimeOne.year < dateTimeTwo.year { return false }
-//        if dateTimeOne.month > dateTimeTwo.month { return true } else if dateTimeOne.month < dateTimeTwo.month { return false }
-//        if dateTimeOne.day > dateTimeTwo.day { return true } else if dateTimeOne.day < dateTimeTwo.day { return false }
-//        if dateTimeOne.am_pm.rawValue > dateTimeTwo.am_pm.rawValue { return true } else if dateTimeOne.am_pm.rawValue < dateTimeTwo.am_pm.rawValue { return false }
-//        if dateTimeOne.hour > dateTimeTwo.hour { return true } else if dateTimeOne.hour < dateTimeTwo.hour { return false }
-//        if dateTimeOne.minute > dateTimeTwo.minute { return true } else if dateTimeOne.minute < dateTimeTwo.minute { return false }
-//        return false
-//    }
     
     ///Method takes current number of days into the year from system & adds additional days in multiples of 7 depending on how many weeks the user wants to advance.  Helper search function.
     func getDaysIntoYear(nowPlusWeeks: Int) -> Int { //we don't have to worry about getting old events because old events are never read or put into FB

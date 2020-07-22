@@ -28,7 +28,14 @@
         <attribute name="time" optional="YES" attributeType="String"/>
         <attribute name="url" optional="YES" attributeType="String"/>
     </entity>
+    <entity name="SigEventData" representedClassName="SigEventData" syncable="YES" codeGenerationType="class">
+        <attribute name="guid" optional="YES" attributeType="String"/>
+        <attribute name="isAttending" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isFavorite" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isInCalendar" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+    </entity>
     <elements>
         <element name="Favorites" positionX="-63" positionY="-18" width="128" height="433"/>
+        <element name="SigEventData" positionX="-63" positionY="135" width="128" height="103"/>
     </elements>
 </model>
