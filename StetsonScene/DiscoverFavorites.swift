@@ -45,6 +45,6 @@ struct DiscoverFavoritesView : View {
                 CalendarView()
             }
             
-        }
+        }.background((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
     }
 }

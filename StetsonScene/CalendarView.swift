@@ -11,6 +11,7 @@ import SwiftUI
 //MARK: CALENDARVIEW DISPLAYS MONTHCAROUSEL
 struct CalendarView : View {
     @EnvironmentObject var config: Configuration
+    @Environment(\.colorScheme) var colorScheme
     @State var selectedDate: Date = Date()
     @State var month = 0
     
@@ -31,7 +32,7 @@ struct CalendarView : View {
                     }
                 }.padding(.horizontal, 10).listRowBackground(config.page == "Favorites" ? config.accent : Color.secondarySystemBackground)
             }.frame(alignment: .center)
-        }.background(config.page == "Favorites" ? config.accent : Color.secondarySystemBackground)
+        }.background((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
     }
     
     func getEventDate(event: EventInstance) -> Date {

@@ -49,6 +49,10 @@ class EventInstance: Identifiable, ObservableObject {
     var isFavorite:Bool = false //Might need to be published
     var isAttending:Bool = false
     var isInCalendar:Bool = false
+    var isVirtual:Bool = false
+    
+    var linkText:String = ""
+    var shareDetails:String = ""
     
     //Properties that can change while the program is running, changes should cause updates in views
     @Published var numAttending:Int!

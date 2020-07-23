@@ -10,7 +10,34 @@ import Foundation
 import SwiftUI
 import MapKit
 
-struct MapView: UIViewRepresentable {
+struct MapView: View {
+//    @ObservedObject var landmarkSupport:LandmarkSupport
+//    @ObservedObject var locationManager = LocationManager()
+//    @ObservedObject var eventModelController:EventModelController
+//
+//    var userLatitude: String {
+//        return "\(locationManager.lastLocation?.coordinate.latitude ?? 0)"
+//    }
+//
+//    var userLongitude: String {
+//        return "\(locationManager.lastLocation?.coordinate.longitude ?? 0)"
+//    }
+//
+//    @State var selectedLandmark: Landmark? = nil
+
+    var body: some View {
+        ZStack {
+            MapViewUI().edgesIgnoringSafeArea(.vertical)
+            VStack {
+                RoundedRectangle(cornerRadius: 20).frame(width: Constants.width*0.35, height: 7).foregroundColor(Color.secondaryLabel.opacity(0.6)).padding(.top, 20)
+                Spacer()
+                Spacer()
+            }
+        }
+    }
+}
+
+struct MapViewUI: UIViewRepresentable {
     
     var locationManager = CLLocationManager()
     func setupManager() {

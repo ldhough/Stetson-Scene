@@ -11,18 +11,20 @@ import SwiftUI
 
 struct ListView : View {
     @EnvironmentObject var config: Configuration
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         VStack(spacing: 0) {
             //LIST
             List {
                 ForEach(config.eventViewModel.eventList) { event in
-                    if self.config.page == "Favorites" && event.isFavorite { //only list favorites on Favorites screen
-                        ListCell(event: event)
-                    } else if self.config.page == "Discover" {
-                        ListCell(event: event)
-                    }
-                }.listRowBackground(config.page == "Favorites" ? config.accent : Color.secondarySystemBackground)
+//                    if self.config.page == "Favorites" && event.isFavorite { //only list favorites on Favorites screen
+//                        ListCell(event: event)
+//                    } else if self.config.page == "Discover" {
+//                        ListCell(event: event)
+//                    }
+                    ListCell(event: event)
+                }.listRowBackground((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
             }
         }
     } //end of View
@@ -54,9 +56,8 @@ struct ListCell : View {
                 
                 Spacer() //fill out rest of cell
             }.padding(.vertical, config.subPage == "List" ? 10 : 5).padding(.horizontal, config.subPage == "List" ? 10 : 5) //padding within the cell, between words and borders
-        }.background(RoundedRectangle(cornerRadius: 10).stroke(Color.clear).foregroundColor(Color.label).background(RoundedRectangle(cornerRadius: 10).foregroundColor(config.page == "Favorites" ? Color.secondarySystemBackground : Color.tertiarySystemBackground)))
+        }.background(RoundedRectangle(cornerRadius: 10).stroke(Color.clear).foregroundColor(Color.label).background(RoundedRectangle(cornerRadius: 10).foregroundColor(config.page == "Favorites" ? (colorScheme == .light ? Color.secondarySystemBackground : config.accent.opacity(0.1)) : Color.tertiarySystemBackground)))
             .onTapGesture { self.detailView = true }
             .sheet(isPresented: $detailView, content: { EventDetailView(event: self.event).environmentObject(self.config) })
-        
     }
 }

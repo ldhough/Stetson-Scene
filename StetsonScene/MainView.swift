@@ -21,10 +21,11 @@ struct NavigationIndicator: UIViewControllerRepresentable {
 
 struct MainView : View {
     @EnvironmentObject var config: Configuration
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
-        ZStack { 
-            Color(config.page == "Favorites" ? config.accentUIColor : UIColor.secondarySystemBackground).edgesIgnoringSafeArea(.all)
+        ZStack {
+            Color((config.page == "Favorites" && colorScheme == .light) ? config.accentUIColor : UIColor.secondarySystemBackground).edgesIgnoringSafeArea(.all)
             VStack(spacing: 0){
                 if config.page == "Trending" {
                     TrendingView().disabled(config.showOptions ? true : false)
@@ -106,7 +107,7 @@ struct TabBar : View {
                         self.config.page = "Information"
                         self.config.showOptions = false
                 }
-            }.padding(.vertical, 5)
+            }.padding(.vertical, 15)
                 .frame(width: Constants.width)
                 .background(Color.tertiarySystemBackground)
                 .animation(.default) //hstack end

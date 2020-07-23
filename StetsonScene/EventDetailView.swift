@@ -11,6 +11,7 @@ import SwiftUI
 
 struct EventDetailView : View {
     @EnvironmentObject var config: Configuration
+    @Environment(\.colorScheme) var colorScheme
     var event: EventInstance
     
     var body: some View {
@@ -33,37 +34,166 @@ struct EventDetailView : View {
             //Description
                 Text(event.eventDescription!).fontWeight(.light).font(.system(size: 16)).multilineTextAlignment(.leading).foregroundColor(Color.label).padding(.horizontal, 10)
                 Text("DETAILS").fontWeight(.light).font(.system(size: 16)).foregroundColor(config.accent).padding(.top)
-            }
+            }.padding([.horizontal])
             
             Spacer()
-            Buttons()
+            Buttons(event: event)
         }.padding([.vertical]).background(Color.secondarySystemBackground).edgesIgnoringSafeArea(.bottom)
     }
 }
 
 struct Buttons: View {
     @EnvironmentObject var config: Configuration
+    @Environment(\.colorScheme) var colorScheme
+    var event: EventInstance
+    @State var share: Bool = false
+    @State var calendar: Bool = false
+    @State var navigate: Bool = false
+    
     var body: some View {
         HStack(spacing: 25) {
             ZStack {
-                Circle().stroke(config.accent).background(Color.tertiarySystemBackground).clipShape(Circle())
-                Image(systemName: "square.and.arrow.up").resizable().frame(width: 18, height: 22).foregroundColor(config.accent)
+                Circle().foregroundColor(share ? config.accent : Color.tertiarySystemBackground).clipShape(Circle())
+                Image(systemName: "square.and.arrow.up").resizable().frame(width: 18, height: 22).foregroundColor(share ? Color.tertiarySystemBackground : config.accent)
             }.frame(width: 40, height: 40)
+            .onTapGesture {
+                self.share.toggle()
+                if !self.event.isVirtual { self.isVirtual() }
+                //GIVE HAPTIC
+            }
+            .sheet(isPresented: $share, content: {
+                ShareView(activityItems: [/*"linktoapp.com"*/self.event.isVirtual ? URL(string: self.event.linkText)!:"", self.event.hasCultural ? "\(self.event.shareDetails) It’s even offering a cultural credit!" : "\(self.event.shareDetails)"/*, event.isVirtual ? URL(string: event.linkText)!:""*/], applicationActivities: nil)
+            })
             
             ZStack {
-                Circle().stroke(config.accent).background(Color.tertiarySystemBackground).clipShape(Circle())
-                Image(systemName: "calendar.badge.plus").resizable().frame(width: 22, height: 20).foregroundColor(config.accent)
+                Circle().foregroundColor(calendar ? config.accent : Color.tertiarySystemBackground).clipShape(Circle())
+                Image(systemName: "calendar.badge.plus").resizable().frame(width: 22, height: 20).foregroundColor(calendar ? Color.tertiarySystemBackground : config.accent)
             }.frame(width: 40, height: 40)
+            .onTapGesture {
+                self.calendar.toggle()
+            }
             
             ZStack {
-                Circle().stroke(Color.tertiarySystemBackground).background(Color.pink).clipShape(Circle())
-                Image(systemName: "heart").resizable().frame(width: 20, height: 20).foregroundColor(Color.tertiarySystemBackground)
+                Circle().foregroundColor(self.event.isFavorite ? config.accent : Color.tertiarySystemBackground).clipShape(Circle())
+                Image(systemName: "heart").resizable().frame(width: 20, height: 20).foregroundColor(self.event.isFavorite ? Color.tertiarySystemBackground : config.accent)
             }.frame(width: 40, height: 40)
+            .onTapGesture {
+                self.event.isFavorite.toggle() //NEED PERSISTENCE
+            }
             
             ZStack {
-                Circle().stroke(config.accent).background(Color.tertiarySystemBackground).clipShape(Circle())
-                Image(systemName: "location").resizable().frame(width: 20, height: 20).foregroundColor(config.accent)
+                Circle().foregroundColor(navigate ? config.accent : Color.tertiarySystemBackground).clipShape(Circle())
+                Image(systemName: "location").resizable().frame(width: 20, height: 20).foregroundColor(navigate ? Color.tertiarySystemBackground : config.accent)
             }.frame(width: 40, height: 40)
+            .onTapGesture {
+                self.navigate.toggle()
+            }.sheet(isPresented: $navigate, content: { MapView().environmentObject(self.config) })
         }.padding([.horizontal, .vertical])
     }
+    
+    func isVirtual() {
+        //if virtual, include url
+        //if cultural credit, include extra text
+        if self.event.mainLon == "0" || self.event.mainLon == "" || self.event.mainLat == "0" || self.event.mainLat == "" {
+            event.isVirtual = true
+            event.linkText = makeLink(text: event.eventDescription)
+            if event.linkText == "" { event.isVirtual = false }
+            event.shareDetails = "Check out this event I found via StetsonScene! \(event.name!) is happening on \(event.date!) at \(event.time!)!"
+        } else {
+            event.shareDetails = "Check out this event I found via StetsonScene! \(event.name!), on \(event.date!) at \(event.time!), is happening at the \(event.location!)!"
+        }
+    }
+    
+    func makeLink(text: String) -> String {
+            print("AIUGKSBAKJBKBFEKB")
+            let linkPattern = #"(<a href=")(.)+?(?=")"#
+            do {
+                let linkRegex = try NSRegularExpression(pattern: linkPattern, options: [])
+                if linkRegex.firstMatch(in: text, options: [], range: NSRange(text.startIndex..., in: text)) != nil {
+                    print("matched")
+                    let linkCG = linkRegex.firstMatch(in: text, options: [], range: NSRange(text.startIndex..., in: text))
+                    let range = linkCG?.range(at: 0)
+                    var link:String = (text as NSString).substring(with: range!)
+                    let scrapeHTMLPattern = #"(<a href=")"#
+                    let scrapeHTMLRegex = try NSRegularExpression(pattern: scrapeHTMLPattern, options: [])
+                    link = scrapeHTMLRegex.stringByReplacingMatches(in: link, options: [], range: NSRange(link.startIndex..., in: link), withTemplate: "")
+                    print(link)
+                    if !link.contains("http") && !link.contains("https") { return "" } else { return link }
+                }
+            } catch { print("Regex error") }
+            return ""
+    }
 }
+
+//struct SafariView: UIViewControllerRepresentable {
+//    let url: URL
+//    func makeUIViewController(context: UIViewControllerRepresentableContext<SafariView>) -> SFSafariViewController {
+//        return SFSafariViewController(url: url)
+//    }
+//    func updateUIViewController(_ uiViewController: SFSafariViewController, context: UIViewControllerRepresentableContext<SafariView>) {
+//
+//    }
+//}
+//
+
+struct ShareView: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    let applicationActivities: [UIActivity]?
+    func makeUIViewController(context: UIViewControllerRepresentableContext<ShareView>) -> UIActivityViewController {
+        return UIActivityViewController(activityItems: activityItems,
+                                        applicationActivities: applicationActivities)
+    }
+    func updateUIViewController(_ uiViewController: UIActivityViewController,
+                                context: UIViewControllerRepresentableContext<ShareView>) {
+    }
+}
+
+//
+//struct MailView: UIViewControllerRepresentable {
+//
+//    @Environment(\.presentationMode) var presentation
+//    @Binding var result: Result<MFMailComposeResult, Error>?
+//    var email:String
+//    var eventName:String
+//    var mBody:String = ""
+//
+//    class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
+//
+//        @Binding var presentation: PresentationMode
+//        @Binding var result: Result<MFMailComposeResult, Error>?
+//
+//        init(presentation: Binding<PresentationMode>,
+//             result: Binding<Result<MFMailComposeResult, Error>?>) {
+//            _presentation = presentation
+//            _result = result
+//        }
+//
+//        func mailComposeController(_ controller: MFMailComposeViewController,
+//                                   didFinishWith result: MFMailComposeResult,
+//                                   error: Error?) {
+//            defer {
+//                $presentation.wrappedValue.dismiss()
+//            }
+//            guard error == nil else {
+//                self.result = .failure(error!)
+//                return
+//            }
+//            self.result = .success(result)
+//        }
+//    }
+//
+//    func makeCoordinator() -> Coordinator {return Coordinator(presentation: presentation,
+//                           result: $result)}
+//
+//    func makeUIViewController(context: UIViewControllerRepresentableContext<MailView>) -> MFMailComposeViewController {
+//        let vc = MFMailComposeViewController()
+//        vc.setToRecipients([email])
+//        vc.setSubject(eventName)
+//        vc.setMessageBody(mBody, isHTML: true)
+//        vc.mailComposeDelegate = context.coordinator
+//        return vc
+//    }
+//
+//    func updateUIViewController(_ uiViewController: MFMailComposeViewController,
+//                                context: UIViewControllerRepresentableContext<MailView>) {}
+//}

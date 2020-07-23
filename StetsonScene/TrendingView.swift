@@ -15,13 +15,26 @@ struct TrendingView : View {
     
     var body: some View {
         VStack {
-            Text("Trending").fontWeight(.heavy).font(.system(size: 50)).padding([.vertical, .horizontal]).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(Color.label)
+            HStack {
+                Text("Trending").fontWeight(.heavy).font(.system(size: 50)).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(Color.label)
+                
+                //change to bell.fill when there are notifications
+                Image(systemName: "bell")
+                    .resizable().frame(width: 30, height: 32, alignment: .trailing).padding(.trailing, 10)
+                    .foregroundColor(Color.secondaryLabel/*config.accent*/)
+            }.padding([.vertical, .horizontal]).padding(.bottom, 10)
+            
+            //Announcements
+            Text("ANNOUNCEMENTS").fontWeight(.medium).font(.system(size: 25)).padding([.horizontal]).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(Color.secondaryLabel)
+            Text("Important announcements will go here, they'll probably be updates about things going on on-campus.").fontWeight(.light).font(.system(size: 20)).padding(.vertical, 5).padding([.horizontal]).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(Color.label)
+            
             //Carousel List- using GeomtryReader to detect the remaining height on the screen (smart scaling)
             GeometryReader{ geometry in
-                Carousel(trendingList: self.trendingList(), card: self.$card, height: geometry.frame(in: .global).height)
+                Carousel(trendingList: self.trendingList(), card: self.$card, height: geometry.frame(in: .global).height*0.7)
             }
             //dots that show which card is being displayed
-            CardControl(trendingList: self.trendingList(), card: self.$card).padding([.vertical, .horizontal])
+            CardControl(trendingList: self.trendingList(), card: self.$card).padding(.vertical, 10)
+            
         }
     }
     
@@ -32,16 +45,15 @@ struct TrendingView : View {
         
         //pick out trending events
         for event in config.eventViewModel.eventList {
-            if event.isTrending {
+            //if event.isTrending {
                 allTrending.append(event)
-            }
+            //}
         }
         
         //shuffle all the trending events and pick the first 10
         for event in allTrending.shuffled() {
             if id<10 {
                 selectTrending.append(event)
-                //selectTrending[id].id = id
                 id += 1
             }
         }
@@ -130,10 +142,10 @@ struct Cards : View {
                             }.frame(width: self.cardWidth, height: self.height*0.6)
                             //Text
                             VStack (alignment: .leading) {
-                                Text(event.name).fontWeight(.medium).font(.system(size: 40)).padding(.top, 10).foregroundColor(event.hasCultural ? self.config.accent : Color.label)
+                                Text(event.name).fontWeight(.medium).font(.system(size: 30)).padding(.top, 10).foregroundColor(event.hasCultural ? self.config.accent : Color.label)
                                 //TODO: CHANGE DATESTRING TO MONTH + DAY
-                                Text(event.date + " | " + event.time).fontWeight(.light).font(.system(size: 25)).padding(.top, 5).padding(.bottom, 5).foregroundColor(Color.secondaryLabel)
-                                Text(event.location).fontWeight(.light).font(.system(size: 25)).padding(.bottom, 10).foregroundColor(Color.secondaryLabel)
+                                Text(event.date + " | " + event.time).fontWeight(.light).font(.system(size: 20)).padding(.vertical, 5).foregroundColor(Color.secondaryLabel)
+                                Text(event.location).fontWeight(.light).font(.system(size: 20)).padding(.bottom, 10).foregroundColor(Color.secondaryLabel)
                             }.padding([.horizontal, .vertical])
                                 .frame(width: self.cardWidth, height: self.height*0.4, alignment: .leading)
                                 .background(Color.tertiarySystemBackground.opacity(0.7))
@@ -146,7 +158,7 @@ struct Cards : View {
                         .sheet(isPresented: self.$detailView, content: { EventDetailView(event: event).environmentObject(self.config) })
                 }.frame(width: Constants.width).animation(.default) //end of vstack
             } //end of foreach
-        } //end of hstack
+        }.padding(.top, height*0.75) //end of hstack
     }
     
 }
