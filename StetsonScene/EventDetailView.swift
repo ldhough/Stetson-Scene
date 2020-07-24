@@ -68,7 +68,7 @@ struct Buttons: View {
             })
             //ADD TO CALENDAR
             ZStack {
-                Circle().foregroundColor(calendar ? config.accent : Color.tertiarySystemBackground).clipShape(Circle())
+                Circle().foregroundColor(self.event.isInCalendar ? config.accent : Color.tertiarySystemBackground).clipShape(Circle())
                 Image(systemName: "calendar.badge.plus").resizable().frame(width: 22, height: 20).foregroundColor(self.event.isInCalendar ? Color.tertiarySystemBackground : config.accent)
             }.frame(width: 40, height: 40)
                 .onTapGesture {
