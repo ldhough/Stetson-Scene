@@ -10,9 +10,6 @@
 		3C0F520823EBA72600C91790 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F520623EBA72600C91790 /* AppDelegate.swift */; };
 		3C0F520923EBA72600C91790 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F520723EBA72600C91790 /* SceneDelegate.swift */; };
 		3C0F523623EDC11B00C91790 /* EventModelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F523523EDC11B00C91790 /* EventModelController.swift */; };
-		3C0F523D23EDC29900C91790 /* EventViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F523723EDC13A00C91790 /* EventViewController.swift */; };
-		3C0F523F23EDC32100C91790 /* SearchEventFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F523B23EDC16E00C91790 /* SearchEventFormView.swift */; };
-		3C0F524023EDC32100C91790 /* SearchFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F523923EDC16E00C91790 /* SearchFormView.swift */; };
 		3C0F524323EDCD4600C91790 /* EventInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F524223EDCD4600C91790 /* EventInstance.swift */; };
 		3C22171723E22776003CC5C3 /* ARTourViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C22171623E22776003CC5C3 /* ARTourViewController.swift */; };
 		3C22171A23E22776003CC5C3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3C22171823E22776003CC5C3 /* Main.storyboard */; };
@@ -28,16 +25,13 @@
 		3C7A740D24BF5E01005DA0B1 /* TrendingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A740C24BF5E01005DA0B1 /* TrendingView.swift */; };
 		3C7A740F24BF5E16005DA0B1 /* ListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A740E24BF5E16005DA0B1 /* ListView.swift */; };
 		3C7A741324BF68E8005DA0B1 /* InformationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A741224BF68E8005DA0B1 /* InformationView.swift */; };
-		3C90E495248C867800427FFB /* RecommendationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C90E494248C867800427FFB /* RecommendationView.swift */; };
 		3CBC5FA123EB9BA800111972 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CBC5FA023EB9BA800111972 /* MainView.swift */; };
 		3CD01BCA24C4D10D0042FACD /* DiscoverFavorites.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CD01BC924C4D10D0042FACD /* DiscoverFavorites.swift */; };
 		3CDCC95E2453588100B6AB9D /* App-Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3CDCC95D2453588100B6AB9D /* App-Icon.png */; };
 		3CF31B8E246A338200840E3F /* TourModeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CF31B8D246A338200840E3F /* TourModeDetailView.swift */; };
 		4806CA86244A7984004B010C /* MapNavView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4806CA85244A7984004B010C /* MapNavView.swift */; };
 		483ACD85242A970C003E2DE6 /* RecommendationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483ACD84242A970B003E2DE6 /* RecommendationEngine.swift */; };
-		4898798023F0E39D00062714 /* EventListNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4898797F23F0E39D00062714 /* EventListNavigationView.swift */; };
 		4898798323F1A9FD00062714 /* PersistentData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4898798123F1A9FD00062714 /* PersistentData.xcdatamodeld */; };
-		4898798523F456F100062714 /* EventListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4898798423F456F000062714 /* EventListView.swift */; };
 		48BF664B24C7E889002B0F4E /* SearchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48BF664A24C7E889002B0F4E /* SearchEngine.swift */; };
 		48D22139240615520051A66D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48D22138240615520051A66D /* ContentView.swift */; };
 		48D2213B240615B50051A66D /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48D2213A240615B50051A66D /* LocationManager.swift */; };
@@ -50,9 +44,6 @@
 		3C0F520623EBA72600C91790 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3C0F520723EBA72600C91790 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		3C0F523523EDC11B00C91790 /* EventModelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventModelController.swift; sourceTree = "<group>"; };
-		3C0F523723EDC13A00C91790 /* EventViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventViewController.swift; sourceTree = "<group>"; };
-		3C0F523923EDC16E00C91790 /* SearchFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFormView.swift; sourceTree = "<group>"; };
-		3C0F523B23EDC16E00C91790 /* SearchEventFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchEventFormView.swift; sourceTree = "<group>"; };
 		3C0F524223EDCD4600C91790 /* EventInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventInstance.swift; sourceTree = "<group>"; };
 		3C22170F23E22776003CC5C3 /* StetsonScene.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StetsonScene.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3C22171623E22776003CC5C3 /* ARTourViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARTourViewController.swift; sourceTree = "<group>"; };
@@ -70,16 +61,13 @@
 		3C7A740C24BF5E01005DA0B1 /* TrendingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingView.swift; sourceTree = "<group>"; };
 		3C7A740E24BF5E16005DA0B1 /* ListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListView.swift; sourceTree = "<group>"; };
 		3C7A741224BF68E8005DA0B1 /* InformationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InformationView.swift; sourceTree = "<group>"; };
-		3C90E494248C867800427FFB /* RecommendationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecommendationView.swift; sourceTree = "<group>"; };
 		3CBC5FA023EB9BA800111972 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		3CD01BC924C4D10D0042FACD /* DiscoverFavorites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverFavorites.swift; sourceTree = "<group>"; };
 		3CDCC95D2453588100B6AB9D /* App-Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "App-Icon.png"; sourceTree = "<group>"; };
 		3CF31B8D246A338200840E3F /* TourModeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TourModeDetailView.swift; sourceTree = "<group>"; };
 		4806CA85244A7984004B010C /* MapNavView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapNavView.swift; sourceTree = "<group>"; };
 		483ACD84242A970B003E2DE6 /* RecommendationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendationEngine.swift; sourceTree = "<group>"; };
-		4898797F23F0E39D00062714 /* EventListNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventListNavigationView.swift; sourceTree = "<group>"; };
 		4898798223F1A9FD00062714 /* PersistentData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PersistentData.xcdatamodel; sourceTree = "<group>"; };
-		4898798423F456F000062714 /* EventListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventListView.swift; sourceTree = "<group>"; };
 		48BF664A24C7E889002B0F4E /* SearchEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchEngine.swift; sourceTree = "<group>"; };
 		48D22138240615520051A66D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		48D2213A240615B50051A66D /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
@@ -102,19 +90,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		3C0F523023EDC0B600C91790 /* Event List */ = {
-			isa = PBXGroup;
-			children = (
-				3C0F523723EDC13A00C91790 /* EventViewController.swift */,
-				4898798423F456F000062714 /* EventListView.swift */,
-				4898797F23F0E39D00062714 /* EventListNavigationView.swift */,
-				3C0F523B23EDC16E00C91790 /* SearchEventFormView.swift */,
-				3C0F523923EDC16E00C91790 /* SearchFormView.swift */,
-				3C90E494248C867800427FFB /* RecommendationView.swift */,
-			);
-			path = "Event List";
-			sourceTree = "<group>";
-		};
 		3C22170623E22776003CC5C3 = {
 			isa = PBXGroup;
 			children = (
@@ -150,7 +125,6 @@
 				3C7A741224BF68E8005DA0B1 /* InformationView.swift */,
 				3C23C9C924699902003E254D /* Configuration.swift */,
 				4898798123F1A9FD00062714 /* PersistentData.xcdatamodeld */,
-				3C0F523023EDC0B600C91790 /* Event List */,
 				48D22135240614B90051A66D /* Map */,
 				3CBC5FA423EB9CB700111972 /* AR */,
 				3CBC5FA223EB9CAC00111972 /* Models */,
@@ -318,13 +292,10 @@
 				3C0F520823EBA72600C91790 /* AppDelegate.swift in Sources */,
 				48D30A14246A3D49004E84A6 /* BuildingInstance.swift in Sources */,
 				48D30A16246A4C53004E84A6 /* BuildingModelController.swift in Sources */,
-				4898798023F0E39D00062714 /* EventListNavigationView.swift in Sources */,
 				3C22171723E22776003CC5C3 /* ARTourViewController.swift in Sources */,
 				3C7A740D24BF5E01005DA0B1 /* TrendingView.swift in Sources */,
-				3C0F523F23EDC32100C91790 /* SearchEventFormView.swift in Sources */,
 				3C290C1F24BFCE54008D83F0 /* FilterView.swift in Sources */,
 				3C7A740F24BF5E16005DA0B1 /* ListView.swift in Sources */,
-				3C0F523D23EDC29900C91790 /* EventViewController.swift in Sources */,
 				48D22139240615520051A66D /* ContentView.swift in Sources */,
 				4806CA86244A7984004B010C /* MapNavView.swift in Sources */,
 				3C290C2324BFD677008D83F0 /* CalendarView.swift in Sources */,
@@ -335,13 +306,10 @@
 				3CD01BCA24C4D10D0042FACD /* DiscoverFavorites.swift in Sources */,
 				3C0F523623EDC11B00C91790 /* EventModelController.swift in Sources */,
 				3C0F524323EDCD4600C91790 /* EventInstance.swift in Sources */,
-				3C90E495248C867800427FFB /* RecommendationView.swift in Sources */,
 				3C3A46F424C4BC75004B2785 /* MapView.swift in Sources */,
-				4898798523F456F100062714 /* EventListView.swift in Sources */,
 				483ACD85242A970C003E2DE6 /* RecommendationEngine.swift in Sources */,
 				3CF31B8E246A338200840E3F /* TourModeDetailView.swift in Sources */,
 				4898798323F1A9FD00062714 /* PersistentData.xcdatamodeld in Sources */,
-				3C0F524023EDC32100C91790 /* SearchFormView.swift in Sources */,
 				3C0F520923EBA72600C91790 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
