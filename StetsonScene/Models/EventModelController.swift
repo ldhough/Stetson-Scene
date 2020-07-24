@@ -203,6 +203,9 @@ class EventViewModel: ObservableObject {
     
     func manageCalendar(_ event: EventInstance) -> ActionSheet {
         let doesEventExist:Bool = self.doesEventExist(store: EKEventStore(), title: event.name, date: event.date, time: event.time, endDate: event.endDate, endTime: event.endTime)
+        if !doesEventExist && event.isInCalendar { //Can happen if event is removed from calendar while app is running
+            self.managePersistentProperties(event, updateFavoriteState: false, updateCalendarState: true)
+        }
         if doesEventExist { //event already exists
             return ActionSheet(title: Text("Whoops!"), message: Text("You already have this event in your calendar!"), buttons: [.destructive(Text("Dismiss"), action: {})])
         } else { //event does not already exist
@@ -447,6 +450,10 @@ class EventViewModel: ObservableObject {
             newInstance.isFavorite = significantDictionary[newInstance.guid]!.isFavorite
             newInstance.isInCalendar = significantDictionary[newInstance.guid]!.isInCalendar
             newInstance.isAttending = significantDictionary[newInstance.guid]!.isAttending
+            let checkCal = self.doesEventExist(store: EKEventStore(), title: newInstance.name, date: newInstance.date, time: newInstance.time, endDate: newInstance.endDate, endTime: newInstance.endTime)
+            if checkCal != newInstance.isInCalendar {
+                self.managePersistentProperties(newInstance, updateFavoriteState: false, updateCalendarState: true)
+            }
         }
         
         return (newInstance, .valid)

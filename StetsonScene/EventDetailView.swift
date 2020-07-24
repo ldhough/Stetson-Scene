@@ -12,7 +12,7 @@ import SwiftUI
 struct EventDetailView : View {
     @EnvironmentObject var config: Configuration
     @Environment(\.colorScheme) var colorScheme
-    var event: EventInstance
+    @ObservedObject var event: EventInstance
     
     var body: some View {
         VStack {
@@ -69,13 +69,14 @@ struct Buttons: View {
             //ADD TO CALENDAR
             ZStack {
                 Circle().foregroundColor(calendar ? config.accent : Color.tertiarySystemBackground).clipShape(Circle())
-                Image(systemName: "calendar.badge.plus").resizable().frame(width: 22, height: 20).foregroundColor(calendar ? Color.tertiarySystemBackground : config.accent)
+                Image(systemName: "calendar.badge.plus").resizable().frame(width: 22, height: 20).foregroundColor(self.event.isInCalendar ? Color.tertiarySystemBackground : config.accent)
             }.frame(width: 40, height: 40)
                 .onTapGesture {
+                    self.calendar = true
                     haptic()
-                    self.config.eventViewModel.manageCalendar(self.event)
-                    //GIVE HAPTIC
-            }//.actionSheet(isPresented: $calendar) { self.eventActions.calendarActions(event: self.event) }
+            }.actionSheet(isPresented: $calendar) {
+                self.config.eventViewModel.manageCalendar(self.event)
+            }
             //FAVORITE
             ZStack {
                 Circle().foregroundColor(self.event.isFavorite ? config.accent : Color.tertiarySystemBackground).clipShape(Circle())
