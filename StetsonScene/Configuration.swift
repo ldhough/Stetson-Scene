@@ -19,16 +19,27 @@ class Configuration: ObservableObject {
         self.eventViewModel = viewModel
     }
     
+    //true=events | false=buildings
+    var appEventMode: Bool = true {
+        didSet {
+            objectWillChange.send(self)
+        }
+    }
+    
+    //Trending, Discover, Favorites, Information 
     var page: String = "Trending" {
         didSet {
             objectWillChange.send(self)
         }
     }
+    
+    //List, Calendar, AR, Map
     var subPage: String = "List" {
         didSet {
             objectWillChange.send(self)
         }
     }
+    
     var showOptions: Bool = false {
         didSet {
             objectWillChange.send(self)

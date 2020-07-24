@@ -36,8 +36,8 @@ class EventInstance: Identifiable, ObservableObject {
     var mainCity:String!
     var mainState:String!
     var mainZip:String!
-    var mainLat:String!
-    var mainLon:String!
+    var mainLat:Double!
+    var mainLon:Double!
     var locations:[String]! = [] //sublocations
     
     var hasCultural:Bool = false //exists for easy validation of which events provide cultural credits

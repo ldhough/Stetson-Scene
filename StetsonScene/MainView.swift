@@ -11,9 +11,12 @@ import UIKit
 
 struct NavigationIndicator: UIViewControllerRepresentable {
     typealias UIViewControllerType = ARView
+    var arFindMode: Bool
+    var navToEvent: EventInstance? = nil
+    @EnvironmentObject var config: Configuration
     
     func makeUIViewController(context: Context) -> ARView {
-        return ARView()
+        return ARView(arFindMode: arFindMode, config: self.config)
     }
     func updateUIViewController(_ uiViewController: NavigationIndicator.UIViewControllerType, context: UIViewControllerRepresentableContext<NavigationIndicator>) { }
 }
@@ -24,7 +27,7 @@ struct MainView : View {
     @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
-        ZStack {
+        ZStack { 
             Color((config.page == "Favorites" && colorScheme == .light) ? config.accentUIColor : UIColor.secondarySystemBackground).edgesIgnoringSafeArea(.all)
             VStack(spacing: 0){
                 if config.page == "Trending" {
@@ -33,7 +36,7 @@ struct MainView : View {
                     if config.subPage == "List" || config.subPage == "Calendar" {
                         DiscoverFavoritesView().blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false)
                     } else if config.subPage == "AR" {
-                        NavigationIndicator().blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false).edgesIgnoringSafeArea(.top)
+                        NavigationIndicator(arFindMode: true).blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false).edgesIgnoringSafeArea(.top)
                     } else if config.subPage == "Map" {
                         MapView().blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false).edgesIgnoringSafeArea(.top)
                     }

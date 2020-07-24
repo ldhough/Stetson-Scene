@@ -177,5 +177,3 @@ struct CardControl : UIViewRepresentable {
         }
     }
 }
-
-

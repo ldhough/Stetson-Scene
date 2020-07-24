@@ -52,7 +52,7 @@ struct Buttons: View {
     
     //MARK: VIEW
     var body: some View {
-        HStack(spacing: 25) {
+        return HStack(spacing: 25) {
             //SHARE
             ZStack {
                 Circle().foregroundColor(share ? config.accent : Color.tertiarySystemBackground).clipShape(Circle())
@@ -60,7 +60,14 @@ struct Buttons: View {
             }.frame(width: 40, height: 40)
                 .onTapGesture {
                     self.share.toggle()
-                    if !self.event.isVirtual { self.isVirtual() }
+                    self.config.eventViewModel.isVirtual(event: self.event)
+                    if self.event.isVirtual {
+                        self.event.linkText = self.makeLink(text: self.event.eventDescription)
+                            if self.event.linkText == "" { self.event.isVirtual = false }
+                            self.event.shareDetails = "Check out this event I found via StetsonScene! \(self.event.name!) is happening on \(self.event.date!) at \(self.event.time!)!"
+                    } else {
+                            self.event.shareDetails = "Check out this event I found via StetsonScene! \(self.event.name!), on \(self.event.date!) at \(self.event.time!), is happening at the \(self.event.location!)!"
+                    }
                     //GIVE HAPTIC
             }
             .sheet(isPresented: $share, content: { //NEED TO LINK TO APPROPRIATE LINKS ONCE APP IS PUBLISHED
@@ -94,40 +101,29 @@ struct Buttons: View {
                 .onTapGesture {
                     self.navigate.toggle()
                     //GIVE HAPTIC
-            }.sheet(isPresented: $navigate, content: { MapView().environmentObject(self.config) })
+            }.sheet(isPresented: $navigate, content: {
+                NavigationIndicator(arFindMode: false, navToEvent: self.event).environmentObject(self.config)
+                //MapView().environmentObject(self.config)
+            })
         }
     }
     
     //MARK: FOR SHARING
-    //determines if event is virtual depending on location
-    func isVirtual() {
-        //if virtual, include url
-        //if cultural credit, include extra text
-        if self.event.mainLon == "0" || self.event.mainLon == "" || self.event.mainLat == "0" || self.event.mainLat == "" {
-            event.isVirtual = true
-            event.linkText = makeLink(text: event.eventDescription)
-            if event.linkText == "" { event.isVirtual = false }
-            event.shareDetails = "Check out this event I found via StetsonScene! \(event.name!) is happening on \(event.date!) at \(event.time!)!"
-        } else {
-            event.shareDetails = "Check out this event I found via StetsonScene! \(event.name!), on \(event.date!) at \(event.time!), is happening at the \(event.location!)!"
-        }
-    }
-    
     //scrapes html for links
     func makeLink(text: String) -> String {
-        print("AIUGKSBAKJBKBFEKB")
+        //print("AIUGKSBAKJBKBFEKB")
         let linkPattern = #"(<a href=")(.)+?(?=")"#
         do {
             let linkRegex = try NSRegularExpression(pattern: linkPattern, options: [])
             if linkRegex.firstMatch(in: text, options: [], range: NSRange(text.startIndex..., in: text)) != nil {
-                print("matched")
+                //print("matched")
                 let linkCG = linkRegex.firstMatch(in: text, options: [], range: NSRange(text.startIndex..., in: text))
                 let range = linkCG?.range(at: 0)
                 var link:String = (text as NSString).substring(with: range!)
                 let scrapeHTMLPattern = #"(<a href=")"#
                 let scrapeHTMLRegex = try NSRegularExpression(pattern: scrapeHTMLPattern, options: [])
                 link = scrapeHTMLRegex.stringByReplacingMatches(in: link, options: [], range: NSRange(link.startIndex..., in: link), withTemplate: "")
-                print(link)
+                //print(link)
                 if !link.contains("http") && !link.contains("https") { return "" } else { return link }
             }
         } catch { print("Regex error") }

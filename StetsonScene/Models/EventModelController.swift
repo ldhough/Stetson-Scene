@@ -416,9 +416,11 @@ class EventViewModel: ObservableObject {
             case "zip":
                 newInstance.mainZip = (v as? String) ?? "Default zip"
             case "lat":
-                newInstance.mainLat = (v as? String) == "" ? "0" : (v as? String) ?? "0"
+                let tempLat = (v as? String) ?? "0.0"
+                newInstance.mainLat = (Double(tempLat) != nil) ? Double(tempLat) : 0.0
             case "lon":
-                newInstance.mainLon = (v as? String) == "" ? "0" : (v as? String) ?? "0"
+                let tempLon = (v as? String) ?? "0.0"
+                newInstance.mainLon = (Double(tempLon) != nil) ? Double(tempLon) : 0.0
             case "hasCultural":
                 newInstance.hasCultural = (v as? Bool) ?? false
             case "subLocations":
@@ -533,6 +535,20 @@ class EventViewModel: ObservableObject {
         daysIntoYear += currentDay
         return daysIntoYear + nowPlusWeeks*7
     }
+    
+    func isVirtual(event: EventInstance) {
+        if event.mainLon == 0.0 || event.mainLat == 0.0 {
+            event.isVirtual = true
+        }
+    }
+    
+    func sanitizeCoords(event: EventInstance) {
+        if (event.mainLat < 0 && event.mainLon > 0) {
+            let temp = event.mainLat
+             event.mainLat = event.mainLon
+             event.mainLon = temp
+       }
+    }
 }
 
 enum AM_PM: Int {
@@ -578,7 +594,7 @@ func getInt(_ data: String) throws -> Int {
 }
 
 func haptic() {
-    print("activated haptic")
+    //print("activated haptic")
     let generator = UINotificationFeedbackGenerator()
     generator.notificationOccurred(.success)
 }

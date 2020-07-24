@@ -44,7 +44,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let vm = EventViewModel()
         let se = EventSearchEngine()
         vm.retrieveFirebaseData(daysIntoYear: vm.getDaysIntoYear(nowPlusWeeks: 1), doFilter: false, searchEngine: se)
-        print(vm.eventList)
+        //print(vm.eventList)
         self.config = Configuration(vm)
         
         //Keeps List views from having cell dividers
