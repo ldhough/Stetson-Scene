@@ -75,6 +75,7 @@ class EventViewModel: ObservableObject {
     
     //Loads stored persistent data into significantDictionary object
     func loadPersistentEventData() {
+        self.significantDictionary = [:]
         let appDelegate = AppDelegate.shared()
         let managedContext = appDelegate.persistentContainer.viewContext
         let fetchReq = NSFetchRequest<NSFetchRequestResult>(entityName: "SigEventData")
@@ -179,7 +180,6 @@ class EventViewModel: ObservableObject {
     }
     
     func toggleFavorite(_ event: EventInstance) {
-        event.isFavorite.toggle()
         self.managePersistentProperties(event, updateFavoriteState: true, updateCalendarState: false)
     }
     
@@ -198,6 +198,7 @@ class EventViewModel: ObservableObject {
                 self.removePersistentData(guid: event.guid)
             }
         }
+        self.loadPersistentEventData()
     }
     
     func manageCalendar(_ event: EventInstance) -> ActionSheet {
@@ -347,6 +348,7 @@ class EventViewModel: ObservableObject {
     }
     
     func retrieveFirebaseData(daysIntoYear: Int, doFilter: Bool, searchEngine: EventSearchEngine) {
+        self.loadPersistentEventData()
         self.eventList = []
         AppDelegate.shared().eventListRef.queryOrdered(byChild: "daysIntoYear").queryEnding(atValue: daysIntoYear).observe(.value, with: { snapshot in
             let fullEventList = snapshot.value as? Dictionary<String, Dictionary<String, Any>>
@@ -441,6 +443,12 @@ class EventViewModel: ObservableObject {
         }
         
         //Add logic here to determine if the event is favorited, in the calendar, or if the user is attending
+        if self.significantDictionary[newInstance.guid] != nil {
+            newInstance.isFavorite = significantDictionary[newInstance.guid]!.isFavorite
+            newInstance.isInCalendar = significantDictionary[newInstance.guid]!.isInCalendar
+            newInstance.isAttending = significantDictionary[newInstance.guid]!.isAttending
+        }
+        
         return (newInstance, .valid)
     }
     
@@ -560,4 +568,10 @@ func getInt(_ data: String) throws -> Int {
     guard let result = Int(data) else { throw MyError.conversionError }
     return result
 
+}
+
+func haptic() {
+    print("activated haptic")
+    let generator = UINotificationFeedbackGenerator()
+    generator.notificationOccurred(.success)
 }

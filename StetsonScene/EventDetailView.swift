@@ -45,7 +45,7 @@ struct EventDetailView : View {
 struct Buttons: View {
     @EnvironmentObject var config: Configuration
     @Environment(\.colorScheme) var colorScheme
-    var event: EventInstance
+    @ObservedObject var event: EventInstance
     @State var share: Bool = false
     @State var calendar: Bool = false
     @State var navigate: Bool = false
@@ -72,7 +72,8 @@ struct Buttons: View {
                 Image(systemName: "calendar.badge.plus").resizable().frame(width: 22, height: 20).foregroundColor(calendar ? Color.tertiarySystemBackground : config.accent)
             }.frame(width: 40, height: 40)
                 .onTapGesture {
-                    self.calendar.toggle()
+                    haptic()
+                    self.config.eventViewModel.manageCalendar(self.event)
                     //GIVE HAPTIC
             }//.actionSheet(isPresented: $calendar) { self.eventActions.calendarActions(event: self.event) }
             //FAVORITE
@@ -81,8 +82,8 @@ struct Buttons: View {
                 Image(systemName: "heart").resizable().frame(width: 20, height: 20).foregroundColor(self.event.isFavorite ? Color.tertiarySystemBackground : config.accent)
             }.frame(width: 40, height: 40)
                 .onTapGesture {
-                    self.event.isFavorite.toggle() //NEED PERSISTENCE
-                    //GIVE HAPTIC
+                    haptic()
+                    self.config.eventViewModel.toggleFavorite(self.event)
             }
             //NAVIGATE
             ZStack {
