@@ -12,6 +12,11 @@ import FirebaseDatabase
 import CoreData
 import EventKit
 
+//
+enum SuccessCheck {
+    case success, error
+}
+
 /// ViewModel class for MVVM design pattern.  A single instance is created and injected into various views.
 class EventViewModel: ObservableObject {
     
@@ -139,12 +144,9 @@ class EventViewModel: ObservableObject {
             let toModify = test[0] as! NSManagedObject
             toModify.setValue(favoriteTrueFalse, forKey: "isFavorite")
             toModify.setValue(calendarTrueFalse, forKey: "isInCalendar")
-            if favoriteTrueFalse || calendarTrueFalse {
-                //if this event has been favorited OR added to calendar, persistent "isAttending" should be made true
-                toModify.setValue(true, forKey: "isAttending")
-            } else {
-                toModify.setValue(false, forKey: "isAttending")
-            }
+            //if this event has been favorited OR added to calendar, persistent "isAttending" should be made true
+            let attendingVal = (favoriteTrueFalse || calendarTrueFalse) ? true : false
+            toModify.setValue(attendingVal, forKey: "isAttending")
             do {
                 try managedContext.save()
             } catch {
@@ -163,11 +165,7 @@ class EventViewModel: ObservableObject {
         fetchReq.predicate = NSPredicate(format: "guid = %@", guid)
         do {
             let test = try managedContext.fetch(fetchReq)
-            if test.isEmpty {
-                return false
-            } else {
-                return true
-            }
+            return test.isEmpty ? false : true
         } catch {
             print("Failed to fetch an event representation with specified guid!")
             print(error)
@@ -180,11 +178,141 @@ class EventViewModel: ObservableObject {
         return (self.significantDictionary[guid]!.isAttending, self.significantDictionary[guid]!.isFavorite, self.significantDictionary[guid]!.isInCalendar)
     }
     
-    func manageAttendingProperties(_ eventInstance: EventInstance, updateFavoriteState: Bool, updateCalendarState: Bool) {
-        eventInstance.isFavorite = true
-        //If does not exist in persistent data and attending, add to persistent
-        //If already in persistent data with different data, modify persistent
-        //If in persistent data but now user is not attending, remove from persistent
+    func toggleFavorite(_ event: EventInstance) {
+        event.isFavorite.toggle()
+        self.managePersistentProperties(event, updateFavoriteState: true, updateCalendarState: false)
+    }
+    
+    func managePersistentProperties(_ event: EventInstance, updateFavoriteState: Bool, updateCalendarState: Bool) {
+        event.isFavorite = updateFavoriteState ? !event.isFavorite : event.isFavorite
+        event.isInCalendar = updateCalendarState ? !event.isInCalendar : event.isInCalendar
+        event.isAttending = (event.isFavorite || event.isInCalendar) ? !event.isAttending : event.isAttending
+        if event.isAttending {
+            if !self.isInPersistentData(guid: event.guid) { //If does not exist in persistent data and attending, add to persistent
+                self.createPersistentData(eI: event)
+            } else { //If already in persistent data with different data, modify persistent
+                self.updatePersistentData(guidToUpdate: event.guid, favoriteTrueFalse: event.isFavorite, calendarTrueFalse: event.isInCalendar)
+            }
+        } else {
+            if self.isInPersistentData(guid: event.guid) { //If in persistent data but now user is not attending, remove from persistent
+                self.removePersistentData(guid: event.guid)
+            }
+        }
+    }
+    
+    func manageCalendar(_ event: EventInstance) -> ActionSheet {
+        let doesEventExist:Bool = self.doesEventExist(store: EKEventStore(), title: event.name, date: event.date, time: event.time, endDate: event.endDate, endTime: event.endTime)
+        if doesEventExist { //event already exists
+            return ActionSheet(title: Text("Whoops!"), message: Text("You already have this event in your calendar!"), buttons: [.destructive(Text("Dismiss"), action: {})])
+        } else { //event does not already exist
+            return ActionSheet(title: Text("Add event?"), message: Text("Would you like to add an alert when this event is about to happen?"),
+                               buttons: [.default(Text("Save with alert"), action: {
+                                let eventStore = EKEventStore()
+                                switch EKEventStore.authorizationStatus(for: .event) {
+                                case .authorized:
+                                    self.manageCalendarInsertion(event: event, eventStore: eventStore, saveWithAlert: true)
+                                case .denied:
+                                    print("Access denied")
+                                case .notDetermined:
+                                    eventStore.requestAccess(to: .event, completion:
+                                        {[self] (granted: Bool, error: Error?) -> Void in
+                                            if granted {
+                                                self.manageCalendarInsertion(event: event, eventStore: eventStore, saveWithAlert: true)
+                                            } else {
+                                                print("Access denied")
+                                            }
+                                    })
+                                default:
+                                    print("Case default")
+                                }
+                               }),
+                                         .default(Text("Save without alert"), action: {
+                                            let eventStore = EKEventStore()
+                                            switch EKEventStore.authorizationStatus(for: .event) {
+                                            case .authorized:
+                                                self.manageCalendarInsertion(event: event, eventStore: eventStore, saveWithAlert: false)
+                                            case .denied:
+                                                print("Access denied")
+                                            case .notDetermined:
+                                                eventStore.requestAccess(to: .event, completion:
+                                                    {[self] (granted: Bool, error: Error?) -> Void in
+                                                        if granted {
+                                                            self.manageCalendarInsertion(event: event, eventStore: eventStore, saveWithAlert: false)
+                                                        } else {
+                                                            print("Access denied")
+                                                        }
+                                                })
+                                            default:
+                                                print("Case default")
+                                            }
+                                         }),
+                                         .destructive(Text("Cancel"), action: {
+                                         })])
+        }
+    }
+    
+    func manageCalendarInsertion(event: EventInstance, eventStore: EKEventStore, saveWithAlert: Bool) {
+        self.insertEvent(store: eventStore, title: event.name, date: event.date, time: event.time, endDate: event.endDate, endTime: event.endTime, saveWithAlert: saveWithAlert)
+        self.managePersistentProperties(event, updateFavoriteState: false, updateCalendarState: true)
+    }
+    
+    ///Inserts events into the user's calendar.
+    func insertEvent(store: EKEventStore, title: String, date: String, time: String, endDate: String, endTime: String, saveWithAlert: Bool) {
+        let calendar = store.defaultCalendarForNewEvents
+        let event = EKEvent(eventStore: store)
+        event.calendar = calendar
+        event.title = title
+        event.startDate = makeDateComponents(day: date, time: time)
+        event.endDate = makeDateComponents(day: endDate, time: endTime)
+        if saveWithAlert { //should or should not save with an alert
+            let alarm = EKAlarm(relativeOffset: TimeInterval(-30*60)) //30 minutes before event start
+            event.addAlarm(alarm)
+        }
+        let alreadyExists = doesEventExist(store: store, title: title, date: date, time: time, endDate: endDate, endTime: endTime)
+        if !alreadyExists {
+            do {
+                try store.save(event, span: .thisEvent)
+                print("Successfully saved event.")
+            } catch {
+                print("Error saving event.")
+            }
+        } else {
+            print("Event already exists.")
+        }
+    }
+    
+    ///Makes DateComponents object that can then be used in putting events on the user's calendar at the right time.
+    func makeDateComponents(day: String, time: String) -> Date {
+        let eventDate:Date
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM/dd/yyyy h:mm a"
+        formatter.timeZone = TimeZone(abbreviation: "EST")
+        let dateToUse = day + " " + time
+        eventDate = formatter.date(from: dateToUse)!
+        print()
+        
+        return eventDate
+    }
+    
+    ///Called when attempting to add events to calendar to determine if the event already exists & deny adding if this is the case.
+    func doesEventExist(store: EKEventStore, title: String, date: String, time: String, endDate: String, endTime: String) -> Bool {
+        let calendar = store.defaultCalendarForNewEvents
+        let event = EKEvent(eventStore: store)
+        event.calendar = calendar
+        event.title = title
+        event.startDate = makeDateComponents(day: date, time: time)
+        event.endDate = makeDateComponents(day: endDate, time: endTime)
+        
+        let predicate = store.predicateForEvents(withStart: makeDateComponents(day: date, time: time), end: makeDateComponents(day: endDate, time: endTime), calendars: nil)
+        let existingEvents = store.events(matching: predicate)
+        let alreadyExists = existingEvents.contains(where: {e in e.title == event.title && e.startDate == event.startDate && e.endDate == event.endDate})
+        
+        if alreadyExists {
+            return true
+        } else {
+            return false
+        }
     }
     
     // ===== FIREBASE FUNCTIONS ===== //
