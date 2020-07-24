@@ -1,5 +1,5 @@
 //
-//  HomeViewController.swift
+//  MainView.swift
 //  StetsonScene
 //
 //  Created by Madison Gipson on 2/5/20.
@@ -107,7 +107,7 @@ struct TabBar : View {
                         self.config.page = "Information"
                         self.config.showOptions = false
                 }
-            }.padding(.vertical, 15)
+            }.padding(.vertical, 10)
                 .frame(width: Constants.width)
                 .background(Color.tertiarySystemBackground)
                 .animation(.default) //hstack end

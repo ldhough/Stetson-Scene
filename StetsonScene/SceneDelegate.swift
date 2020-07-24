@@ -51,14 +51,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         //UITableView.appearance().allowsSelection = false
         //UITableViewCell.appearance().selectionStyle = .none
         UITableView.appearance().separatorStyle = .none
-        UITableView.appearance().backgroundColor = config.page == "Favorites" ? config.accentUIColor : UIColor.clear
+        UITableView.appearance().backgroundColor = UIColor.clear
         //UITableView.appearance().separatorColor = .clear
-        
         
         
         //SwiftUI root view
         //let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        let contentView = MainView(/*eventModelController: self.eventModelController, event: self.event, landmarkSupport: landmarkSupport*//*, helperClass: self.wheelNavigation*/)//.environment(\.managedObjectContext, context)
+        let contentView = MainView()//.environment(\.managedObjectContext, context)
         
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)
@@ -66,7 +65,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             //            window.rootViewController = UIHostingController(rootView: contentView.onTapGesture(count: 2, perform: {
             //                window.endEditing(true)
             //            }))
-            window.rootViewController = UIHostingController(rootView: MainView().environmentObject(Configuration(vm)))
+            window.rootViewController = UIHostingController(rootView: contentView.environmentObject(Configuration(vm)))
             self.window = window
             window.makeKeyAndVisible()
         }

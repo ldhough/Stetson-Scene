@@ -30,7 +30,7 @@ struct CalendarView : View {
                             ListCell(event: event)
                         }
                     }
-                }.padding(.horizontal, 10).listRowBackground(config.page == "Favorites" ? config.accent : Color.secondarySystemBackground)
+                }.padding(.horizontal, 10).listRowBackground((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
             }.frame(alignment: .center)
         }.background((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
     }

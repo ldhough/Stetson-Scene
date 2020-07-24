@@ -15,12 +15,11 @@ struct EventDetailView : View {
     var event: EventInstance
     
     var body: some View {
-        VStack(spacing: 30) {
+        VStack {
             RoundedRectangle(cornerRadius: 20).frame(width: Constants.width*0.25, height: 5, alignment: .center).foregroundColor(Color.secondaryLabel.opacity(0.2)).padding(.bottom, 10)
             
-            ScrollView {
                 //Event name
-                Text(event.name).fontWeight(.medium).font(.system(size: 40)).frame(maxWidth: .infinity, alignment: .center).multilineTextAlignment(.center).foregroundColor(event.hasCultural ? config.accent : Color.label)
+                Text(event.name).fontWeight(.medium).font(.system(size: 30)).frame(maxWidth: .infinity, alignment: .center).multilineTextAlignment(.center).foregroundColor(event.hasCultural ? config.accent : Color.label)
                 //Info row
                 HStack(spacing: 20) {
                     Text(event.date).fontWeight(.light).font(.system(size: 20)).frame(maxWidth: .infinity, alignment: .trailing).foregroundColor(event.hasCultural ? Color.label : config.accent)
@@ -30,14 +29,15 @@ struct EventDetailView : View {
                     }
                     Text(event.time).fontWeight(.light).font(.system(size: 20)).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(event.hasCultural ? Color.label : config.accent)
                 }
-                Rectangle().frame(width: Constants.width*0.75, height: 1, alignment: .center).foregroundColor(Color.secondaryLabel.opacity(0.2)).padding(.vertical, 15)
+                Rectangle().frame(width: Constants.width*0.75, height: 1, alignment: .center).foregroundColor(Color.secondaryLabel.opacity(0.2)).padding(.vertical, 10)
+            ScrollView {
                 //Description
                 Text(event.eventDescription!).fontWeight(.light).font(.system(size: 16)).multilineTextAlignment(.leading).foregroundColor(Color.label).padding(.horizontal, 10)
                 Text("DETAILS").fontWeight(.light).font(.system(size: 16)).foregroundColor(config.accent).padding(.top)
             }.padding([.horizontal])
             
             Spacer()
-            Buttons(event: event)
+            Buttons(event: event).padding(.vertical, 5)
         }.padding([.vertical]).background(Color.secondarySystemBackground).edgesIgnoringSafeArea(.bottom)
     }
 }
@@ -93,7 +93,7 @@ struct Buttons: View {
                     self.navigate.toggle()
                     //GIVE HAPTIC
             }.sheet(isPresented: $navigate, content: { MapView().environmentObject(self.config) })
-        }.padding([.horizontal, .vertical])
+        }
     }
     
     //MARK: FOR SHARING

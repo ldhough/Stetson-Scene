@@ -15,25 +15,18 @@ struct TrendingView : View {
     
     var body: some View {
         VStack {
-            HStack {
-                Text("Trending").fontWeight(.heavy).font(.system(size: 50)).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(Color.label)
-                
-                //change to bell.fill when there are notifications
-                Image(systemName: "bell")
-                    .resizable().frame(width: 30, height: 32, alignment: .trailing).padding(.trailing, 10)
-                    .foregroundColor(Color.secondaryLabel/*config.accent*/)
-            }.padding([.vertical, .horizontal]).padding(.bottom, 10)
+            Text("Trending").fontWeight(.heavy).font(.system(size: 50)).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(Color.label).padding([.vertical, .horizontal]).padding(.bottom, 10)
             
             //Announcements
-            Text("ANNOUNCEMENTS").fontWeight(.medium).font(.system(size: 25)).padding([.horizontal]).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(Color.secondaryLabel)
+            Text("ANNOUNCEMENTS").fontWeight(.medium).font(.system(size: 25)).padding([.horizontal]).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(config.accent)
             Text("Important announcements will go here, they'll probably be updates about things going on on-campus.").fontWeight(.light).font(.system(size: 20)).padding(.vertical, 5).padding([.horizontal]).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(Color.label)
             
             //Carousel List- using GeomtryReader to detect the remaining height on the screen (smart scaling)
             GeometryReader{ geometry in
-                Carousel(trendingList: self.trendingList(), card: self.$card, height: geometry.frame(in: .global).height*0.7)
+                Carousel(trendingList: self.trendingList(), card: self.$card, height: geometry.frame(in: .global).height)
             }
             //dots that show which card is being displayed
-            CardControl(trendingList: self.trendingList(), card: self.$card).padding(.vertical, 10)
+            CardControl(trendingList: self.trendingList(), card: self.$card).padding(.bottom, 10)
             
         }
     }
@@ -119,7 +112,7 @@ struct Cards : View {
     var trendingList: [EventInstance]
     var height : CGFloat
     let cardWidth = Constants.width*0.9
-    @State var detailView: Bool = false
+    @State var selectedEvent: EventInstance? = nil
     
     var body: some View {
         //horizontal list of events in list
@@ -154,11 +147,12 @@ struct Cards : View {
                         .frame(width: self.cardWidth, height: self.height)
                         .cornerRadius(20)
                         .shadow(radius: 5)
-                        .onTapGesture { self.detailView = true }
-                        .sheet(isPresented: self.$detailView, content: { EventDetailView(event: event).environmentObject(self.config) })
+                        .onTapGesture { self.selectedEvent = event }
                 }.frame(width: Constants.width).animation(.default) //end of vstack
             } //end of foreach
-        }.padding(.top, height*0.75) //end of hstack
+        }.sheet(item: $selectedEvent) { event in
+             EventDetailView(event: event).environmentObject(self.config)
+        }//end of hstack
     }
     
 }
