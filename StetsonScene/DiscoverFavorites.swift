@@ -28,7 +28,7 @@ struct DiscoverFavoritesView : View {
                         .resizable().frame(width: 25, height: 25).padding(.trailing, 10)
                         .foregroundColor(filterApplied ? config.accent : Color.secondaryLabel)
                         .onTapGesture { self.filterView = true }
-                        .sheet(isPresented: $filterView, content: { FilterView() })
+                        .sheet(isPresented: $filterView, content: { FilterView().environmentObject(self.config) })
                 }
                 
                 //Quick Search Button
