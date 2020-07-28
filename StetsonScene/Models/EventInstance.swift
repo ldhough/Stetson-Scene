@@ -49,7 +49,7 @@ class EventInstance: Identifiable, ObservableObject {
     @Published var isFavorite:Bool = false //Might need to be published
     var isAttending:Bool = false
     @Published var isInCalendar:Bool = false
-    var isVirtual:Bool = false
+    @Published var isVirtual:Bool = false
     
     var linkText:String = ""
     var shareDetails:String = ""

@@ -19,7 +19,7 @@ struct EventDetailView : View {
             RoundedRectangle(cornerRadius: 20).frame(width: Constants.width*0.25, height: 5, alignment: .center).foregroundColor(Color.secondaryLabel.opacity(0.2)).padding(.bottom, 10)
             
                 //Event name
-                Text(event.name).fontWeight(.medium).font(.system(size: 30)).frame(maxWidth: .infinity, alignment: .center).multilineTextAlignment(.center).foregroundColor(event.hasCultural ? config.accent : Color.label)
+            Text(event.name).fontWeight(.medium).font(.system(size: 30)).frame(maxWidth: .infinity, alignment: .center).multilineTextAlignment(.center).foregroundColor(event.hasCultural ? config.accent : Color.label).padding([.horizontal])
                 //Info row
                 HStack(spacing: 20) {
                     Text(event.date).fontWeight(.light).font(.system(size: 20)).frame(maxWidth: .infinity, alignment: .trailing).foregroundColor(event.hasCultural ? Color.label : config.accent)
@@ -49,6 +49,7 @@ struct Buttons: View {
     @State var share: Bool = false
     @State var calendar: Bool = false
     @State var navigate: Bool = false
+    @State var arMode: Bool = true //false=mapMode
     
     //MARK: VIEW
     var body: some View {
@@ -99,11 +100,29 @@ struct Buttons: View {
                 Image(systemName: "location").resizable().frame(width: 20, height: 20).foregroundColor(navigate ? Color.tertiarySystemBackground : config.accent)
             }.frame(width: 40, height: 40)
                 .onTapGesture {
-                    self.navigate.toggle()
-                    //GIVE HAPTIC
+                    haptic()
+                    if self.event.isVirtual {
+                        //TODO: add in the capability to follow a link to register or something
+                        self.config.eventViewModel.createAlert(title: "Virtual Event", message: "Sorry! This event is virtual, so you have no where to navigate to.")
+                    } else {
+                        self.navigate.toggle()
+                    }
             }.sheet(isPresented: $navigate, content: {
-                NavigationIndicator(arFindMode: false, navToEvent: self.event).environmentObject(self.config)
-                //MapView().environmentObject(self.config)
+                ZStack {
+                    if self.arMode {
+                        NavigationIndicator(arFindMode: false, navToEvent: self.event).environmentObject(self.config)
+                    } else { //mapMode
+                        MapView().environmentObject(self.config)
+                    }
+                    if self.config.appEventMode {
+                        ZStack {
+                            Text(self.arMode ? "Map View" : "AR View").fontWeight(.light).font(.system(size: 18)).foregroundColor(self.config.accent)
+                        }.padding(10)
+                            .background(RoundedRectangle(cornerRadius: 15).stroke(Color.clear).foregroundColor(Color.tertiarySystemBackground.opacity(0.8)).background(RoundedRectangle(cornerRadius: 10).foregroundColor(Color.tertiarySystemBackground.opacity(0.8))))
+                            .onTapGesture { withAnimation { self.arMode.toggle() } }
+                            .offset(y: Constants.height*0.4)
+                    }
+                }
             })
         }
     }

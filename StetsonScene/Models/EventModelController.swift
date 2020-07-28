@@ -537,7 +537,7 @@ class EventViewModel: ObservableObject {
     }
     
     func isVirtual(event: EventInstance) {
-        if event.mainLon == 0.0 || event.mainLat == 0.0 {
+        if event.mainLon == 0.0 && event.mainLat == 0.0 && event.location.lowercased() == "virtual" {
             event.isVirtual = true
         }
     }
@@ -548,6 +548,14 @@ class EventViewModel: ObservableObject {
              event.mainLat = event.mainLon
              event.mainLon = temp
        }
+    }
+    
+    func createAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in
+            NSLog("The \"OK\" alert occured.")
+        }))
+        self.present(alert, animated: true, completion: nil)
     }
 }
 

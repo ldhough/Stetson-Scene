@@ -11,42 +11,57 @@ import UIKit
 
 struct NavigationIndicator: UIViewControllerRepresentable {
     typealias UIViewControllerType = ARView
-    var arFindMode: Bool
-    var navToEvent: EventInstance? = nil
     @EnvironmentObject var config: Configuration
+    var arFindMode: Bool
+    var navToEvent: EventInstance?
     
     func makeUIViewController(context: Context) -> ARView {
-        return ARView(arFindMode: arFindMode, config: self.config)
+        return ARView(config: self.config, arFindMode: self.arFindMode, navToEvent: self.navToEvent ?? EventInstance())
     }
     func updateUIViewController(_ uiViewController: NavigationIndicator.UIViewControllerType, context: UIViewControllerRepresentableContext<NavigationIndicator>) { }
 }
 
-
 struct MainView : View {
     @EnvironmentObject var config: Configuration
     @Environment(\.colorScheme) var colorScheme
+    @State var listVirtualEvents:Bool = false
     
     var body: some View {
         ZStack { 
             Color((config.page == "Favorites" && colorScheme == .light) ? config.accentUIColor : UIColor.secondarySystemBackground).edgesIgnoringSafeArea(.all)
-            VStack(spacing: 0){
+            VStack(spacing: 0) {
                 if config.page == "Trending" {
                     TrendingView().disabled(config.showOptions ? true : false)
                 } else if config.page == "Discover" || config.page == "Favorites" {
                     if config.subPage == "List" || config.subPage == "Calendar" {
                         DiscoverFavoritesView().blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false)
-                    } else if config.subPage == "AR" {
-                        NavigationIndicator(arFindMode: true).blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false).edgesIgnoringSafeArea(.top)
-                    } else if config.subPage == "Map" {
-                        MapView().blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false).edgesIgnoringSafeArea(.top)
+                    } else { //AR or Map
+                        ZStack {
+                            if config.subPage == "AR" {
+                                NavigationIndicator(arFindMode: true).blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false).edgesIgnoringSafeArea(.top)
+                            } else if config.subPage == "Map" {
+                                MapView().blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false).edgesIgnoringSafeArea(.top)
+                            }
+                            if config.appEventMode {
+                                ZStack {
+                                    Text("Virtual Events").fontWeight(.light).font(.system(size: 18)).foregroundColor(config.accent)
+                                }.padding(10)
+                                    .background(RoundedRectangle(cornerRadius: 15).stroke(Color.clear).foregroundColor(Color.tertiarySystemBackground.opacity(0.8)).background(RoundedRectangle(cornerRadius: 10).foregroundColor(Color.tertiarySystemBackground.opacity(0.8))))
+                                    .onTapGesture { withAnimation { self.listVirtualEvents = true } }
+                                    .offset(y: Constants.height*0.38)
+                            }
+                        }
                     }
                 } else if config.page == "Information" {
                     InformationView().blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false)
-                }
+                } 
                 
                 TabBar()
                 
             }.edgesIgnoringSafeArea(.bottom)
+                .sheet(isPresented: $listVirtualEvents, content: {
+                    ListView(allVirtual: true).environmentObject(self.config).background(Color.secondarySystemBackground)
+                })
             
         }.animation(.spring())
     }
@@ -133,7 +148,7 @@ struct TabOptions: View {
             //List
             ZStack {
                 Circle()
-                    .stroke(self.config.subPage == "List" ? selectedColor(element: "stroke") : nonselectedColor(element: "stroke"))
+                    .stroke(Color.clear)
                     .background(self.config.subPage == "List" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "list.bullet")
@@ -150,7 +165,7 @@ struct TabOptions: View {
             //Calendar
             ZStack {
                 Circle()
-                    .stroke(self.config.subPage == "Calendar" ? selectedColor(element: "stroke") : nonselectedColor(element: "stroke"))
+                    .stroke(Color.clear)
                     .background(self.config.subPage == "Calendar" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "calendar")
@@ -167,7 +182,7 @@ struct TabOptions: View {
             //AR
             ZStack {
                 Circle()
-                    .stroke(self.config.subPage == "AR" ? selectedColor(element: "stroke") : nonselectedColor(element: "stroke"))
+                    .stroke(Color.clear)
                     .background(self.config.subPage == "AR" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "camera")
@@ -184,7 +199,7 @@ struct TabOptions: View {
             //Map
             ZStack {
                 Circle()
-                    .stroke(self.config.subPage == "Map" ? selectedColor(element: "stroke") : nonselectedColor(element: "stroke"))
+                    .stroke(Color.clear)
                     .background(self.config.subPage == "Map" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "mappin.and.ellipse")

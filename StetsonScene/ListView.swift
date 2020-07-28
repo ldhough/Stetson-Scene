@@ -13,6 +13,7 @@ struct ListView : View {
     @EnvironmentObject var config: Configuration
     @Environment(\.colorScheme) var colorScheme
     var eventLocation: String? = ""
+    var allVirtual: Bool? = false
     
     var body: some View { 
         VStack(spacing: 0) {
@@ -20,9 +21,14 @@ struct ListView : View {
             List {
                 ForEach(config.eventViewModel.eventList) { event in
                     //have to do this by subpage then page to get the correct sub-lists
-                    if (self.config.subPage == "AR" || self.config.subPage == "Map") && (event.location! == self.eventLocation!) {
-                        if self.config.page == "Discover" || (self.config.page == "Favorites" && event.isFavorite) {
+                    if (self.config.subPage == "AR" || self.config.subPage == "Map") {
+                        if event.isVirtual && self.allVirtual == true { //listing only virtual events
                             ListCell(event: event)
+                        }
+                        if event.location! == self.eventLocation! { //navigating to a specific event
+                            if self.config.page == "Discover" || (self.config.page == "Favorites" && event.isFavorite) {
+                                ListCell(event: event)
+                            }
                         }
                     } else if (self.config.subPage == "List" || self.config.subPage == "Calendar") {
                         if self.config.page == "Discover" || (self.config.page == "Favorites" && event.isFavorite) {
