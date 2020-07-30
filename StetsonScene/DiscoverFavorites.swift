@@ -27,7 +27,10 @@ struct DiscoverFavoritesView : View {
                     Image(systemName: "line.horizontal.3.decrease.circle")
                         .resizable().frame(width: 25, height: 25).padding(.trailing, 10)
                         .foregroundColor(filterApplied ? config.accent : Color.secondaryLabel)
-                        .onTapGesture { self.filterView = true }
+                        .onTapGesture {
+                            self.filterView = true
+                            print("tapped ")
+                    }
                         .sheet(isPresented: $filterView, content: { FilterView().environmentObject(self.config) })
                 }
                 

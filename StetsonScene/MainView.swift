@@ -50,7 +50,9 @@ struct MainView : View {
                                     .onTapGesture { withAnimation { self.listVirtualEvents = true } }
                                     .offset(y: Constants.height*0.38)
                             }
-                        }
+                        }.sheet(isPresented: $listVirtualEvents, content: {
+                            ListView(allVirtual: true).environmentObject(self.config).background(Color.secondarySystemBackground)
+                        })
                     }
                 } else if config.page == "Information" {
                     InformationView().blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false)
@@ -59,9 +61,6 @@ struct MainView : View {
                 TabBar()
                 
             }.edgesIgnoringSafeArea(.bottom)
-                .sheet(isPresented: $listVirtualEvents, content: {
-                    ListView(allVirtual: true).environmentObject(self.config).background(Color.secondarySystemBackground)
-                })
             
         }.animation(.spring())
     }
