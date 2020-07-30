@@ -13,21 +13,22 @@ struct FilterView : View {
     
     @EnvironmentObject var config: Configuration
     
+    @Binding var filterView:Bool
     @State var weeksDisplayed:Double = 1
     @State var weekdaysSelected:[Bool] = [false, false, false, false, false, false, false]
     @State var onlyCultural:Bool = false
-    @State var eventTypesSelected:[String] = []
+    @State var eventTypesSelected:[(String, Bool)] = []
     
     func daysOfWeekView() -> some View {
         let systemImagesLetters:[String] = ["s.square", "m.square", "t.square", "w.square", "t.square", "f.square", "s.square"]
         return HStack {
             ForEach(0 ..< weekdaysSelected.count) { i in
-            Button(action: {
-                self.weekdaysSelected[i].toggle()
-            }) {
-                !self.weekdaysSelected[i] ? Image(systemName: systemImagesLetters[i]).foregroundColor(self.config.accent).scaleEffect(1.5).padding(.bottom).padding(.horizontal, Constants.width/28) : Image(systemName: systemImagesLetters[i] + ".fill").foregroundColor(self.config.accent).scaleEffect(1.5).padding(.bottom).padding(.horizontal, Constants.width/28)
+                Button(action: {
+                    self.weekdaysSelected[i].toggle()
+                }) {
+                    !self.weekdaysSelected[i] ? Image(systemName: systemImagesLetters[i]).foregroundColor(self.config.accent).scaleEffect(1.5).padding(.bottom).padding(.horizontal, Constants.width/28) : Image(systemName: systemImagesLetters[i] + ".fill").foregroundColor(self.config.accent).scaleEffect(1.5).padding(.bottom).padding(.horizontal, Constants.width/28)
+                }
             }
-        }
         }
     }
     
@@ -46,7 +47,7 @@ struct FilterView : View {
               }.cornerRadius(15)
             }.frame(height: 30).padding([.top, .bottom])
             daysOfWeekView()
-            Divider().background(Color.black).opacity(0.25)
+            Divider().background(config.accent).opacity(0.25)
             Button(action: {
                 
             }) {
@@ -61,14 +62,14 @@ struct FilterView : View {
                     }
                 }
             }.foregroundColor(Color.white)
-            Divider().background(Color.black).opacity(0.25)
+            Divider().background(config.accent).opacity(0.25)
             //Select event type view
-            
-            Divider().background(Color.black).opacity(0.25)
+            FilterEventTypeView().environmentObject(self.config)
             Spacer()
+            Divider().background(config.accent).opacity(0.25)
             //Search Button
             Button("Search") {
-                
+                self.filterView = false
             }
         }.padding()
     }
