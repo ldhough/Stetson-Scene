@@ -13,11 +13,12 @@ struct FilterView : View {
     
     @EnvironmentObject var config: Configuration
     
+    //Make all computed properties w/ UserDefaults
     @Binding var filterView:Bool
     @State var weeksDisplayed:Double = 1
     @State var weekdaysSelected:[Bool] = [false, false, false, false, false, false, false]
     @State var onlyCultural:Bool = false
-    @State var eventTypesSelected:[(String, Bool)] = []
+    @State var eventTypesSelected:Set<String>
     
     func daysOfWeekView() -> some View {
         let systemImagesLetters:[String] = ["s.square", "m.square", "t.square", "w.square", "t.square", "f.square", "s.square"]
@@ -47,28 +48,29 @@ struct FilterView : View {
               }.cornerRadius(15)
             }.frame(height: 30).padding([.top, .bottom])
             daysOfWeekView()
-            Divider().background(config.accent).opacity(0.25)
-            Button(action: {
-                
+            Divider().background(config.accent)
+            Button(action: { //If checked only events that have cultural credits should be presented after filtering
+                self.onlyCultural.toggle()
             }) {
                 HStack {
                     Text("Cultural Credits").foregroundColor(self.config.accent).padding()
                     Spacer()
                     ZStack {
-                        Image(systemName: "square").foregroundColor(Color.white).opacity(0.5).scaleEffect(1.5).padding()
+                        Image(systemName: "square").foregroundColor(Color.secondarySystemBackground).scaleEffect(1.5).padding()
                         if self.onlyCultural {
                             Image(systemName: "checkmark").foregroundColor(self.config.accent).padding()
                         }
                     }
                 }
             }.foregroundColor(Color.white)
-            Divider().background(config.accent).opacity(0.25)
+            Divider().background(config.accent)
             //Select event type view
-            FilterEventTypeView().environmentObject(self.config)
+            FilterEventTypeView(eventTypesSelected: self.$eventTypesSelected).environmentObject(self.config)
             Spacer()
-            Divider().background(config.accent).opacity(0.25)
+            Divider().background(config.accent)
             //Search Button
-            Button("Search") {
+            Button("Search") { //Calls filter method of EventSearchEngine instance in primary ViewModel instance to interact with the event list and apply correct filter to all elements
+                print(self.config.eventViewModel.eventSearchEngine.eventTypeSet)
                 self.filterView = false
             }
         }.padding()

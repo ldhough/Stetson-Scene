@@ -20,6 +20,7 @@ enum SuccessCheck {
 class EventViewModel: ObservableObject {
     
     var hasObtainedAssociations:Bool = false //Determines if listeners have been put on event and location association nodes
+    var eventSearchEngine = EventSearchEngine()
     
     //List of EventInstance objects representing live events loaded into the app from the backend
     @Published var eventList:[EventInstance] = []
@@ -41,7 +42,10 @@ class EventViewModel: ObservableObject {
     var eventTypeAssociations:Dictionary<String, Any> = [:]
     var locationAssociations:Dictionary<String, Any> = [:]
     @Published var eventTypeList:[String] = []//Used to contain event types or locations that the user cares about
+    //Unlike eventTypeSet used in searching which only contains what is being filtered on, eventTypeSetFull contains all possible event types
+    @Published var eventTypeSetFull:Set<String> = []
     @Published var locationList:[String] = []
+    @Published var locationSetFull:Set<String> = []
     
     //Indicates how many weeks worth of database info are currently loaded into the app to prevent unnecessary database queries
     var weeksStored:Int = 1
@@ -371,12 +375,14 @@ class EventViewModel: ObservableObject {
         if !hasObtainedAssociations {
             AppDelegate.shared().eventTypeAssociationRef.observe(.childAdded) { snapshot in
                 self.eventTypeList.append(snapshot.key)
+                self.eventTypeSetFull.insert(snapshot.key)
                 //self.displayEventTypeList.append(true)
                 self.eventTypeAssociations[snapshot.key] = snapshot.value as? Dictionary<String, String>
             }
         
             AppDelegate.shared().locationAssocationRef.observe(.childAdded) { snapshot in
                 self.locationList.append(snapshot.key)
+                self.locationSetFull.insert(snapshot.key)
                 self.locationAssociations[snapshot.key] = snapshot.value as? Dictionary<String, String>
             }
         }

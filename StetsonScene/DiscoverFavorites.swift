@@ -31,7 +31,16 @@ struct DiscoverFavoritesView : View {
                             self.filterView = true
                             print("tapped ")
                     }
-                    .sheet(isPresented: $filterView, content: { FilterView(filterView: self.$filterView).environmentObject(self.config) })
+                    .sheet(isPresented: $filterView, content: { FilterView(filterView: self.$filterView, eventTypesSelected: {
+                        
+                        
+                            if self.config.eventViewModel.eventSearchEngine.eventTypeSet == [] && UserDefaults.standard.object(forKey: "firstTypeLoad") == nil {
+                                //If no event types are being filtered on and it is the first time that the eventTypeSet has been computed (which will result in empty set), use the full event type set to have all event types selected in filter view
+                                return self.config.eventViewModel.eventTypeSetFull
+                            } else {
+                                return self.config.eventViewModel.eventSearchEngine.eventTypeSet
+                            }
+                        }()).environmentObject(self.config) })
                 }
                 
                 //Quick Search Button
