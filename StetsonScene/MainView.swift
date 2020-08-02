@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import UIKit
 
-struct NavigationIndicator: UIViewControllerRepresentable {
+struct ARNavigationIndicator: UIViewControllerRepresentable {
     typealias UIViewControllerType = ARView
     @EnvironmentObject var config: Configuration
     var arFindMode: Bool
@@ -18,16 +18,20 @@ struct NavigationIndicator: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> ARView {
         return ARView(config: self.config, arFindMode: self.arFindMode, navToEvent: self.navToEvent ?? EventInstance())
     }
-    func updateUIViewController(_ uiViewController: NavigationIndicator.UIViewControllerType, context: UIViewControllerRepresentableContext<NavigationIndicator>) { }
+    func updateUIViewController(_ uiViewController: ARNavigationIndicator.UIViewControllerType, context: UIViewControllerRepresentableContext<ARNavigationIndicator>) { }
 }
 
 struct MainView : View {
     @EnvironmentObject var config: Configuration
     @Environment(\.colorScheme) var colorScheme
     @State var listVirtualEvents:Bool = false
+    //used for alerts in mapview
+    @State var showAlert: Bool = false
+    @State var arrived: Bool = false
+    @State var tooFar: Bool = false
     
     var body: some View {
-        ZStack { 
+        ZStack {
             Color((config.page == "Favorites" && colorScheme == .light) ? config.accentUIColor : UIColor.secondarySystemBackground).edgesIgnoringSafeArea(.all)
             VStack(spacing: 0) {
                 if config.page == "Trending" {
@@ -38,9 +42,19 @@ struct MainView : View {
                     } else { //AR or Map
                         ZStack {
                             if config.subPage == "AR" {
-                                NavigationIndicator(arFindMode: true).blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false).edgesIgnoringSafeArea(.top)
+                                ARNavigationIndicator(arFindMode: true).blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false).edgesIgnoringSafeArea(.top)
                             } else if config.subPage == "Map" {
-                                MapView().blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false).edgesIgnoringSafeArea(.top)
+                                MapView(mapFindMode: true, showAlert: self.$showAlert, arrived: self.$arrived, tooFar: self.$tooFar).environmentObject(self.config)
+                                    .blur(radius: config.showOptions ? 5 : 0)
+                                    .disabled(config.showOptions ? true : false)
+                                    .edgesIgnoringSafeArea(.top)
+                                    .alert(isPresented: self.$showAlert) { () -> Alert in
+                                        if config.eventViewModel.determineVirtualList(config: config) {
+                                            return self.config.eventViewModel.alert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
+                                        } else {
+                                            return self.config.eventViewModel.alert(title: "This shouldn't happen", message: "")
+                                        }
+                                    }
                             }
                             if config.appEventMode {
                                 ZStack {

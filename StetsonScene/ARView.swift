@@ -40,7 +40,6 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
     var distanceFromCampus:Double! = 0.0
     var distanceFromBuilding:Int! = 0
     var alertSent: Bool = false
-    var allVirtual: Bool = true
     
     //Initialization
     init(config: Configuration, arFindMode: Bool, navToEvent: EventInstance) {
@@ -90,19 +89,16 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
             createBuildingNode(location: "Stetson University", lat: 29.0349780, lon: -81.3026430, altitude: (userAltitude! + 15)) //just create a stetson node
             if !alertSent {
                 alertSent = true
-                self.config.eventViewModel.createAlert(title: "Too Far from Campus to Tour", message: "Sorry! It looks like you're too far away from campus to tour using AR. Try touring with the map instead!") //send an alert once
+                //self.config.eventViewModel.createAlert(title: "Too Far from Campus to Tour", message: "Sorry! It looks like you're too far away from campus to tour using AR. Try touring with the map instead!") //send an alert once
             }
         } else { //if you're within 0.5mi of campus
             alertSent = false //if you were too far away and are now on-campus, reset alertSent so if you go off-campus again it will only alert you once
             for annotationNode in self.sceneLocationView.locationNodes { annotationNode.removeFromParentNode() } //clean scene
             determineNodes() //create the appropriate nodes depending on appEventMode & arFindMode
         }
-        //if you change from discover AR -> favorites AR, refresh
-        let prevPage = config.page
-        if prevPage != config.page {
-            for annotationNode in self.sceneLocationView.locationNodes { annotationNode.removeFromParentNode() } //clean scene
-            determineNodes() //create the appropriate nodes depending on appEventMode & arFindMode
-        }
+        //refresh
+        for annotationNode in self.sceneLocationView.locationNodes { annotationNode.removeFromParentNode() } //clean scene
+        determineNodes() //create the appropriate nodes depending on appEventMode & arFindMode
     }
     
     func determineNodes() {
@@ -117,7 +113,7 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
                     createBuildingNode(location: "Stetson University", lat: 29.0349780, lon: -81.3026430, altitude: (userAltitude! + 15)) //just create a stetson node
                     if !alertSent {
                         alertSent = true
-                        self.config.eventViewModel.createAlert(title: "Too Far from Campus to Tour", message: "Sorry! It looks like you're too far away from campus to tour using AR. Try touring with the map instead!") //send an alert once
+                        //self.config.eventViewModel.createAlert(title: "Too Far from Campus to Navigate", message: "Sorry! It looks like you're too far away from campus to navigate to an event.") //send an alert once
                     }
                 }
                 //if you're on campus, create a node and send alert if you've basically arrived
@@ -126,7 +122,7 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
                     //CLLocationDistance distanceInMeters = [location1 distanceFromLocation:location2];
                     let destination = CLLocation(latitude: (navToEvent!.mainLat)!, longitude: (navToEvent!.mainLon)!)
                     if (round(1000 * (destination.distance(from: userLocation)))/1000) < 16 {
-                        self.config.eventViewModel.createAlert(title: "You've Arrived!", message: "Have fun at \(String(describing: navToEvent!.name))!")
+                        //self.config.eventViewModel.createAlert(title: "You've Arrived!", message: "Have fun at \(String(describing: navToEvent!.name))!")
                     }
                 }
                 return
@@ -134,13 +130,7 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
             
             //add buildings with non-virtual events to discover/favorites view
             for event in config.eventViewModel.eventList {
-                config.eventViewModel.isVirtual(event: event)
-                if config.page == "Favorites" && event.isFavorite && !event.isVirtual {
-                    print("HERE 1")
-                    allVirtual = false
-                } else if config.page != "Favorites" && !event.isVirtual {
-                    allVirtual = false
-                }
+                if !config.eventViewModel.determineVirtualList(config: config) {
                     config.eventViewModel.sanitizeCoords(event: event)
                     //don't repeat building nodes, only add to favorites view if the event is favorited
                     if !locationsWithNode.contains(event.location) && ((config.page == "Favorites" && event.isFavorite) || config.page == "Discover") {
@@ -148,14 +138,14 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
                         locationsWithNode.append(event.location)
                         createBuildingNode(location: event.location, lat: event.mainLat, lon: event.mainLon, altitude: (userAltitude! + 15))
                     }
-                print("allVirtual: ", allVirtual)
+                }
             }
             
             //if all events are virtual, create a single Stetson node and send an alert
-            if allVirtual {
+            if arFindMode && config.eventViewModel.determineVirtualList(config: config) {
                 print("HERE 3")
                 createBuildingNode(location: "Stetson University", lat: 29.0349780, lon: -81.3026430, altitude: (userAltitude! + 15))
-                self.config.eventViewModel.createAlert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
+                //self.config.eventViewModel.createAlert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
             }
         } else {
             //TODO
@@ -222,8 +212,8 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
             
             if config.appEventMode {
                 //if all events are virtual and you tap on the Stetson University node, send the virtual events only alert
-                if allVirtual && (String(describing: hits.name!)) == "Stetson University" {
-                    self.config.eventViewModel.createAlert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
+                if config.eventViewModel.determineVirtualList(config: config) && (String(describing: hits.name!)) == "Stetson University" {
+                    //self.config.eventViewModel.createAlert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
                     return
                 }
                 if (String(describing: hits.name!)) != "Stetson University" {
@@ -238,7 +228,7 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
                             if userLocation != nil {
                                 let building = CLLocation(latitude: navToEvent!.mainLat, longitude: navToEvent!.mainLon)
                                 distanceFromBuilding = Int(building.distance(from: userLocation))
-                                self.config.eventViewModel.createAlert(title: "\(navToEvent!.name!)", message: "This event is at \(navToEvent!.time!) on \(navToEvent!.date!), and you are \(distanceFromBuilding!)m from \(navToEvent!.location!).")
+                                //self.config.eventViewModel.createAlert(title: "\(navToEvent!.name!)", message: "This event is at \(navToEvent!.time!) on \(navToEvent!.date!), and you are \(distanceFromBuilding!)m from \(navToEvent!.location!).")
                             }
                         }
                 }

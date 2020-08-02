@@ -50,6 +50,10 @@ struct Buttons: View {
     @State var calendar: Bool = false
     @State var navigate: Bool = false
     @State var arMode: Bool = true //false=mapMode
+    //used for alerts in mapview
+    @State var showAlert: Bool = false
+    @State var arrived: Bool = false
+    @State var tooFar: Bool = false
     
     //MARK: VIEW
     var body: some View {
@@ -110,9 +114,18 @@ struct Buttons: View {
             }.sheet(isPresented: $navigate, content: {
                 ZStack {
                     if self.arMode {
-                        NavigationIndicator(arFindMode: false, navToEvent: self.event).environmentObject(self.config)
+                        ARNavigationIndicator(arFindMode: false, navToEvent: self.event).environmentObject(self.config)
                     } else { //mapMode
-                        MapView().environmentObject(self.config)
+                        MapView(mapFindMode: false, navToEvent: self.event, showAlert: self.$showAlert, arrived: self.$arrived, tooFar: self.$tooFar).environmentObject(self.config)
+                            .alert(isPresented: self.$showAlert) { () -> Alert in
+                                if self.tooFar {
+                                    return self.config.eventViewModel.alert(title: "Too Far from Campus to Navigate", message: "Sorry! It looks like you're too far away from campus to navigate to an event.") //send an alert once
+                                } else if self.arrived {
+                                    return self.config.eventViewModel.alert(title: "You've Arrived!", message: "Have fun at \(String(describing: self.event.name))!")
+                                } else { //assume that it's for eventdetails
+                                    return self.config.eventViewModel.alert(title: "\(self.event.name!)", message: "This event is at \(self.event.time!) on \(self.event.date!).")/*, and you are \(distanceFromBuilding!)m from \(event!.location!)*/
+                                }
+                            }
                     }
                     if self.config.appEventMode {
                         ZStack {

@@ -1,27 +1,27 @@
-////
-////  MapNavView.swift
-////  StetsonScene
-////
-////  Created by Lannie Hough on 4/17/20.
-////  Copyright © 2020 Madison Gipson. All rights reserved.
-////
 //
-//import SwiftUI
-//import MapKit
-//import UIKit
+//  MapNavView.swift
+//  StetsonScene
 //
+//  Created by Lannie Hough on 4/17/20.
+//  Copyright © 2020 Madison Gipson. All rights reserved.
+//
+
+import SwiftUI
+import MapKit
+import UIKit
+
 //struct MapNavigationView: UIViewRepresentable {
-//    
+//
 //    @ObservedObject var event:EventInstance
 //    @Binding var checkpoints:[Checkpoint]
-//  
+//
 //    var locationManager = CLLocationManager()
 //    func setupManager() {
 //        locationManager.desiredAccuracy = kCLLocationAccuracyBest
 //        locationManager.requestWhenInUseAuthorization()
 //        locationManager.requestAlwaysAuthorization()
 //    }
-//  
+//
 //    func makeUIView(context: Context) -> MKMapView {
 //        let map = MKMapView()
 //        map.delegate = context.coordinator
@@ -33,16 +33,16 @@
 //        map.setRegion(region, animated: true)
 //        return map
 //  }
-//  
+//
 //    func updateUIView(_ uiView: MKMapView, context: Context) {
 //        uiView.addAnnotations(checkpoints)
-//        
+//
 //    }
-//    
+//
 //    func makeCoordinator() -> Coordinator {
 //        Coordinator(self)
 //    }
-//    
+//
 //    final class Coordinator: NSObject, MKMapViewDelegate {
 //        var parent:MapNavigationView
 //        init(_ parent: MapNavigationView) {
@@ -73,7 +73,7 @@
 //        }
 //    }
 //}
-//
+
 //struct MapNavView: View {
 //    @ObservedObject var event:EventInstance
 //    @State var checkpoints:[Checkpoint]
@@ -81,7 +81,7 @@
 //        MapNavigationView(event: event, checkpoints: $checkpoints)
 //    }
 //}
-//
+
 //final class Checkpoint: NSObject, MKAnnotation {
 //  let title: String?
 //  let coordinate: CLLocationCoordinate2D

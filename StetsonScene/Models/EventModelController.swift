@@ -542,6 +542,18 @@ class EventViewModel: ObservableObject {
         }
     }
     
+    func determineVirtualList(config: Configuration) -> Bool {
+        for event in config.eventViewModel.eventList {
+            config.eventViewModel.isVirtual(event: event)
+            if config.page == "Favorites" && event.isFavorite && !event.isVirtual {
+                return false
+            } else if config.page != "Favorites" && !event.isVirtual {
+                return false
+            }
+        }
+        return true
+    }
+    
     func sanitizeCoords(event: EventInstance) {
         if (event.mainLat < 0 && event.mainLon > 0) {
             let temp = event.mainLat
@@ -550,12 +562,18 @@ class EventViewModel: ObservableObject {
        }
     }
     
+    //use in ARView
     func createAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in
             NSLog("The \"OK\" alert occured.")
         }))
         alert.present(alert, animated: true, completion: nil)
+    }
+    
+    //use in MapView
+    func alert(title: String, message: String) -> Alert {
+        return Alert(title: Text(title), message: Text(message), dismissButton: .default(Text("OK")))
     }
 }
 
