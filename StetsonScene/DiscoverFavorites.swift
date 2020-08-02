@@ -31,7 +31,7 @@ struct DiscoverFavoritesView : View {
                             self.filterView = true
                             print("tapped ")
                     }
-                        .sheet(isPresented: $filterView, content: { FilterView().environmentObject(self.config) })
+                    .sheet(isPresented: $filterView, content: { FilterView(filterView: self.$filterView).environmentObject(self.config) })
                 }
                 
                 //Quick Search Button
