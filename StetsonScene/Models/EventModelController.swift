@@ -4,7 +4,6 @@
 //
 //  Created by Lannie Hough on 1/29/20.
 //  Copyright © 2020 Lannie Hough. All rights reserved.
-
 import Foundation
 import SwiftUI
 import Firebase
@@ -19,6 +18,8 @@ enum SuccessCheck {
 
 /// ViewModel class for MVVM design pattern.  A single instance is created and injected into various views.
 class EventViewModel: ObservableObject {
+    
+    var hasObtainedAssociations:Bool = false //Determines if listeners have been put on event and location association nodes
     
     //List of EventInstance objects representing live events loaded into the app from the backend
     @Published var eventList:[EventInstance] = []
@@ -39,6 +40,8 @@ class EventViewModel: ObservableObject {
     //ex: Room 210 is a sublocation for Elizabeth Hall
     var eventTypeAssociations:Dictionary<String, Any> = [:]
     var locationAssociations:Dictionary<String, Any> = [:]
+    @Published var eventTypeList:[String] = []//Used to contain event types or locations that the user cares about
+    @Published var locationList:[String] = []
     
     //Indicates how many weeks worth of database info are currently loaded into the app to prevent unnecessary database queries
     var weeksStored:Int = 1
@@ -362,12 +365,22 @@ class EventViewModel: ObservableObject {
                     continue
                 } else {
                     self.insertEvent(newInstanceCheck.0)
-//                    for event in self.eventList {
-//                        print(event.date!)
-//                    }
                 }
             }
         })
+        if !hasObtainedAssociations {
+            AppDelegate.shared().eventTypeAssociationRef.observe(.childAdded) { snapshot in
+                self.eventTypeList.append(snapshot.key)
+                //self.displayEventTypeList.append(true)
+                self.eventTypeAssociations[snapshot.key] = snapshot.value as? Dictionary<String, String>
+            }
+        
+            AppDelegate.shared().locationAssocationRef.observe(.childAdded) { snapshot in
+                self.locationList.append(snapshot.key)
+                self.locationAssociations[snapshot.key] = snapshot.value as? Dictionary<String, String>
+            }
+        }
+        hasObtainedAssociations = true
     }
     
     func readEventData(eventData: Dictionary<String, Any>) -> (EventInstance, DataState) {
@@ -375,7 +388,7 @@ class EventViewModel: ObservableObject {
         for (k, v) in eventData {
             switch k {
             case "absolutePosition":
-                newInstance.absolutePosition = (v as? Int)!
+                newInstance.absolutePosition = (v as? Int)! //Unused at present
             case "guid":
                 newInstance.guid = (v as? String) ?? "" //Highly unlikely to occur
                 if newInstance.guid == "" { return (newInstance, .invalid) }
