@@ -16,6 +16,15 @@ struct FilterEventTypeView: View {
     @Binding var eventTypesSelected:Set<String> {
         didSet {
             config.eventViewModel.eventSearchEngine.eventTypeSet = self.eventTypesSelected
+            print(self.eventTypesSelected.count)
+            print(self.config.eventViewModel.eventTypeList.count/2)
+            if self.eventTypesSelected.count > self.config.eventViewModel.eventTypeList.count/2 {
+                print("deselect all")
+                self.selectAllDeselectAll = false
+            } else {
+                print("select all")
+                self.selectAllDeselectAll = true
+            }
         }
     }
     
@@ -29,12 +38,7 @@ struct FilterEventTypeView: View {
                 } else {
                     self.eventTypesSelected = []
                 }
-                if self.eventTypesSelected.count > self.config.eventViewModel.eventTypeList.count/2 {
-                    self.selectAllDeselectAll = false
-                    //return false
-                }
-                self.selectAllDeselectAll = true
-                //return true
+                //self.selectAllDeselectAll.toggle()
             }) {
                 Text(self.selectAllDeselectAll ? "Select All" : "Deselect All"
                 ).font(.system(size: 16, weight: .light, design: .default)).foregroundColor(config.accent)
@@ -52,11 +56,14 @@ struct FilterEventTypeView: View {
                                         } else {
                                             self.eventTypesSelected.insert(eventType)
                                         }
-                                    if self.eventTypesSelected.count > self.config.eventViewModel.eventTypeList.count/2 {
-                                        self.selectAllDeselectAll = false
-                                        //return false
-                                    }
-                                    self.selectAllDeselectAll = true
+//                                    print(self.eventTypesSelected.count)
+//                                    print(self.config.eventViewModel.eventTypeList.count/2)
+//                                    if self.eventTypesSelected.count > self.config.eventViewModel.eventTypeList.count/2 {
+//                                        print("code executing")
+//                                        self.selectAllDeselectAll = !false
+//                                        //return false
+//                                    }
+                                    //self.selectAllDeselectAll = true
                                     //return true
                                     self.updateSelect += 1
                                     }

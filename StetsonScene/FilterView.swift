@@ -81,10 +81,8 @@ struct FilterView : View {
             //Select event type view
             FilterEventTypeView(selectAllDeselectAll: {
                 if self.eventTypesSelected.count > self.config.eventViewModel.eventTypeList.count/2 {
-                    //self.selectAllDeselectAll = false
                     return false
                 }
-                //self.selectAllDeselectAll = true
                 return true
             }(), eventTypesSelected: self.$eventTypesSelected).environmentObject(self.config)
             Spacer()
