@@ -30,7 +30,7 @@ struct ListView : View {
                                 ListCell(event: event)
                             }
                         }
-                    } else if (self.config.subPage == "List" || self.config.subPage == "Calendar") {
+                    } else if (self.config.subPage == "List" || self.config.subPage == "Calendar") && event.filteredOn {
                         if (self.config.page == "Discover" && event.filteredOn) || (self.config.page == "Favorites" && event.isFavorite) {
                             ListCell(event: event)
                         }
