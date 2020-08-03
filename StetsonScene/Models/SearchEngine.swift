@@ -77,12 +77,14 @@ class EventSearchEngine {
     
     var locationSet:Set<String> = [] //Not yet adding to filter
     
-    
-    
     func filter(evm: EventViewModel) {
         //If weeks loaded > what is actually loaded, use compare date functions
         //If weeks loaded < what is actually loaded, call retrieveFirebaseData
         //evm.weeksStored
+    }
+    
+    func checkEvent(ei: EventInstance) {
+        
     }
     
 }

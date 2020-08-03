@@ -80,8 +80,12 @@ struct FilterView : View {
             Divider().background(config.accent)
             //Select event type view
             FilterEventTypeView(selectAllDeselectAll: {
-                
-                return false
+                if self.eventTypesSelected.count > self.config.eventViewModel.eventTypeList.count/2 {
+                    //self.selectAllDeselectAll = false
+                    return false
+                }
+                //self.selectAllDeselectAll = true
+                return true
             }(), eventTypesSelected: self.$eventTypesSelected).environmentObject(self.config)
             Spacer()
             Divider().background(config.accent)
@@ -90,7 +94,7 @@ struct FilterView : View {
                 self.config.eventViewModel.eventSearchEngine.weeksDisplayed = Int(self.weeksDisplayed)
                 print(self.config.eventViewModel.eventSearchEngine.eventTypeSet)
                 self.filterView = false
-            }
+            }.buttonStyle(MainButtonStyle(accentColor: config.accent)).padding(.horizontal, Constants.width*0.1)
         }.padding()
     }
 }

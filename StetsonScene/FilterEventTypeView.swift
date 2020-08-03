@@ -11,6 +11,7 @@ import SwiftUI
 struct FilterEventTypeView: View {
     
     @EnvironmentObject var config: Configuration
+    @State var updateSelect:Int = 1
     @State var selectAllDeselectAll:Bool
     @Binding var eventTypesSelected:Set<String> {
         didSet {
@@ -21,9 +22,22 @@ struct FilterEventTypeView: View {
     var body: some View {
         VStack {
             Button(action: {
-                
+                if self.selectAllDeselectAll {
+                    for element in self.config.eventViewModel.eventTypeList {
+                        self.eventTypesSelected.insert(element)
+                    }
+                } else {
+                    self.eventTypesSelected = []
+                }
+                if self.eventTypesSelected.count > self.config.eventViewModel.eventTypeList.count/2 {
+                    self.selectAllDeselectAll = false
+                    //return false
+                }
+                self.selectAllDeselectAll = true
+                //return true
             }) {
-                Text(self.selectAllDeselectAll == false ? "Select All" : "Deselect All").font(.system(size: 16, weight: .light, design: .default)).foregroundColor(config.accent)
+                Text(self.selectAllDeselectAll ? "Select All" : "Deselect All"
+                ).font(.system(size: 16, weight: .light, design: .default)).foregroundColor(config.accent)
             }.buttonStyle(MainButtonStyle(accentColor: config.accent)).padding(.horizontal, Constants.width*0.1)
             List {
                 ForEach(config.eventViewModel.eventTypeList, id:\.self) { eventType in
@@ -38,6 +52,13 @@ struct FilterEventTypeView: View {
                                         } else {
                                             self.eventTypesSelected.insert(eventType)
                                         }
+                                    if self.eventTypesSelected.count > self.config.eventViewModel.eventTypeList.count/2 {
+                                        self.selectAllDeselectAll = false
+                                        //return false
+                                    }
+                                    self.selectAllDeselectAll = true
+                                    //return true
+                                    self.updateSelect += 1
                                     }
                                 if self.eventTypesSelected.contains(eventType) {
                                     Image(systemName: "checkmark").foregroundColor(self.config.accent).scaleEffect(1)
