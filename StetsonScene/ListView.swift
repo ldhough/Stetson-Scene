@@ -31,7 +31,7 @@ struct ListView : View {
                             }
                         }
                     } else if (self.config.subPage == "List" || self.config.subPage == "Calendar") {
-                        if self.config.page == "Discover" || (self.config.page == "Favorites" && event.isFavorite) {
+                        if (self.config.page == "Discover" && event.filteredOn) || (self.config.page == "Favorites" && event.isFavorite) {
                             ListCell(event: event)
                         }
                     }

@@ -78,13 +78,59 @@ class EventSearchEngine {
     var locationSet:Set<String> = [] //Not yet adding to filter
     
     func filter(evm: EventViewModel) {
-        //If weeks loaded > what is actually loaded, use compare date functions
-        //If weeks loaded < what is actually loaded, call retrieveFirebaseData
-        //evm.weeksStored
+        if evm.weeksStored >= self.weeksDisplayed { //If weeks loaded > what is actually loaded filter on current event list
+            print("Don't need to query DB")
+            for event in evm.eventList {
+                checkEvent(event, evm)
+            }
+        } else if evm.weeksStored < self.weeksDisplayed { //If weeks loaded < what is actually loaded, call retrieveFirebaseData to load in new data, then filter
+            
+        }
+        //remove and add an event to force view update by changing state of list
+        let tempEvent = evm.eventList[evm.eventList.count-1]
+        evm.eventList.remove(at: evm.eventList.count-1)
+        evm.eventList.append(tempEvent)
     }
     
-    func checkEvent(ei: EventInstance) {
-        
+    func checkEvent(_ ei: EventInstance, _ evm: EventViewModel) {
+        var filteredState = true
+        block: if true {
+            if self.onlyCultural && !ei.hasCultural { //Check cultural
+                print("Failed cultural check")
+                filteredState = false
+                break block
+            }
+            var eventTypeSatisfied = false
+            loop: for eType in self.eventTypeSet { //Check event type
+                for (type, _) in evm.eventTypeAssociations[eType] as! Dictionary<String, String> { //k, v
+                    if type == ei.mainEventType {
+                        eventTypeSatisfied = true
+                        break loop
+                    }
+                }
+            }
+            if !eventTypeSatisfied {
+                print("Failed eType check")
+                filteredState = false
+                break block
+            }
+            //Check weekdays selected
+            if !self.weekdaysSelected[EventViewModel.getDayOfWeek(day: ei.startDateTimeInfo.day, month: ei.startDateTimeInfo.month, year: ei.startDateTimeInfo.year)] {
+                print("Failed weekday check")
+                filteredState = false
+                break block
+            }
+            //Check week displayed
+            let maxDays = evm.getDaysIntoYear(nowPlusWeeks: self.weeksDisplayed)
+            if ei.daysIntoYear > maxDays {
+                print("Failed weeks displayed check")
+                filteredState = false
+            }
+        }
+        if filteredState {
+            print("Passed all checks")
+        }
+        ei.filteredOn = filteredState //event should show up in list
     }
     
 }

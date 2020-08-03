@@ -380,6 +380,7 @@ class EventViewModel: ObservableObject {
                 self.eventTypeSetFull.insert(snapshot.key)
                 //self.displayEventTypeList.append(true)
                 self.eventTypeAssociations[snapshot.key] = snapshot.value as? Dictionary<String, String>
+                print(self.eventTypeAssociations)
             }
         
             AppDelegate.shared().locationAssocationRef.observe(.childAdded) { snapshot in
@@ -555,6 +556,19 @@ class EventViewModel: ObservableObject {
         }
         daysIntoYear += currentDay
         return daysIntoYear + nowPlusWeeks*7
+    }
+    
+    //Tomohiko Sakamoto algorithm
+    static func getDayOfWeek(day: Int, month: Int, year: Int) -> Int {
+        var y = year;
+        let t:[Int] = [0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4]
+        y -= month < 3 ? 1 : 0
+        var x:Int = y + y/4
+        x -= y/100
+        x += y/400
+        x += t[month-1] + day
+        x %= 7
+        return x
     }
     
     func isVirtual(event: EventInstance) {

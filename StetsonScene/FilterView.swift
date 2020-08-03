@@ -90,8 +90,10 @@ struct FilterView : View {
             //Search Button
             Button("Search") { //Calls filter method of EventSearchEngine instance in primary ViewModel instance to interact with the event list and apply correct filter to all elements
                 self.config.eventViewModel.eventSearchEngine.weeksDisplayed = Int(self.weeksDisplayed)
-                print(self.config.eventViewModel.eventSearchEngine.eventTypeSet)
-                self.filterView = false
+                self.filterView = false //Dismiss modal
+                self.config.eventViewModel.eventSearchEngine.filter(evm: self.config.eventViewModel)
+                //Update after filter in case filter needs to load more data we want to keep this accurate as to what is actually loaded
+                self.config.eventViewModel.weeksStored = self.config.eventViewModel.eventSearchEngine.weeksDisplayed > self.config.eventViewModel.weeksStored ? self.config.eventViewModel.eventSearchEngine.weeksDisplayed : self.config.eventViewModel.weeksStored
             }.buttonStyle(MainButtonStyle(accentColor: config.accent)).padding(.horizontal, Constants.width*0.1)
         }.padding()
     }
