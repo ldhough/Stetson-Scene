@@ -358,6 +358,8 @@ class EventViewModel: ObservableObject {
     }
     
     func retrieveFirebaseData(daysIntoYear: Int, doFilter: Bool, searchEngine: EventSearchEngine) {
+        //Prevent duplicate observers
+        AppDelegate.shared().eventListRef.removeAllObservers()
         self.loadPersistentEventData()
         self.eventList = []
         AppDelegate.shared().eventListRef.queryOrdered(byChild: "daysIntoYear").queryEnding(atValue: daysIntoYear).observe(.value, with: { snapshot in

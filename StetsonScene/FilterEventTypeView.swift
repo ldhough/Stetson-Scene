@@ -11,7 +11,7 @@ import SwiftUI
 struct FilterEventTypeView: View {
     
     @EnvironmentObject var config: Configuration
-    @State var selectAllDeselectAll:Bool = false
+    @State var selectAllDeselectAll:Bool
     @Binding var eventTypesSelected:Set<String> {
         didSet {
             config.eventViewModel.eventSearchEngine.eventTypeSet = self.eventTypesSelected

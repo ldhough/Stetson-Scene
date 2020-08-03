@@ -13,12 +13,26 @@ struct FilterView : View {
     
     @EnvironmentObject var config: Configuration
     
-    //Make all computed properties w/ UserDefaults
     @Binding var filterView:Bool
-    @State var weeksDisplayed:Double = 1
-    @State var weekdaysSelected:[Bool] = [false, false, false, false, false, false, false]
-    @State var onlyCultural:Bool = false
-    @State var eventTypesSelected:Set<String>
+    
+    //Filter properties linked to search engine
+    @State var weeksDisplayed:Double //{
+//        didSet {
+//            config.eventViewModel.eventSearchEngine.weeksDisplayed = Int(self.weeksDisplayed)
+//        }
+//    }
+    @State var weekdaysSelected:[Bool] {
+        didSet {
+            config.eventViewModel.eventSearchEngine.weekdaysSelected = self.weekdaysSelected
+        }
+    }
+    @State var onlyCultural:Bool {
+        didSet {
+            config.eventViewModel.eventSearchEngine.onlyCultural = self.onlyCultural
+        }
+    }
+    
+    @State var eventTypesSelected:Set<String> //Passed down to FilterEventTypeView
     
     func daysOfWeekView() -> some View {
         let systemImagesLetters:[String] = ["s.square", "m.square", "t.square", "w.square", "t.square", "f.square", "s.square"]
@@ -65,11 +79,15 @@ struct FilterView : View {
             }.foregroundColor(Color.white)
             Divider().background(config.accent)
             //Select event type view
-            FilterEventTypeView(eventTypesSelected: self.$eventTypesSelected).environmentObject(self.config)
+            FilterEventTypeView(selectAllDeselectAll: {
+                
+                return false
+            }(), eventTypesSelected: self.$eventTypesSelected).environmentObject(self.config)
             Spacer()
             Divider().background(config.accent)
             //Search Button
             Button("Search") { //Calls filter method of EventSearchEngine instance in primary ViewModel instance to interact with the event list and apply correct filter to all elements
+                self.config.eventViewModel.eventSearchEngine.weeksDisplayed = Int(self.weeksDisplayed)
                 print(self.config.eventViewModel.eventSearchEngine.eventTypeSet)
                 self.filterView = false
             }

@@ -31,8 +31,7 @@ struct DiscoverFavoritesView : View {
                             self.filterView = true
                             print("tapped ")
                     }
-                    .sheet(isPresented: $filterView, content: { FilterView(filterView: self.$filterView, eventTypesSelected: {
-                        
+                    .sheet(isPresented: $filterView, content: { FilterView(filterView: self.$filterView, weeksDisplayed:  Double(self.config.eventViewModel.eventSearchEngine.weeksDisplayed), weekdaysSelected:  self.config.eventViewModel.eventSearchEngine.weekdaysSelected, onlyCultural: self.config.eventViewModel.eventSearchEngine.onlyCultural, eventTypesSelected: {
                         
                             if self.config.eventViewModel.eventSearchEngine.eventTypeSet == [] && UserDefaults.standard.object(forKey: "firstTypeLoad") == nil {
                                 //If no event types are being filtered on and it is the first time that the eventTypeSet has been computed (which will result in empty set), use the full event type set to have all event types selected in filter view
@@ -40,7 +39,9 @@ struct DiscoverFavoritesView : View {
                             } else {
                                 return self.config.eventViewModel.eventSearchEngine.eventTypeSet
                             }
-                        }()).environmentObject(self.config) })
+                    }() ).environmentObject(self.config)
+                        
+                    })
                 }
                 
                 //Quick Search Button
