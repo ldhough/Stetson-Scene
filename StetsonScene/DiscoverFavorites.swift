@@ -51,8 +51,17 @@ struct DiscoverFavoritesView : View {
                 
             }.padding([.vertical, .horizontal])
             
+            //IF IT'S FAVORITES PAGE BUT THERE AREN'T ANY FAVORITES
+            if self.config.page == "Favorites" && !config.eventViewModel.doFavoritesExist(config: config) {
+                VStack(alignment: .center, spacing: 10) {
+                    Text("No Events Favorited").fontWeight(.light).font(.system(size: 20)).padding([.horizontal]).foregroundColor(config.accent)
+                    Text("Add some events to your favorites by using the hard-press shortcut on the event preview or the favorite button on the event detail page.").fontWeight(.light).font(.system(size: 16)).padding([.horizontal]).foregroundColor(Color.label)
+                    Spacer()
+                    Spacer()
+                }
+            }
             //LIST OR CALENDAR
-            if config.subPage == "List" {
+            else if config.subPage == "List" {
                 ListView()
             } else if config.subPage == "Calendar" {
                 CalendarView()

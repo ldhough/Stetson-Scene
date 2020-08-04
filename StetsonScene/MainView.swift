@@ -31,6 +31,7 @@ struct MainView : View {
     @EnvironmentObject var config: Configuration
     @Environment(\.colorScheme) var colorScheme
     @State var listVirtualEvents:Bool = false
+    @State var noFavorites: Bool = false
     //for alerts
     @State var externalAlert: Bool = false
     @State var tooFar: Bool = false
@@ -83,13 +84,15 @@ struct MainView : View {
                             }
                         }.sheet(isPresented: $listVirtualEvents, content: {
                             ListView(allVirtual: true).environmentObject(self.config).background(Color.secondarySystemBackground)
-                        })
+                        }).alert(isPresented: self.$noFavorites) { () -> Alert in //if favorites map or favorites AR & there are no favorites
+                           return self.config.eventViewModel.alert(title: "No Favorites to Show", message: "Add some favorites so we can show you them in \(config.subPage) Mode!")
+                        }
                     }
                 } else if config.page == "Information" {
                     InformationView().blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false)
                 } 
                 
-                TabBar()
+                TabBar(noFavorites: self.$noFavorites)
                 
             }.edgesIgnoringSafeArea(.bottom)
             
@@ -99,6 +102,7 @@ struct MainView : View {
 
 struct TabBar : View {
     @EnvironmentObject var config: Configuration
+    @Binding var noFavorites: Bool
     
     var body: some View {
         ZStack {
@@ -143,6 +147,11 @@ struct TabBar : View {
                             self.config.showOptions = true
                         }
                         self.config.page = "Favorites"
+                        //if there aren't any favorites, send alert through noFavorites & don't allow Map/AR to show by not getting rid of options
+                        if !self.config.eventViewModel.doFavoritesExist(config: self.config) && (self.config.subPage == "AR" || self.config.subPage == "Map") {
+                            self.noFavorites = true
+                            self.config.showOptions = true
+                        }
                 }
                 //Info
                 HStack {
@@ -162,7 +171,7 @@ struct TabBar : View {
             
             //other tabs
             if self.config.showOptions {
-                TabOptions().offset(x: self.config.page == "Discover" ? -30 : 30, y: -60)
+                TabOptions(noFavorites: self.$noFavorites).offset(x: self.config.page == "Discover" ? -30 : 30, y: -60)
             }
             
         }//zstack end
@@ -172,6 +181,7 @@ struct TabBar : View {
 struct TabOptions: View {
     @EnvironmentObject var config: Configuration
     @Environment(\.colorScheme) var colorScheme
+    @Binding var noFavorites: Bool
     
     var body: some View {
         HStack {
@@ -225,6 +235,11 @@ struct TabOptions: View {
                         self.config.subPage = "AR"
                         self.config.showOptions = false
                     }
+                    //if there aren't any favorites, send alert through noFavorites & don't allow AR to show by not getting rid of options
+                    if !self.config.eventViewModel.doFavoritesExist(config: self.config) && self.config.page == "Favorites" {
+                        self.noFavorites = true
+                        self.config.showOptions = true
+                    }
             }
             //Map
             ZStack {
@@ -241,6 +256,11 @@ struct TabOptions: View {
                     withAnimation {
                         self.config.subPage = "Map"
                         self.config.showOptions = false
+                    }
+                    //if there aren't any favorites, send alert through noFavorites & don't allow Map to show by not getting rid of options
+                    if !self.config.eventViewModel.doFavoritesExist(config: self.config) && self.config.page == "Favorites" {
+                        self.noFavorites = true
+                        self.config.showOptions = true
                     }
             }
         }.transition(.scale) //hstack

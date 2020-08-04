@@ -577,6 +577,7 @@ class EventViewModel: ObservableObject {
         }
     }
     
+    //
     func determineVirtualList(config: Configuration) -> Bool {
         for event in config.eventViewModel.eventList {
             config.eventViewModel.isVirtual(event: event)
@@ -587,6 +588,16 @@ class EventViewModel: ObservableObject {
             }
         }
         return true
+    }
+    
+    //determine if any events are favorited
+    func doFavoritesExist(config: Configuration) -> Bool {
+        for event in config.eventViewModel.eventList {
+            if event.isFavorite {
+                return true
+            }
+        }
+        return false
     }
     
     func sanitizeCoords(event: EventInstance) {
