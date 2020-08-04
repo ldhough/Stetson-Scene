@@ -572,7 +572,7 @@ class EventViewModel: ObservableObject {
     }
     
     func isVirtual(event: EventInstance) {
-        if event.mainLon == 0.0 && event.mainLat == 0.0 && event.location.lowercased() == "virtual" {
+        if (event.mainLon == 0.0 && event.mainLat == 0.0) || event.location.lowercased() == "virtual" {
             event.isVirtual = true
         }
     }

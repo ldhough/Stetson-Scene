@@ -20,9 +20,15 @@ struct ARViewIndicator: UIViewControllerRepresentable {
     @EnvironmentObject var config: Configuration
     var arFindMode: Bool
     var navToEvent: EventInstance?
+    @Binding var internalAlert: Bool
+    @Binding var externalAlert: Bool
+    @Binding var tooFar: Bool
+    @Binding var allVirtual: Bool
+    @Binding var arrived: Bool
+    @Binding var eventDetails: Bool
     
     func makeUIViewController(context: Context) -> ARView {
-        return ARView(config: self.config, arFindMode: self.arFindMode, navToEvent: self.navToEvent ?? EventInstance())
+        return ARView(config: self.config, arFindMode: self.arFindMode, navToEvent: self.navToEvent ?? EventInstance(), internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: self.$allVirtual, arrived: self.$arrived, eventDetails: self.$eventDetails)
     }
     func updateUIViewController(_ uiViewController: ARViewIndicator.UIViewControllerType, context: UIViewControllerRepresentableContext<ARViewIndicator>) { }
 }
@@ -33,19 +39,52 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
     var config: Configuration
     var arFindMode: Bool //true=finding | false=navigating
     var navToEvent: EventInstance?
+    @Binding var internalAlert: Bool
+    @Binding var externalAlert: Bool
+    @Binding var tooFar: Bool
+    @Binding var allVirtual: Bool
+    @Binding var arrived: Bool
+    @Binding var eventDetails: Bool
+    @State var alertSent: Bool = false //keeps the alerts from being obnoxious
+    let StetsonUniversity = CLLocation(latitude: 29.0349780, longitude: -81.3026430)
     let locationManager = CLLocationManager()
-    var userLocation: CLLocation!
     var userAltitude = Double?(10)
     var sceneLocationView = SceneLocationView()
-    var distanceFromCampus:Double! = 0.0
     var distanceFromBuilding:Int! = 0
-    var alertSent: Bool = false
+    //every time user location is updated, update the scene as well
+    var userLocation: CLLocation! {
+        didSet {
+            //if you're navigating to an event with AR, update distanceFromBuilding so it can be displayed on the AR tag
+            if !arFindMode {
+                let building = CLLocation(latitude: navToEvent!.mainLat, longitude: navToEvent!.mainLon)
+                distanceFromBuilding = Int(building.distance(from: userLocation))
+            }
+            if StetsonUniversity.distance(from: userLocation) > 805 && !alertSent { //805m = 0.5mi //if you're too far away from campus, create just one node and send an alert
+                for annotationNode in self.sceneLocationView.locationNodes { annotationNode.removeFromParentNode() } //clean scene
+                createBuildingNode(location: "Stetson University", lat: 29.0349780, lon: -81.3026430, altitude: (userAltitude! + 15)) //just create a stetson node
+                externalAlert = true
+                tooFar = true
+                alertSent = true
+            } else { //if you're within 0.5mi of campus
+                for annotationNode in self.sceneLocationView.locationNodes { annotationNode.removeFromParentNode() } //clean scene
+                determineNodes() //create the appropriate nodes depending on appEventMode & arFindMode
+                externalAlert = false
+                tooFar = false
+            }
+        }
+    }
     
     //Initialization
-    init(config: Configuration, arFindMode: Bool, navToEvent: EventInstance) {
+    init(config: Configuration, arFindMode: Bool, navToEvent: EventInstance, internalAlert: Binding<Bool>, externalAlert: Binding<Bool>, tooFar: Binding<Bool>, allVirtual: Binding<Bool>, arrived: Binding<Bool>, eventDetails: Binding<Bool>) {
         self.config = config
         self.arFindMode = arFindMode
         self.navToEvent = navToEvent
+        self._internalAlert = internalAlert
+        self._externalAlert = externalAlert
+        self._tooFar = tooFar
+        self._allVirtual = allVirtual
+        self._arrived = arrived
+        self._eventDetails = eventDetails
         super.init(nibName: nil, bundle: nil)
     }
     required init?(coder: NSCoder) {
@@ -78,63 +117,35 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
         if let lastLocation = locations.last {
             userAltitude = lastLocation.altitude
             userLocation = lastLocation
-            if (userLocation != nil) {
-                let StetsonUniversity = CLLocation(latitude: 29.0349780, longitude: -81.3026430)
-                distanceFromCampus = StetsonUniversity.distance(from: userLocation) //in meters
-            }
         }
-        //if you're too far away from campus
-        if distanceFromCampus > 805 { //805m = 0.5mi
-            for annotationNode in self.sceneLocationView.locationNodes { annotationNode.removeFromParentNode() } //clean scene
-            createBuildingNode(location: "Stetson University", lat: 29.0349780, lon: -81.3026430, altitude: (userAltitude! + 15)) //just create a stetson node
-            if !alertSent {
-                alertSent = true
-                //self.config.eventViewModel.createAlert(title: "Too Far from Campus to Tour", message: "Sorry! It looks like you're too far away from campus to tour using AR. Try touring with the map instead!") //send an alert once
-            }
-        } else { //if you're within 0.5mi of campus
-            alertSent = false //if you were too far away and are now on-campus, reset alertSent so if you go off-campus again it will only alert you once
-            for annotationNode in self.sceneLocationView.locationNodes { annotationNode.removeFromParentNode() } //clean scene
-            determineNodes() //create the appropriate nodes depending on appEventMode & arFindMode
-        }
-        //refresh
-        for annotationNode in self.sceneLocationView.locationNodes { annotationNode.removeFromParentNode() } //clean scene
-        determineNodes() //create the appropriate nodes depending on appEventMode & arFindMode
     }
     
     func determineNodes() {
         var locationsWithNode: [String] = []
         if config.appEventMode {
-            //if you're navigating to a single event, create just one node for it
-            if !arFindMode && navToEvent != nil {
+            //if you're navigating to a single event and are close enough to campus to navigate, create just one node for it
+            if !arFindMode && navToEvent != nil && StetsonUniversity.distance(from: userLocation) <= 805 {
                 for annotationNode in self.sceneLocationView.locationNodes { annotationNode.removeFromParentNode() } //clean scene
-                //if you're too far away from campus, send alert and exit AR
-                if distanceFromCampus > 805 {
-                    for annotationNode in self.sceneLocationView.locationNodes { annotationNode.removeFromParentNode() } //clean scene
-                    createBuildingNode(location: "Stetson University", lat: 29.0349780, lon: -81.3026430, altitude: (userAltitude! + 15)) //just create a stetson node
-                    if !alertSent {
-                        alertSent = true
-                        //self.config.eventViewModel.createAlert(title: "Too Far from Campus to Navigate", message: "Sorry! It looks like you're too far away from campus to navigate to an event.") //send an alert once
-                    }
-                }
-                //if you're on campus, create a node and send alert if you've basically arrived
                 createBuildingNode(location: navToEvent!.name, lat: navToEvent!.mainLat, lon: navToEvent!.mainLon, altitude: (userAltitude! + 15))
-                if userLocation != nil {
-                    //CLLocationDistance distanceInMeters = [location1 distanceFromLocation:location2];
+                //if you're navigating to an event and are basically there, send the "you've arrived" alert ONCE
+                if !alertSent && locationManager.location != nil && (CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways) {
                     let destination = CLLocation(latitude: (navToEvent!.mainLat)!, longitude: (navToEvent!.mainLon)!)
-                    if (round(1000 * (destination.distance(from: userLocation)))/1000) < 16 {
-                        //self.config.eventViewModel.createAlert(title: "You've Arrived!", message: "Have fun at \(String(describing: navToEvent!.name))!")
+                    if (round(1000 * (destination.distance(from: locationManager.location!)))/1000) < 16 {
+                        print("should send arrived alert")
+                        internalAlert = true
+                        arrived = true
+                        alertSent = true
                     }
                 }
                 return
             }
             
-            //add buildings with non-virtual events to discover/favorites view
+            //if you're touring with AR, create nodes for each building with events
             for event in config.eventViewModel.eventList {
                 if !config.eventViewModel.determineVirtualList(config: config) {
                     config.eventViewModel.sanitizeCoords(event: event)
                     //don't repeat building nodes, only add to favorites view if the event is favorited
                     if !locationsWithNode.contains(event.location) && ((config.page == "Favorites" && event.isFavorite) || config.page == "Discover") {
-                        print("HERE 2")
                         locationsWithNode.append(event.location)
                         createBuildingNode(location: event.location, lat: event.mainLat, lon: event.mainLon, altitude: (userAltitude! + 15))
                     }
@@ -142,10 +153,10 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
             }
             
             //if all events are virtual, create a single Stetson node and send an alert
-            if arFindMode && config.eventViewModel.determineVirtualList(config: config) {
-                print("HERE 3")
+            if arFindMode && config.eventViewModel.determineVirtualList(config: config) && !alertSent {
                 createBuildingNode(location: "Stetson University", lat: 29.0349780, lon: -81.3026430, altitude: (userAltitude! + 15))
-                //self.config.eventViewModel.createAlert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
+                allVirtual = true
+                alertSent = true
             }
         } else {
             //TODO
@@ -183,15 +194,15 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
             uiview.addSubview(tagLabel)
             
             if !arFindMode {
-            //add a text label to the uiview and get it all configured with relative sizing
+                //add a text label to the uiview and get it all configured with relative sizing
                 let tagLabel2 = UILabel(frame: CGRect(x:0, y:0, width:Double(width*0.9), height:Double(height)))
-            tagLabel2.text = "\(distanceFromBuilding!)m"
-            tagLabel2.textColor = UIColor.secondaryLabel
-            tagLabel2.font = UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.light)
-            tagLabel2.textAlignment = .right
-            tagLabel2.center = CGPoint(x: uiview.frame.midX, y: uiview.frame.minY+(height/2))
-            tagLabel2.adjustsFontSizeToFitWidth = true
-            uiview.addSubview(tagLabel2)
+                tagLabel2.text = "\(distanceFromBuilding!)m"
+                tagLabel2.textColor = UIColor.secondaryLabel
+                tagLabel2.font = UIFont.systemFont(ofSize: 16, weight: UIFont.Weight.light)
+                tagLabel2.textAlignment = .right
+                tagLabel2.center = CGPoint(x: uiview.frame.midX, y: uiview.frame.minY+(height/2))
+                tagLabel2.adjustsFontSizeToFitWidth = true
+                uiview.addSubview(tagLabel2)
             }
             return uiview
         }
@@ -212,25 +223,35 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
             
             if config.appEventMode {
                 //if all events are virtual and you tap on the Stetson University node, send the virtual events only alert
-                if config.eventViewModel.determineVirtualList(config: config) && (String(describing: hits.name!)) == "Stetson University" {
-                    //self.config.eventViewModel.createAlert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
+                if arFindMode && config.eventViewModel.determineVirtualList(config: config) && (String(describing: hits.name!)) == "Stetson University" {
+                    print("ALL VIRTUAL")
+                    allVirtual = true
                     return
                 }
+                //if you're too far from campus and you tap the Stetson node, send the too far alert
+                if arFindMode && StetsonUniversity.distance(from: userLocation) > 1 && (String(describing: hits.name!)) == "Stetson University" {
+                    print("TOO FAR")
+                    externalAlert = true
+                    tooFar = true
+                    return
+                }
+                //if you tap an actual building
                 if (String(describing: hits.name!)) != "Stetson University" {
-                        if arFindMode { //checking out events in a building
-                            for event in config.eventViewModel.eventList {
+                    if arFindMode {
+                        print("EVENT LIST BY BUILDING")
+                        //see event list for a building
+                        for event in config.eventViewModel.eventList {
                             if event.location == (String(describing: hits.name!)) {
                                 let eventListByBuilding = UIHostingController(rootView: ListView(eventLocation: event.location!).environmentObject(self.config).background(Color.secondarySystemBackground))
                                 present(eventListByBuilding, animated: true)
                             }
-                            }
-                        } else { //navigating to specific event
-                            if userLocation != nil {
-                                let building = CLLocation(latitude: navToEvent!.mainLat, longitude: navToEvent!.mainLon)
-                                distanceFromBuilding = Int(building.distance(from: userLocation))
-                                //self.config.eventViewModel.createAlert(title: "\(navToEvent!.name!)", message: "This event is at \(navToEvent!.time!) on \(navToEvent!.date!), and you are \(distanceFromBuilding!)m from \(navToEvent!.location!).")
-                            }
                         }
+                    } else {
+                        //navigating to specific event & want details about the event- tap for eventDetails alert
+                        print("EVENT DETAILS")
+                        internalAlert = true
+                        eventDetails = true
+                    }
                 }
             } else {
                 //TODO

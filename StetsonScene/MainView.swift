@@ -14,9 +14,15 @@ struct ARNavigationIndicator: UIViewControllerRepresentable {
     @EnvironmentObject var config: Configuration
     var arFindMode: Bool
     var navToEvent: EventInstance?
+    @Binding var internalAlert: Bool
+    @Binding var externalAlert: Bool
+    @Binding var tooFar: Bool
+    @Binding var allVirtual: Bool
+    @Binding var arrived: Bool
+    @Binding var eventDetails: Bool
     
     func makeUIViewController(context: Context) -> ARView {
-        return ARView(config: self.config, arFindMode: self.arFindMode, navToEvent: self.navToEvent ?? EventInstance())
+        return ARView(config: self.config, arFindMode: self.arFindMode, navToEvent: self.navToEvent ?? EventInstance(), internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: self.$allVirtual, arrived: self.$arrived, eventDetails: self.$eventDetails)
     }
     func updateUIViewController(_ uiViewController: ARNavigationIndicator.UIViewControllerType, context: UIViewControllerRepresentableContext<ARNavigationIndicator>) { }
 }
@@ -25,10 +31,10 @@ struct MainView : View {
     @EnvironmentObject var config: Configuration
     @Environment(\.colorScheme) var colorScheme
     @State var listVirtualEvents:Bool = false
-    //used for alerts in mapview
-    @State var showAlert: Bool = false
-    @State var arrived: Bool = false
+    //for alerts
+    @State var externalAlert: Bool = false
     @State var tooFar: Bool = false
+    @State var allVirtual: Bool = false
     
     var body: some View {
         ZStack {
@@ -42,18 +48,25 @@ struct MainView : View {
                     } else { //AR or Map
                         ZStack {
                             if config.subPage == "AR" {
-                                ARNavigationIndicator(arFindMode: true).blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false).edgesIgnoringSafeArea(.top)
-                            } else if config.subPage == "Map" {
-                                MapView(mapFindMode: true, showAlert: self.$showAlert, arrived: self.$arrived, tooFar: self.$tooFar).environmentObject(self.config)
+                                ARNavigationIndicator(arFindMode: true, internalAlert: .constant(false), externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: self.$allVirtual, arrived: .constant(false), eventDetails: .constant(false)).environmentObject(self.config)
                                     .blur(radius: config.showOptions ? 5 : 0)
                                     .disabled(config.showOptions ? true : false)
                                     .edgesIgnoringSafeArea(.top)
-                                    .alert(isPresented: self.$showAlert) { () -> Alert in
-                                        if config.eventViewModel.determineVirtualList(config: config) {
+                                    .alert(isPresented: self.$externalAlert) { () -> Alert in
+                                        if self.tooFar {
+                                            return self.config.eventViewModel.alert(title: "Too Far to Tour with AR", message: "You're currently too far away from campus to use the AR feature to tour. Try using the map instead.")
+                                        } else if self.allVirtual {
                                             return self.config.eventViewModel.alert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
-                                        } else {
-                                            return self.config.eventViewModel.alert(title: "This shouldn't happen", message: "")
                                         }
+                                        return self.config.eventViewModel.alert(title: "ERROR", message: "Please report as a bug.")
+                                     }
+                            } else if config.subPage == "Map" {
+                                MapView(mapFindMode: true, internalAlert: .constant(false), externalAlert: .constant(false), tooFar: .constant(false), allVirtual: self.$allVirtual, arrived: .constant(false), eventDetails: .constant(false)).environmentObject(self.config)
+                                    .blur(radius: config.showOptions ? 5 : 0)
+                                    .disabled(config.showOptions ? true : false)
+                                    .edgesIgnoringSafeArea(.top)
+                                    .alert(isPresented: self.$allVirtual) { () -> Alert in
+                                        return self.config.eventViewModel.alert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
                                     }
                             }
                             if config.appEventMode {

@@ -12,17 +12,19 @@ import CoreLocation
 import Combine
 
 //MARK: MapView
+//handles UI view loading and updating, as well as placement of annotations
 struct MapView: UIViewRepresentable {
     @EnvironmentObject var config: Configuration
     var mapFindMode: Bool //true=finding | false=navigating
     var navToEvent: EventInstance?
-    //for alerts- pass straight through to coordinator
-    @Binding var showAlert: Bool
-    @Binding var arrived: Bool
+    @Binding var internalAlert: Bool
+    @Binding var externalAlert: Bool
     @Binding var tooFar: Bool
-    
+    @Binding var allVirtual: Bool
+    @Binding var arrived: Bool
+    @Binding var eventDetails: Bool
+    @State var alertSent: Bool = false //keeps the alerts from being obnoxious
     let locationManager = CLLocationManager()
-    var distanceFromBuilding:Int! = 0
     
     //handle UIView with makeUIView and updateUIView
     func makeUIView(context: Context) -> MKMapView {
@@ -36,6 +38,7 @@ struct MapView: UIViewRepresentable {
         if CLLocationManager.locationServicesEnabled() {
             locationManager.desiredAccuracy = kCLLocationAccuracyBest
             locationManager.startUpdatingLocation()
+            locationManager.distanceFilter = 5.0 // location manager updates location every time it's a difference of 5m- want this for navigation
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0, execute: {
                 let region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 29.0350, longitude: -81.3032), span:MKCoordinateSpan(latitudeDelta: 0.015, longitudeDelta: 0.015))
                 uiView.setRegion(region, animated: true)
@@ -47,10 +50,13 @@ struct MapView: UIViewRepresentable {
         uiView.addAnnotations(determineAnnotations())
     }
     
+    //figure out what annotations should go on the map
+    //depends on appEventMode, mapFindMode, if there are virtual events/only virtual events, distance from campus, etc.
     func determineAnnotations() -> [Annotation] {
         var annotations:[Annotation] = []
         var locationsWithAnnotation: [String] = []
         
+        //app event mode
         if config.appEventMode {
             //if you're navigating to a single event, create just one annotation for it
             if !mapFindMode && navToEvent != nil {
@@ -68,6 +74,7 @@ struct MapView: UIViewRepresentable {
                 }
             }
             
+            //if you're finding/discovering events
             //add buildings with non-virtual events to discover/favorites view
             for event in config.eventViewModel.eventList {
                 if !config.eventViewModel.determineVirtualList(config: config) {
@@ -85,15 +92,16 @@ struct MapView: UIViewRepresentable {
                 annotations.append(Annotation(title: "Stetson University", info: "", coordinate: CLLocationCoordinate2D(latitude: 29.0349780, longitude: -81.3026430)))
                 return annotations
             }
-        } else {
+        } else { //app tour mode
             //TODO
             //create all building annotations
         }
         return annotations
     }
     
+    //make a coordinator to handle updating values during the view session
     func makeCoordinator() -> Coordinator {
-        Coordinator(self, config: config, locationManager: locationManager, mapFindMode: mapFindMode, navToEvent: navToEvent, showAlert: self.$showAlert, arrived: self.$arrived, tooFar: self.$tooFar)
+        Coordinator(self, config: config, locationManager: locationManager, mapFindMode: mapFindMode, navToEvent: navToEvent, internalAlert: $internalAlert, externalAlert: $externalAlert, tooFar: $tooFar, allVirtual: $allVirtual, arrived: $arrived, eventDetails: $eventDetails, alertSent: $alertSent)
     }
 }
 
@@ -104,20 +112,28 @@ final class Coordinator: NSObject, MKMapViewDelegate {
     var locationManager: CLLocationManager
     var mapFindMode: Bool
     var navToEvent: EventInstance?
-    //for alerts
-    @Binding var showAlert: Bool
-    @Binding var arrived: Bool
+    @Binding var internalAlert: Bool
+    @Binding var externalAlert: Bool
     @Binding var tooFar: Bool
+    @Binding var allVirtual: Bool
+    @Binding var arrived: Bool
+    @Binding var eventDetails: Bool
+    @Binding var alertSent: Bool //keeps the alerts from being obnoxious
     
-    init(_ parent: MapView, config: Configuration, locationManager: CLLocationManager, mapFindMode: Bool, navToEvent: EventInstance?, showAlert: Binding<Bool>, arrived: Binding<Bool>, tooFar: Binding<Bool>) {
+    //initialize
+    init(_ parent: MapView, config: Configuration, locationManager: CLLocationManager, mapFindMode: Bool, navToEvent: EventInstance?, internalAlert: Binding<Bool>, externalAlert: Binding<Bool>, tooFar: Binding<Bool>, allVirtual: Binding<Bool>, arrived: Binding<Bool>, eventDetails: Binding<Bool>, alertSent: Binding<Bool>) {
         self.parent = parent
         self.config = config
         self.locationManager = locationManager
         self.mapFindMode = mapFindMode
         self.navToEvent = navToEvent
-        self._showAlert = showAlert
-        self._arrived = arrived
+        self._internalAlert = internalAlert
+        self._externalAlert = externalAlert
         self._tooFar = tooFar
+        self._allVirtual = allVirtual
+        self._arrived = arrived
+        self._eventDetails = eventDetails
+        self._alertSent = alertSent
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
@@ -125,6 +141,7 @@ final class Coordinator: NSObject, MKMapViewDelegate {
         mapView.setRegion(MKCoordinateRegion(center: coordinates, span: mapView.region.span), animated: true)
     }
     
+    //when the view loads & reloads
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         if annotation.isKind(of: MKUserLocation.self) {
             return nil
@@ -135,50 +152,51 @@ final class Coordinator: NSObject, MKMapViewDelegate {
         view.rightCalloutAccessoryView = infoButton
         view.pinTintColor = config.accentUIColor
         view.canShowCallout = true
+        
+        //if all events in list are virtual, allVirtual = true & alert will be sent upon screen initialization ONCE
+        if config.appEventMode && mapFindMode && config.eventViewModel.determineVirtualList(config: config) && !alertSent {
+            allVirtual = true
+            alertSent = true
+        }
+        //if you're navigating to an event and are basically there, send the "you've arrived" alert ONCE
+        if config.appEventMode && !mapFindMode && !alertSent && locationManager.location != nil && (CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways) {
+            let destination = CLLocation(latitude: (navToEvent!.mainLat)!, longitude: (navToEvent!.mainLon)!)
+            if (round(1000 * (destination.distance(from: locationManager.location!)))/1000) < 16 {
+                print("should send arrived alert")
+                internalAlert = true
+                arrived = true
+                alertSent = true
+            }
+        }
+        
         return view
     }
     
     @objc func tapped() {UIImpactFeedbackGenerator(style: .medium).impactOccurred()}
     
+    //only for if you tap
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
         let window = UIApplication.shared.windows.first
         
         if config.appEventMode {
             //if all events are virtual and you tap on the Stetson University node, send the virtual events only alert
             if mapFindMode && config.eventViewModel.determineVirtualList(config: config) && view.annotation?.title!! == "Stetson University" {
-                self.showAlert = true
+                allVirtual = true
                 return
             }
-            if view.annotation?.title!! != "Stetson University" { //if you click on an actual event or building, not Stetson University pin
-                if mapFindMode { //checking out events in a building
-                    print("find mode")
+            //if you click on an actual event or building, not Stetson University pin
+            if view.annotation?.title!! != "Stetson University" {
+                if mapFindMode {
+                    //event list for buildings
                     for event in config.eventViewModel.eventList {
                         if event.location == view.annotation?.title!! {
                             window?.rootViewController?.present(UIHostingController(rootView: ListView(eventLocation: event.location!).environmentObject(self.config).background(Color.secondarySystemBackground)), animated: true)
                         }
                     }
-                } else { //navigating to specific event
-                    print("nav mode")
-                    if locationManager.location != nil && (CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways) {
-                        let building = CLLocation(latitude: navToEvent!.mainLat, longitude: navToEvent!.mainLon)
-                        let distanceFromBuilding = Int(building.distance(from: locationManager.location!))
-                        //if you're too far away from campus, send alert
-                        let StetsonUniversity = CLLocation(latitude: 29.0349780, longitude: -81.3026430)
-                        if StetsonUniversity.distance(from: locationManager.location!) > 805 { //in meters
-                            self.tooFar = true
-                            self.showAlert = true
-                            print("too far to navigate")
-                        }
-                        //if you're on campus navigating to an event, send alert if you've basically arrived
-                        let destination = CLLocation(latitude: (navToEvent!.mainLat)!, longitude: (navToEvent!.mainLon)!)
-                        if (round(1000 * (destination.distance(from: locationManager.location!)))/1000) < 16 {
-                            self.arrived = true
-                            self.showAlert = true
-                        }
-                        //if you tap on the pin
-                        //assume this is for event details, w/o any other clarification
-                        self.showAlert = true
-                    }
+                } else {
+                    //navigating to specific event & want details about the event- tap for eventDetails alert
+                    internalAlert = true
+                    eventDetails = true
                 }
             }
         } else {
