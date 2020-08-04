@@ -597,18 +597,16 @@ class EventViewModel: ObservableObject {
        }
     }
     
-    //use in ARView
-    func createAlert(title: String, message: String) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in
-            NSLog("The \"OK\" alert occured.")
-        }))
-        alert.present(alert, animated: true, completion: nil)
-    }
-    
-    //use in MapView
     func alert(title: String, message: String) -> Alert {
         return Alert(title: Text(title), message: Text(message), dismissButton: .default(Text("OK")))
+    }
+    
+    func navAlert(lat: Double, lon: Double) -> Alert {
+        return Alert(title: Text("Too Far to Navigate to Event in StetsonScene"), message: Text("You're currently too far away from campus to navigate to this event through StetsonScene; would you like to navigate to it with Apple Maps?"),
+              primaryButton: .default(Text("Navigate in Apple Maps")) {
+                let url = URL(string: "http://maps.apple.com/maps?saddr=&daddr=\(lat),\(lon)")
+                UIApplication.shared.open(url!)
+              }, secondaryButton: .cancel())
     }
 }
 

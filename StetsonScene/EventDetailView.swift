@@ -110,34 +110,30 @@ struct Buttons: View {
                 .onTapGesture {
                     haptic()
                     self.config.eventViewModel.isVirtual(event: self.event)
-                    print("HERE HERE HERE")
                     //if you're trying to navigate to an event and are too far from campus, alert user and don't go to map
                     let locationManager = CLLocationManager()
                     let StetsonUniversity = CLLocation(latitude: 29.0349780, longitude: -81.3026430)
-                    if locationManager.location != nil && (CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways) && StetsonUniversity.distance(from: locationManager.location!) > 805 {
+                    if !self.event.isVirtual && locationManager.location != nil && (CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways) && StetsonUniversity.distance(from: locationManager.location!) > 805 {
                             self.externalAlert = true
                             self.tooFar = true
                             self.navigate = false
-                            print("navigate false")
                     } else if self.event.isVirtual { //if you're trying to navigate to a virtual event, alert user and don't go to map
                         //TODO: add in the capability to follow a link to register or something
                         self.externalAlert = true
                         self.isVirtual = true
                         self.navigate = false
-                        print("navigate false")
                     } else { //otherwise go to map
                         self.externalAlert = false
                         self.isVirtual = false
                         self.tooFar = false
                         self.navigate = true
-                        print("navigate true")
                     }
             }.sheet(isPresented: $navigate, content: {
                 ZStack {
                     if self.arMode && !self.event.isVirtual {
-                        ARNavigationIndicator(arFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
+                        ARNavigationIndicator(arFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
                     } else if !self.event.isVirtual { //mapMode
-                        MapView(mapFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
+                        MapView(mapFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
                     }
                     if self.config.appEventMode {
                         ZStack {
@@ -159,7 +155,8 @@ struct Buttons: View {
                 if self.isVirtual {
                     return self.config.eventViewModel.alert(title: "Virtual Event", message: "Sorry! This event is virtual, so you have no where to navigate to.")
                 } else if self.tooFar {
-                    return self.config.eventViewModel.alert(title: "Too Far to Navigate to Event", message: "You're currently too far away from campus to navigate to this event. You can still view it in the map, and once you get closer to campus, can navigate there.")
+                    //return self.config.eventViewModel.alert(title: "Too Far to Navigate to Event", message: "You're currently too far away from campus to navigate to this event. You can still view it in the map, and once you get closer to campus, can navigate there.")
+                    return self.config.eventViewModel.navAlert(lat: self.event.mainLat, lon: self.event.mainLon)
                 }
                 return self.config.eventViewModel.alert(title: "ERROR", message: "Please report as a bug.")
             }

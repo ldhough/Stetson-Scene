@@ -144,8 +144,8 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
             for event in config.eventViewModel.eventList {
                 if !config.eventViewModel.determineVirtualList(config: config) {
                     config.eventViewModel.sanitizeCoords(event: event)
-                    //don't repeat building nodes, only add to favorites view if the event is favorited
-                    if !locationsWithNode.contains(event.location) && ((config.page == "Favorites" && event.isFavorite) || config.page == "Discover") {
+                    //only add non-virtual events, don't repeat building nodes, only add to favorites view if the event is favorited
+                    if (event.location.lowercased() != "virtual") && !locationsWithNode.contains(event.location) && ((config.page == "Favorites" && event.isFavorite) || config.page == "Discover") {
                         locationsWithNode.append(event.location)
                         createBuildingNode(location: event.location, lat: event.mainLat, lon: event.mainLon, altitude: (userAltitude! + 15))
                     }
@@ -224,13 +224,12 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
             if config.appEventMode {
                 //if all events are virtual and you tap on the Stetson University node, send the virtual events only alert
                 if arFindMode && config.eventViewModel.determineVirtualList(config: config) && (String(describing: hits.name!)) == "Stetson University" {
-                    print("ALL VIRTUAL")
+                    externalAlert = true
                     allVirtual = true
                     return
                 }
                 //if you're too far from campus and you tap the Stetson node, send the too far alert
-                if arFindMode && StetsonUniversity.distance(from: userLocation) > 1 && (String(describing: hits.name!)) == "Stetson University" {
-                    print("TOO FAR")
+                if arFindMode && StetsonUniversity.distance(from: userLocation) > 805 && (String(describing: hits.name!)) == "Stetson University" {
                     externalAlert = true
                     tooFar = true
                     return
@@ -238,7 +237,6 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
                 //if you tap an actual building
                 if (String(describing: hits.name!)) != "Stetson University" {
                     if arFindMode {
-                        print("EVENT LIST BY BUILDING")
                         //see event list for a building
                         for event in config.eventViewModel.eventList {
                             if event.location == (String(describing: hits.name!)) {
@@ -248,7 +246,6 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
                         }
                     } else {
                         //navigating to specific event & want details about the event- tap for eventDetails alert
-                        print("EVENT DETAILS")
                         internalAlert = true
                         eventDetails = true
                     }

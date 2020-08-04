@@ -56,7 +56,11 @@ struct MainView : View {
                                         if self.tooFar {
                                             return self.config.eventViewModel.alert(title: "Too Far to Tour with AR", message: "You're currently too far away from campus to use the AR feature to tour. Try using the map instead.")
                                         } else if self.allVirtual {
-                                            return self.config.eventViewModel.alert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
+                                            if config.page == "Favorites" {
+                                                return self.config.eventViewModel.alert(title: "All Favorited Events are Virtual", message: "Unfortunately, there are no events in your favorites list that are on campus at the moment. Check out the virtual event list instead.")
+                                            } else { //config.page == "Discover"
+                                                return self.config.eventViewModel.alert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
+                                            }
                                         }
                                         return self.config.eventViewModel.alert(title: "ERROR", message: "Please report as a bug.")
                                      }
