@@ -44,27 +44,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let vm = EventViewModel()
         let se = EventSearchEngine()
         vm.retrieveFirebaseData(daysIntoYear: vm.getDaysIntoYear(nowPlusWeeks: 1), doFilter: false, searchEngine: se)
-        //print(vm.eventList)
         self.config = Configuration(vm)
         
         //Keeps List views from having cell dividers
-        //UITableView.appearance().allowsSelection = false
-        //UITableViewCell.appearance().selectionStyle = .none
         UITableView.appearance().separatorStyle = .none
         UITableView.appearance().backgroundColor = UIColor.clear
-        //UITableView.appearance().separatorColor = .clear
         
         
         //SwiftUI root view
-        //let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        let contentView = MainView()//.environment(\.managedObjectContext, context)
+        let contentView = MainView(evm: vm)//.environment(\.managedObjectContext, context)
         
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)
-            //window.rootViewController = UIHostingController(rootView: contentView/*.onTapGesture(count: 2, perform: { window.endEditing(true) })*/)
-            //            window.rootViewController = UIHostingController(rootView: contentView.onTapGesture(count: 2, perform: {
-            //                window.endEditing(true)
-            //            }))
             window.rootViewController = UIHostingController(rootView: contentView.environmentObject(Configuration(vm)))
             self.window = window
             window.makeKeyAndVisible()

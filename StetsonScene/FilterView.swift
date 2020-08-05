@@ -10,25 +10,21 @@ import Foundation
 import SwiftUI
 
 struct FilterView : View {
-    
+    @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
     
     @Binding var filterView:Bool
     
     //Filter properties linked to search engine
-    @State var weeksDisplayed:Double //{
-//        didSet {
-//            config.eventViewModel.eventSearchEngine.weeksDisplayed = Int(self.weeksDisplayed)
-//        }
-//    }
+    @State var weeksDisplayed:Double
     @State var weekdaysSelected:[Bool] {
         didSet {
-            config.eventViewModel.eventSearchEngine.weekdaysSelected = self.weekdaysSelected
+            evm.eventSearchEngine.weekdaysSelected = self.weekdaysSelected
         }
     }
     @State var onlyCultural:Bool {
         didSet {
-            config.eventViewModel.eventSearchEngine.onlyCultural = self.onlyCultural
+            evm.eventSearchEngine.onlyCultural = self.onlyCultural
         }
     }
     
@@ -80,7 +76,7 @@ struct FilterView : View {
             Divider().background(config.accent)
             //Select event type view
             FilterEventTypeView(selectAllDeselectAll: {
-                if self.eventTypesSelected.count > self.config.eventViewModel.eventTypeList.count/2 {
+                if self.eventTypesSelected.count > self.evm.eventTypeList.count/2 {
                     return false
                 }
                 return true
@@ -89,11 +85,11 @@ struct FilterView : View {
             Divider().background(config.accent)
             //Search Button
             Button("Search") { //Calls filter method of EventSearchEngine instance in primary ViewModel instance to interact with the event list and apply correct filter to all elements
-                self.config.eventViewModel.eventSearchEngine.weeksDisplayed = Int(self.weeksDisplayed)
+                self.evm.eventSearchEngine.weeksDisplayed = Int(self.weeksDisplayed)
                 self.filterView = false //Dismiss modal
-                self.config.eventViewModel.eventSearchEngine.filter(evm: self.config.eventViewModel)
+                self.evm.eventSearchEngine.filter(evm: self.config.eventViewModel)
                 //Update after filter in case filter needs to load more data we want to keep this accurate as to what is actually loaded
-                self.config.eventViewModel.weeksStored = self.config.eventViewModel.eventSearchEngine.weeksDisplayed > self.config.eventViewModel.weeksStored ? self.config.eventViewModel.eventSearchEngine.weeksDisplayed : self.config.eventViewModel.weeksStored
+                self.evm.weeksStored = self.config.eventViewModel.eventSearchEngine.weeksDisplayed > self.config.eventViewModel.weeksStored ? self.config.eventViewModel.eventSearchEngine.weeksDisplayed : self.config.eventViewModel.weeksStored
             }.buttonStyle(MainButtonStyle(accentColor: config.accent)).padding(.horizontal, Constants.width*0.1)
         }.padding()
     }

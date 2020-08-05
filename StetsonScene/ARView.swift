@@ -16,6 +16,7 @@ import ARCL
 // MARK: - ARViewIndicator (ties together AR UIKit & app SwiftUI)
 
 struct ARViewIndicator: UIViewControllerRepresentable {
+    @ObservedObject var evm:EventViewModel
     typealias UIViewControllerType = ARView
     @EnvironmentObject var config: Configuration
     var arFindMode: Bool
@@ -28,7 +29,7 @@ struct ARViewIndicator: UIViewControllerRepresentable {
     @Binding var eventDetails: Bool
     
     func makeUIViewController(context: Context) -> ARView {
-        return ARView(config: self.config, arFindMode: self.arFindMode, navToEvent: self.navToEvent ?? EventInstance(), internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: self.$allVirtual, arrived: self.$arrived, eventDetails: self.$eventDetails)
+        return ARView(evm: self.evm, config: self.config, arFindMode: self.arFindMode, navToEvent: self.navToEvent ?? EventInstance(), internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: self.$allVirtual, arrived: self.$arrived, eventDetails: self.$eventDetails)
     }
     func updateUIViewController(_ uiViewController: ARViewIndicator.UIViewControllerType, context: UIViewControllerRepresentableContext<ARViewIndicator>) { }
 }
@@ -36,6 +37,7 @@ struct ARViewIndicator: UIViewControllerRepresentable {
 // MARK: - ARCameraView
 
 class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
+    @ObservedObject var evm:EventViewModel
     var config: Configuration
     var arFindMode: Bool //true=finding | false=navigating
     var navToEvent: EventInstance?
@@ -75,7 +77,8 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
     }
     
     //Initialization
-    init(config: Configuration, arFindMode: Bool, navToEvent: EventInstance, internalAlert: Binding<Bool>, externalAlert: Binding<Bool>, tooFar: Binding<Bool>, allVirtual: Binding<Bool>, arrived: Binding<Bool>, eventDetails: Binding<Bool>) {
+    init(evm: EventViewModel, config: Configuration, arFindMode: Bool, navToEvent: EventInstance, internalAlert: Binding<Bool>, externalAlert: Binding<Bool>, tooFar: Binding<Bool>, allVirtual: Binding<Bool>, arrived: Binding<Bool>, eventDetails: Binding<Bool>) {
+        self.evm = evm
         self.config = config
         self.arFindMode = arFindMode
         self.navToEvent = navToEvent
@@ -240,7 +243,7 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
                         //see event list for a building
                         for event in config.eventViewModel.eventList {
                             if event.location == (String(describing: hits.name!)) {
-                                let eventListByBuilding = UIHostingController(rootView: ListView(eventLocation: event.location!).environmentObject(self.config).background(Color.secondarySystemBackground))
+                                let eventListByBuilding = UIHostingController(rootView: ListView(evm: self.evm, eventLocation: event.location!).environmentObject(self.config).background(Color.secondarySystemBackground))
                                 present(eventListByBuilding, animated: true)
                             }
                         }

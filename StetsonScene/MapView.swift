@@ -14,6 +14,7 @@ import Combine
 //MARK: MapView
 //handles UI view loading and updating, as well as placement of annotations
 struct MapView: UIViewRepresentable {
+    @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
     var mapFindMode: Bool //true=finding | false=navigating
     var navToEvent: EventInstance?
@@ -101,12 +102,13 @@ struct MapView: UIViewRepresentable {
     
     //make a coordinator to handle updating values during the view session
     func makeCoordinator() -> Coordinator {
-        Coordinator(self, config: config, locationManager: locationManager, mapFindMode: mapFindMode, navToEvent: navToEvent, internalAlert: $internalAlert, externalAlert: $externalAlert, tooFar: $tooFar, allVirtual: $allVirtual, arrived: $arrived, eventDetails: $eventDetails, alertSent: $alertSent)
+        Coordinator(evm: self.evm, self, config: config, locationManager: locationManager, mapFindMode: mapFindMode, navToEvent: navToEvent, internalAlert: $internalAlert, externalAlert: $externalAlert, tooFar: $tooFar, allVirtual: $allVirtual, arrived: $arrived, eventDetails: $eventDetails, alertSent: $alertSent)
     }
 }
 
 //does all the actual work
 final class Coordinator: NSObject, MKMapViewDelegate {
+    @ObservedObject var evm:EventViewModel
     var parent:MapView
     var config: Configuration
     var locationManager: CLLocationManager
@@ -121,7 +123,8 @@ final class Coordinator: NSObject, MKMapViewDelegate {
     @Binding var alertSent: Bool //keeps the alerts from being obnoxious
     
     //initialize
-    init(_ parent: MapView, config: Configuration, locationManager: CLLocationManager, mapFindMode: Bool, navToEvent: EventInstance?, internalAlert: Binding<Bool>, externalAlert: Binding<Bool>, tooFar: Binding<Bool>, allVirtual: Binding<Bool>, arrived: Binding<Bool>, eventDetails: Binding<Bool>, alertSent: Binding<Bool>) {
+    init(evm: EventViewModel, _ parent: MapView, config: Configuration, locationManager: CLLocationManager, mapFindMode: Bool, navToEvent: EventInstance?, internalAlert: Binding<Bool>, externalAlert: Binding<Bool>, tooFar: Binding<Bool>, allVirtual: Binding<Bool>, arrived: Binding<Bool>, eventDetails: Binding<Bool>, alertSent: Binding<Bool>) {
+        self.evm = evm
         self.parent = parent
         self.config = config
         self.locationManager = locationManager
@@ -190,7 +193,7 @@ final class Coordinator: NSObject, MKMapViewDelegate {
                     //event list for buildings
                     for event in config.eventViewModel.eventList {
                         if event.location == view.annotation?.title!! {
-                            window?.rootViewController?.present(UIHostingController(rootView: ListView(eventLocation: event.location!).environmentObject(self.config).background(Color.secondarySystemBackground)), animated: true)
+                            window?.rootViewController?.present(UIHostingController(rootView: ListView(evm: self.evm, eventLocation: event.location!).environmentObject(self.config).background(Color.secondarySystemBackground)), animated: true)
                         }
                     }
                 } else {

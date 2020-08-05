@@ -10,6 +10,7 @@ import Foundation
 import SwiftUI
 
 struct DiscoverFavoritesView : View {
+    @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
     @Environment(\.colorScheme) var colorScheme
     @State var filterApplied: Bool = false
@@ -31,7 +32,7 @@ struct DiscoverFavoritesView : View {
                             self.filterView = true
                             print("tapped ")
                     }
-                    .sheet(isPresented: $filterView, content: { FilterView(filterView: self.$filterView, weeksDisplayed:  Double(self.config.eventViewModel.eventSearchEngine.weeksDisplayed), weekdaysSelected:  self.config.eventViewModel.eventSearchEngine.weekdaysSelected, onlyCultural: self.config.eventViewModel.eventSearchEngine.onlyCultural, eventTypesSelected: {
+                    .sheet(isPresented: $filterView, content: { FilterView(evm: self.evm, filterView: self.$filterView, weeksDisplayed:  Double(self.config.eventViewModel.eventSearchEngine.weeksDisplayed), weekdaysSelected:  self.config.eventViewModel.eventSearchEngine.weekdaysSelected, onlyCultural: self.config.eventViewModel.eventSearchEngine.onlyCultural, eventTypesSelected: {
                         
                             if self.config.eventViewModel.eventSearchEngine.eventTypeSet == [] && UserDefaults.standard.object(forKey: "firstTypeLoad") == nil {
                                 //If no event types are being filtered on and it is the first time that the eventTypeSet has been computed (which will result in empty set), use the full event type set to have all event types selected in filter view
@@ -62,9 +63,9 @@ struct DiscoverFavoritesView : View {
             }
             //LIST OR CALENDAR
             else if config.subPage == "List" {
-                ListView()
+                ListView(evm: self.evm)
             } else if config.subPage == "Calendar" {
-                CalendarView()
+                CalendarView(evm: self.evm)
             }
             
         }.background((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)

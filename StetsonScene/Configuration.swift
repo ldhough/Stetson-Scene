@@ -13,7 +13,7 @@ import Combine
 
 class Configuration: ObservableObject {
     let objectWillChange = PassthroughSubject<Configuration,Never>()
-    var eventViewModel:EventViewModel 
+    var eventViewModel:EventViewModel
 
     init(_ viewModel: EventViewModel) {
         self.eventViewModel = viewModel

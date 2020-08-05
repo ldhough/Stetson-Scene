@@ -10,6 +10,7 @@ import Foundation
 import SwiftUI
 
 struct ListView : View {
+    @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
     @Environment(\.colorScheme) var colorScheme
     var eventLocation: String? = ""
@@ -19,20 +20,20 @@ struct ListView : View {
         VStack(spacing: 0) {
             //LIST
             List {
-                ForEach(config.eventViewModel.eventList) { event in
+                ForEach(self.evm.eventList) { event in
                     //have to do this by subpage then page to get the correct sub-lists
                     if (self.config.subPage == "AR" || self.config.subPage == "Map") {
                         if event.isVirtual && self.allVirtual == true { //listing only virtual events
-                            ListCell(event: event)
+                            ListCell(evm: self.evm, event: event)
                         }
                         if event.location! == self.eventLocation! { //navigating to a specific event
                             if self.config.page == "Discover" || (self.config.page == "Favorites" && event.isFavorite) {
-                                ListCell(event: event)
+                                ListCell(evm: self.evm, event: event)
                             }
                         }
                     } else if (self.config.subPage == "List" || self.config.subPage == "Calendar") && event.filteredOn {
                         if (self.config.page == "Discover" && event.filteredOn) || (self.config.page == "Favorites" && event.isFavorite) {
-                            ListCell(event: event)
+                            ListCell(evm: self.evm, event: event)
                         }
                     }
                 }.listRowBackground((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
@@ -43,6 +44,7 @@ struct ListView : View {
 
 //CONTENTS OF EACH EVENT CELL
 struct ListCell : View {
+    @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
     @Environment(\.colorScheme) var colorScheme
     var event: EventInstance
@@ -70,6 +72,6 @@ struct ListCell : View {
         }.background(RoundedRectangle(cornerRadius: 10).stroke(Color.clear).foregroundColor(Color.label).background(RoundedRectangle(cornerRadius: 10).foregroundColor(config.page == "Favorites" ? (colorScheme == .light ? Color.secondarySystemBackground : config.accent.opacity(0.1)) : Color.tertiarySystemBackground)))
             .padding(.top, (self.config.subPage == "AR" || self.config.subPage == "Map") ? 15 : 0)
             .onTapGesture { self.detailView = true }
-            .sheet(isPresented: $detailView, content: { EventDetailView(event: self.event).environmentObject(self.config) })
+            .sheet(isPresented: $detailView, content: { EventDetailView(evm: self.evm, event: self.event).environmentObject(self.config) })
     }
 }

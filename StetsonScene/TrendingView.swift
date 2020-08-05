@@ -10,6 +10,7 @@ import Foundation
 import SwiftUI
 
 struct TrendingView : View {
+    @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
     @State var card = 0
     
@@ -23,7 +24,7 @@ struct TrendingView : View {
             
             //Carousel List- using GeomtryReader to detect the remaining height on the screen (smart scaling)
             GeometryReader{ geometry in
-                Carousel(trendingList: self.trendingList(), card: self.$card, height: geometry.frame(in: .global).height)
+                Carousel(evm: self.evm, trendingList: self.trendingList(), card: self.$card, height: geometry.frame(in: .global).height)
             }
             //dots that show which card is being displayed
             CardControl(trendingList: self.trendingList(), card: self.$card).padding(.bottom, 10)
@@ -58,6 +59,7 @@ struct TrendingView : View {
 //Uses a UIScrollView to detect card offset and tells the UIView when the card changes through @Binding card
 //@Binding card then updates in the rest of the structs that use it so the correct card is displayed
 struct Carousel : UIViewRepresentable {
+    @ObservedObject var evm:EventViewModel
     var trendingList: [EventInstance]
     @Binding var card : Int
     var height : CGFloat
@@ -75,7 +77,7 @@ struct Carousel : UIViewRepresentable {
         scrollview.delegate = context.coordinator
         
         //make the Card SwiftUI View into a UIView (essentially)
-        let uiCardView = UIHostingController(rootView: Cards(trendingList: trendingList, height: height*0.9))
+        let uiCardView = UIHostingController(rootView: Cards(evm: self.evm, trendingList: trendingList, height: height*0.9))
         uiCardView.view.frame = CGRect(x: 0, y: 0, width: carouselWidth, height: self.height)
         uiCardView.view.backgroundColor = .clear
         
@@ -108,6 +110,7 @@ struct Carousel : UIViewRepresentable {
 
 //CARDS: create a card for each event in the list
 struct Cards : View {
+    @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
     var trendingList: [EventInstance]
     var height : CGFloat
@@ -151,7 +154,7 @@ struct Cards : View {
                 }.frame(width: Constants.width).animation(.default) //end of vstack
             } //end of foreach
         }.sheet(item: $selectedEvent) { event in
-             EventDetailView(event: event).environmentObject(self.config)
+            EventDetailView(evm: self.evm, event: event).environmentObject(self.config)
         }//end of hstack
     }
     

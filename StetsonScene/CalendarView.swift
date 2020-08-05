@@ -10,6 +10,7 @@ import SwiftUI
 
 //MARK: CALENDARVIEW DISPLAYS MONTHCAROUSEL
 struct CalendarView : View {
+    @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
     @Environment(\.colorScheme) var colorScheme
     @State var selectedDate: Date = Date()
@@ -25,9 +26,9 @@ struct CalendarView : View {
                 ForEach(config.eventViewModel.eventList) { event in
                     if self.compareDates(date1: self.selectedDate, date2: self.getEventDate(event: event)) {
                         if self.config.page == "Favorites" && event.isFavorite {
-                            ListCell(event: event)
+                            ListCell(evm: self.evm, event: event)
                         } else if self.config.page == "Discover" {
-                            ListCell(event: event)
+                            ListCell(evm: self.evm, event: event)
                         }
                     }
                 }.padding(.horizontal, 10).listRowBackground((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)

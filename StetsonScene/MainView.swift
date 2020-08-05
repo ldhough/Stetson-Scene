@@ -10,6 +10,7 @@ import SwiftUI
 import UIKit
 
 struct ARNavigationIndicator: UIViewControllerRepresentable {
+    @ObservedObject var evm:EventViewModel
     typealias UIViewControllerType = ARView
     @EnvironmentObject var config: Configuration
     var arFindMode: Bool
@@ -22,12 +23,13 @@ struct ARNavigationIndicator: UIViewControllerRepresentable {
     @Binding var eventDetails: Bool
     
     func makeUIViewController(context: Context) -> ARView {
-        return ARView(config: self.config, arFindMode: self.arFindMode, navToEvent: self.navToEvent ?? EventInstance(), internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: self.$allVirtual, arrived: self.$arrived, eventDetails: self.$eventDetails)
+        return ARView(evm: self.evm, config: self.config, arFindMode: self.arFindMode, navToEvent: self.navToEvent ?? EventInstance(), internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: self.$allVirtual, arrived: self.$arrived, eventDetails: self.$eventDetails)
     }
     func updateUIViewController(_ uiViewController: ARNavigationIndicator.UIViewControllerType, context: UIViewControllerRepresentableContext<ARNavigationIndicator>) { }
 }
 
 struct MainView : View {
+    @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
     @Environment(\.colorScheme) var colorScheme
     @State var listVirtualEvents:Bool = false
@@ -42,14 +44,14 @@ struct MainView : View {
             Color((config.page == "Favorites" && colorScheme == .light) ? config.accentUIColor : UIColor.secondarySystemBackground).edgesIgnoringSafeArea(.all)
             VStack(spacing: 0) {
                 if config.page == "Trending" {
-                    TrendingView().disabled(config.showOptions ? true : false)
+                    TrendingView(evm: self.evm).disabled(config.showOptions ? true : false)
                 } else if config.page == "Discover" || config.page == "Favorites" {
                     if config.subPage == "List" || config.subPage == "Calendar" {
-                        DiscoverFavoritesView().blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false)
+                        DiscoverFavoritesView(evm: self.evm).blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false)
                     } else { //AR or Map
                         ZStack {
                             if config.subPage == "AR" {
-                                ARNavigationIndicator(arFindMode: true, internalAlert: .constant(false), externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: self.$allVirtual, arrived: .constant(false), eventDetails: .constant(false)).environmentObject(self.config)
+                                ARNavigationIndicator(evm: self.evm, arFindMode: true, internalAlert: .constant(false), externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: self.$allVirtual, arrived: .constant(false), eventDetails: .constant(false)).environmentObject(self.config)
                                     .blur(radius: config.showOptions ? 5 : 0)
                                     .disabled(config.showOptions ? true : false)
                                     .edgesIgnoringSafeArea(.top)
@@ -66,7 +68,7 @@ struct MainView : View {
                                         return self.config.eventViewModel.alert(title: "ERROR", message: "Please report as a bug.")
                                      }
                             } else if config.subPage == "Map" {
-                                MapView(mapFindMode: true, internalAlert: .constant(false), externalAlert: .constant(false), tooFar: .constant(false), allVirtual: self.$allVirtual, arrived: .constant(false), eventDetails: .constant(false)).environmentObject(self.config)
+                                MapView(evm: self.evm, mapFindMode: true, internalAlert: .constant(false), externalAlert: .constant(false), tooFar: .constant(false), allVirtual: self.$allVirtual, arrived: .constant(false), eventDetails: .constant(false)).environmentObject(self.config)
                                     .blur(radius: config.showOptions ? 5 : 0)
                                     .disabled(config.showOptions ? true : false)
                                     .edgesIgnoringSafeArea(.top)
@@ -83,7 +85,7 @@ struct MainView : View {
                                     .offset(y: Constants.height*0.38)
                             }
                         }.sheet(isPresented: $listVirtualEvents, content: {
-                            ListView(allVirtual: true).environmentObject(self.config).background(Color.secondarySystemBackground)
+                            ListView(evm: self.evm, allVirtual: true).environmentObject(self.config).background(Color.secondarySystemBackground)
                         }).alert(isPresented: self.$noFavorites) { () -> Alert in //if favorites map or favorites AR & there are no favorites
                            return self.config.eventViewModel.alert(title: "No Favorites to Show", message: "Add some favorites so we can show you them in \(config.subPage) Mode!")
                         }

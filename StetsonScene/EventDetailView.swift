@@ -11,6 +11,7 @@ import SwiftUI
 import CoreLocation
 
 struct EventDetailView : View {
+    @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
     @Environment(\.colorScheme) var colorScheme
     @ObservedObject var event: EventInstance
@@ -38,12 +39,13 @@ struct EventDetailView : View {
             }.padding([.horizontal])
             
             Spacer()
-            Buttons(event: event).padding(.vertical, 5)
+            Buttons(evm: self.evm, event: event).padding(.vertical, 5)
         }.padding([.vertical]).background(Color.secondarySystemBackground).edgesIgnoringSafeArea(.bottom)
     }
 }
 
 struct Buttons: View {
+    @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
     @Environment(\.colorScheme) var colorScheme
     @ObservedObject var event: EventInstance
@@ -131,9 +133,9 @@ struct Buttons: View {
             }.sheet(isPresented: $navigate, content: {
                 ZStack {
                     if self.arMode && !self.event.isVirtual {
-                        ARNavigationIndicator(arFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
+                        ARNavigationIndicator(evm: self.evm, arFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
                     } else if !self.event.isVirtual { //mapMode
-                        MapView(mapFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
+                        MapView(evm: self.evm, mapFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
                     }
                     if self.config.appEventMode {
                         ZStack {
