@@ -4,6 +4,7 @@
 //
 //  Created by Lannie Hough on 1/29/20.
 //  Copyright © 2020 Lannie Hough. All rights reserved.
+
 import Foundation
 import SwiftUI
 import Firebase
