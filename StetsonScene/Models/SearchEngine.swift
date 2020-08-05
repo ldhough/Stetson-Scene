@@ -82,13 +82,13 @@ class EventSearchEngine {
             print("Don't need to query DB")
             for event in evm.eventList {
                 checkEvent(event, evm)
-                evm.eventList.append(event)
+                //evm.eventList.append(event)
             }
         } else if evm.weeksStored < self.weeksDisplayed { //If weeks loaded < what is actually loaded, call retrieveFirebaseData to load in new data, then filter
             
         }
         //remove and add an event to force view update by changing state of list
-        let tempList = evm.eventList; evm.eventList = []; evm.eventList = tempList
+        //let tempList = evm.eventList; evm.eventList = []; evm.eventList = tempList
         let tempEvent = evm.eventList[evm.eventList.count-1]
         evm.eventList.remove(at: evm.eventList.count-1)
         evm.eventList.append(tempEvent)
