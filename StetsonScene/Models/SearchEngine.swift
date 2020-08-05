@@ -78,11 +78,9 @@ class EventSearchEngine {
     var locationSet:Set<String> = [] //Not yet adding to filter
     
     func filter(evm: EventViewModel) {
-        let tempList = evm.eventList
-        evm.eventList = []
         if evm.weeksStored >= self.weeksDisplayed { //If weeks loaded > what is actually loaded filter on current event list
             print("Don't need to query DB")
-            for event in /*evm.eventList*/tempList {
+            for event in evm.eventList {
                 checkEvent(event, evm)
                 evm.eventList.append(event)
             }
@@ -90,10 +88,10 @@ class EventSearchEngine {
             
         }
         //remove and add an event to force view update by changing state of list
-        //let tempList = evm.eventList; evm.eventList = []; evm.eventList = tempList
-        //let tempEvent = evm.eventList[evm.eventList.count-1]
-        //evm.eventList.remove(at: evm.eventList.count-1)
-        //evm.eventList.append(tempEvent)
+        let tempList = evm.eventList; evm.eventList = []; evm.eventList = tempList
+        let tempEvent = evm.eventList[evm.eventList.count-1]
+        evm.eventList.remove(at: evm.eventList.count-1)
+        evm.eventList.append(tempEvent)
     }
     
     func checkEvent(_ ei: EventInstance, _ evm: EventViewModel) {

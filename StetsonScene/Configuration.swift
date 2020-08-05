@@ -11,6 +11,8 @@ import SwiftUI
 import UIKit
 import Combine
 
+var color:String = UserDefaults.standard.object(forKey: "accent") != nil ? UserDefaults.standard.string(forKey: "accent")! : "indigo"
+
 class Configuration: ObservableObject {
     let objectWillChange = PassthroughSubject<Configuration,Never>()
     var eventViewModel:EventViewModel
@@ -46,14 +48,16 @@ class Configuration: ObservableObject {
         }
     }
     
-    var accent: Color = Color(UIColor.systemIndigo) {
+    var accent: Color = Color(UserDefaults.standard.object(forKey: "accent") != nil ? setColor(color).1 : UIColor.systemIndigo) {
         didSet {
+            UserDefaults.standard.set(color, forKey: "accent")
             objectWillChange.send(self)
         }
     }
     
-    var accentUIColor: UIColor = UIColor.systemIndigo {
+    var accentUIColor: UIColor = UserDefaults.standard.object(forKey: "accent") != nil ? setColor(color).1 : UIColor.systemIndigo {
         didSet {
+            UserDefaults.standard.set(color, forKey: "accent")
             objectWillChange.send(self)
         }
     }

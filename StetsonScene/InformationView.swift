@@ -9,6 +9,43 @@
 import Foundation
 import SwiftUI
 
+enum AccentColors: String {
+    case pink = "pink"
+    case red = "red"
+    case orange = "orange"
+    case yellow = "yellow"
+    case green = "green"
+    case teal = "teal"
+    case blue = "blue"
+    case indigo = "indigo"
+    case purple = "purple"
+}
+
+func setColor(_ color: String) -> (Color, UIColor) {
+    switch color {
+    case "pink":
+        return (Color(UIColor.systemPink), UIColor.systemPink)
+    case "red":
+        return (Color(UIColor.systemRed), UIColor.systemRed)
+    case "orange":
+        return (Color(UIColor.systemOrange), UIColor.systemOrange)
+    case "yellow":
+        return (Color(UIColor.systemYellow), UIColor.systemYellow)
+    case "green":
+        return (Color(UIColor.systemGreen), UIColor.systemGreen)
+    case "teal":
+        return (Color(UIColor.systemTeal), UIColor.systemTeal)
+    case "blue":
+        return (Color(UIColor.systemBlue), UIColor.systemBlue)
+    case "indigo":
+        return (Color(UIColor.systemIndigo), UIColor.systemIndigo)
+    case "purple":
+        return (Color(UIColor.systemPurple), UIColor.systemPurple)
+    default:
+        return (Color(UIColor.systemPink), UIColor.systemPink)
+    }
+}
+
 struct InformationView : View {
     
     @EnvironmentObject var config: Configuration
@@ -19,48 +56,66 @@ struct InformationView : View {
                 Text(config.page).fontWeight(.heavy).font(.system(size: 50)).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(Color.label)
                 Text("Pink").fontWeight(.medium).font(.system(size: 20)).foregroundColor(Color(UIColor.systemPink))
                     .onTapGesture{
-                        self.config.accent = Color(UIColor.systemPink)
-                        self.config.accentUIColor = UIColor.systemPink
+                        color = "pink"
+                        let res = setColor(color)
+                        self.config.accent = res.0
+                        self.config.accentUIColor = res.1
                 }
                 Text("Red").fontWeight(.medium).font(.system(size: 20)).foregroundColor(Color(UIColor.systemRed))
                     .onTapGesture{
-                        self.config.accent = Color(UIColor.systemRed)
-                        self.config.accentUIColor = UIColor.systemRed
+                        color = "red"
+                        let res = setColor(color)
+                        self.config.accent = res.0
+                        self.config.accentUIColor = res.1
                 }
                 Text("Orange").fontWeight(.medium).font(.system(size: 20)).foregroundColor(Color(UIColor.systemOrange))
                     .onTapGesture{
-                        self.config.accent = Color(UIColor.systemOrange)
-                        self.config.accentUIColor = UIColor.systemOrange
+                        color = "orange"
+                        let res = setColor(color)
+                        self.config.accent = res.0
+                        self.config.accentUIColor = res.1
                 }
                 Text("Yellow").fontWeight(.medium).font(.system(size: 20)).foregroundColor(Color(UIColor.systemYellow))
                     .onTapGesture{
-                        self.config.accent = Color(UIColor.systemYellow)
-                        self.config.accentUIColor = UIColor.systemYellow
+                        color = "yellow"
+                        let res = setColor(color)
+                        self.config.accent = res.0
+                        self.config.accentUIColor = res.1
                 }
                 Text("Green").fontWeight(.medium).font(.system(size: 20)).foregroundColor(Color(UIColor.systemGreen))
                     .onTapGesture{
-                        self.config.accent = Color(UIColor.systemGreen)
-                        self.config.accentUIColor = UIColor.systemGreen
+                        color = "green"
+                        let res = setColor(color)
+                        self.config.accent = res.0
+                        self.config.accentUIColor = res.1
                 }
                 Text("Teal").fontWeight(.medium).font(.system(size: 20)).foregroundColor(Color(UIColor.systemTeal))
                     .onTapGesture{
-                        self.config.accent = Color(UIColor.systemTeal)
-                        self.config.accentUIColor = UIColor.systemTeal
+                        color = "teal"
+                        let res = setColor(color)
+                        self.config.accent = res.0
+                        self.config.accentUIColor = res.1
                 }
                 Text("Blue").fontWeight(.medium).font(.system(size: 20)).foregroundColor(Color(UIColor.systemBlue))
                     .onTapGesture{
-                        self.config.accent = Color(UIColor.systemBlue)
-                        self.config.accentUIColor = UIColor.systemBlue
+                        color = "blue"
+                        let res = setColor(color)
+                        self.config.accent = res.0
+                        self.config.accentUIColor = res.1
                 }
                 Text("Indigo").fontWeight(.medium).font(.system(size: 20)).foregroundColor(Color(UIColor.systemIndigo))
                     .onTapGesture{
-                        self.config.accent = Color(UIColor.systemIndigo)
-                        self.config.accentUIColor = UIColor.systemIndigo
+                        color = "blue"
+                        let res = setColor(color)
+                        self.config.accent = res.0
+                        self.config.accentUIColor = res.1
                 }
                 Text("Purple").fontWeight(.medium).font(.system(size: 20)).foregroundColor(Color(UIColor.systemPurple))
                     .onTapGesture{
-                        self.config.accent = Color(UIColor.systemPurple)
-                        self.config.accentUIColor = UIColor.systemPurple
+                        color = "purple"
+                        let res = setColor(color)
+                        self.config.accent = res.0
+                        self.config.accentUIColor = res.1
                 }
             }
             Spacer()
