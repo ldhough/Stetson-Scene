@@ -52,6 +52,7 @@ struct ListCell : View {
     @State var detailView: Bool = false
     @State var share: Bool = false
     @State var calendar: Bool = false
+    @State var fav: Bool = false
     @State var navigate: Bool = false
     @State var arMode: Bool = true //false=mapMode
     //for alerts
@@ -84,7 +85,6 @@ struct ListCell : View {
         }.background(RoundedRectangle(cornerRadius: 10).stroke(Color.clear).foregroundColor(Color.label).background(RoundedRectangle(cornerRadius: 10).foregroundColor(config.page == "Favorites" ? (colorScheme == .light ? Color.secondarySystemBackground : config.accent.opacity(0.1)) : Color.tertiarySystemBackground)))
             .padding(.top, (self.config.subPage == "AR" || self.config.subPage == "Map") ? 15 : 0)
             .onTapGesture { self.detailView = true }
-            .sheet(isPresented: $detailView, content: { EventDetailView(evm: self.evm, event: self.event).environmentObject(self.config) })
             .contextMenu {
                 //SHARE
                 Button(action: {
@@ -107,22 +107,26 @@ struct ListCell : View {
                     haptic()
                     self.calendar = true
                 }) {
-                    Text("Add to Calendar")
-                    Image(systemName: "calendar.badge.plus") //persistent fill + alert if already added
+                    Text(self.event.isInCalendar ? "Already in Calendar" : "Add to Calendar")
+                    Image(systemName: "calendar.badge.plus")
                 }
                 
                 //FAVORITE
-                
                 Button(action: {
                     haptic()
                     self.evm.toggleFavorite(self.event)
+                    self.fav = self.event.isFavorite //this fixes the display
                 }) {
-                    Text(self.event.isFavorite ? "Unfavorite":"Favorite")
-                    Image(systemName: "heart") //persistent fill
+                    Text(self.fav ? "Unfavorite":"Favorite")
+                    Image(systemName: self.fav ? "heart.fill":"heart")
                 }
                 
                 //NAVIGATE
                 Button(action: {
+                    print(self.event.location)
+                    print(self.event.mainLat)
+                    print(self.event.mainLon)
+                    print(self.event.isVirtual)
                     haptic()
                     self.evm.isVirtual(event: self.event)
                     //if you're trying to navigate to an event and are too far from campus, alert user and don't go to map
@@ -148,44 +152,44 @@ struct ListCell : View {
                     Image(systemName: "location")
                 }
         } //end of context menu
-            .sheet(isPresented: $share, content: { //NEED TO LINK TO APPROPRIATE LINKS ONCE APP IS PUBLISHED
-                ShareView(activityItems: [/*"linktoapp.com"*/self.event.isVirtual ? URL(string: self.event.linkText)!:"", self.event.hasCultural ? "\(self.event.shareDetails) It’s even offering a cultural credit!" : "\(self.event.shareDetails)"/*, event.isVirtual ? URL(string: event.linkText)!:""*/], applicationActivities: nil)
-            })
+            .background(EmptyView().sheet(isPresented: $detailView, content: { //notice that these backgrounds are nested- weird but it works
+                EventDetailView(evm: self.evm, event: self.event).environmentObject(self.config)
+            }).background(EmptyView().sheet(isPresented: $navigate, content: {
+                ZStack {
+                    if self.arMode && !self.event.isVirtual {
+                        ARNavigationIndicator(evm: self.evm, arFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
+                    } else if !self.event.isVirtual { //mapMode
+                        MapView(evm: self.evm, mapFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
+                    }
+                    if self.config.appEventMode {
+                        ZStack {
+                            Text(self.arMode ? "Map View" : "AR View").fontWeight(.light).font(.system(size: 18)).foregroundColor(self.config.accent)
+                        }.padding(10)
+                            .background(RoundedRectangle(cornerRadius: 15).stroke(Color.clear).foregroundColor(Color.tertiarySystemBackground.opacity(0.8)).background(RoundedRectangle(cornerRadius: 10).foregroundColor(Color.tertiarySystemBackground.opacity(0.8))))
+                            .onTapGesture { withAnimation { self.arMode.toggle() } }
+                            .offset(y: Constants.height*0.4)
+                    }
+                }.alert(isPresented: self.$internalAlert) { () -> Alert in //done in the view
+                    if self.arrived {
+                        return self.evm.alert(title: "You've Arrived!", message: "Have fun at \(String(describing: self.event.name!))!")
+                    } else if self.eventDetails {
+                        return self.evm.alert(title: "\(self.event.name!)", message: "This event is at \(self.event.time!) on \(self.event.date!).")/*, and you are \(distanceFromBuilding!)m from \(event!.location!)*/
+                    }
+                    return self.evm.alert(title: "ERROR", message: "Please report as a bug.")
+                }
+            }).alert(isPresented: self.$externalAlert) { () -> Alert in //done outside the view
+                if self.isVirtual {
+                    return self.evm.alert(title: "Virtual Event", message: "Sorry! This event is virtual, so you have no where to navigate to.")
+                } else if self.tooFar {
+                    //return self.evm.alert(title: "Too Far to Navigate to Event", message: "You're currently too far away from campus to navigate to this event. You can still view it in the map, and once you get closer to campus, can navigate there.")
+                    return self.evm.navAlert(lat: self.event.mainLat, lon: self.event.mainLon)
+                }
+                return self.evm.alert(title: "ERROR", message: "Please report as a bug.")
+            }.background(EmptyView().sheet(isPresented: $share, content: { //NEED TO LINK TO APPROPRIATE LINKS ONCE APP IS PUBLISHED
+                ShareView(activityItems: [/*"linktoapp.com"*/(self.event.isVirtual && URL(string: self.event.linkText) != nil) ? URL(string: self.event.linkText)!:"", self.event.hasCultural ? "\(self.event.shareDetails) It’s even offering a cultural credit!" : "\(self.event.shareDetails)"/*, event.isVirtual ? URL(string: event.linkText)!:""*/], applicationActivities: nil)
+            }))))
             .actionSheet(isPresented: $calendar) {
                 self.evm.manageCalendar(self.event)
         }
-        .sheet(isPresented: $navigate, content: {
-            ZStack {
-                if self.arMode && !self.event.isVirtual {
-                    ARNavigationIndicator(evm: self.evm, arFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
-                } else if !self.event.isVirtual { //mapMode
-                    MapView(evm: self.evm, mapFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
-                }
-                if self.config.appEventMode {
-                    ZStack {
-                        Text(self.arMode ? "Map View" : "AR View").fontWeight(.light).font(.system(size: 18)).foregroundColor(self.config.accent)
-                    }.padding(10)
-                        .background(RoundedRectangle(cornerRadius: 15).stroke(Color.clear).foregroundColor(Color.tertiarySystemBackground.opacity(0.8)).background(RoundedRectangle(cornerRadius: 10).foregroundColor(Color.tertiarySystemBackground.opacity(0.8))))
-                        .onTapGesture { withAnimation { self.arMode.toggle() } }
-                        .offset(y: Constants.height*0.4)
-                }
-            }.alert(isPresented: self.$internalAlert) { () -> Alert in //done in the view
-                if self.arrived {
-                    return self.evm.alert(title: "You've Arrived!", message: "Have fun at \(String(describing: self.event.name!))!")
-                } else if self.eventDetails {
-                    return self.evm.alert(title: "\(self.event.name!)", message: "This event is at \(self.event.time!) on \(self.event.date!).")/*, and you are \(distanceFromBuilding!)m from \(event!.location!)*/
-                }
-                return self.evm.alert(title: "ERROR", message: "Please report as a bug.")
-            }
-        }).alert(isPresented: self.$externalAlert) { () -> Alert in //done outside the view
-            if self.isVirtual {
-                return self.evm.alert(title: "Virtual Event", message: "Sorry! This event is virtual, so you have no where to navigate to.")
-            } else if self.tooFar {
-                //return self.evm.alert(title: "Too Far to Navigate to Event", message: "You're currently too far away from campus to navigate to this event. You can still view it in the map, and once you get closer to campus, can navigate there.")
-                return self.evm.navAlert(lat: self.event.mainLat, lon: self.event.mainLon)
-            }
-            return self.evm.alert(title: "ERROR", message: "Please report as a bug.")
-        }
-        
     }
 }

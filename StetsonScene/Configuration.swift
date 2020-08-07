@@ -29,7 +29,7 @@ class Configuration: ObservableObject {
     }
     
     //Trending, Discover, Favorites, Information 
-    var page: String = "Trending" {
+    var page: String = "Discover" {
         didSet {
             objectWillChange.send(self)
         }

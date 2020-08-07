@@ -110,17 +110,6 @@ struct TabBar : View {
     var body: some View {
         ZStack {
             HStack(spacing: 20){
-                //Trending
-                HStack {
-                    Image(systemName: "hand.thumbsup").resizable().frame(width: 20, height: 20).foregroundColor(config.page == "Trending" ? Color.white : Color.secondaryLabel)
-                    Text(config.page == "Trending" ? config.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color.white)
-                }.padding(15)
-                    .background(config.page == "Trending" ? config.accent : Color.clear)
-                    .clipShape(Capsule())
-                    .onTapGesture {
-                        self.config.page = "Trending"
-                        self.config.showOptions = false
-                }
                 //Discover
                 HStack {
                     Image(systemName: "magnifyingglass").resizable().frame(width: 20, height: 20).foregroundColor(config.page == "Discover" ? Color.white : Color.secondaryLabel)
@@ -156,6 +145,17 @@ struct TabBar : View {
                             self.config.showOptions = true
                         }
                 }
+                //Trending
+                HStack {
+                    Image(systemName: "hand.thumbsup").resizable().frame(width: 20, height: 20).foregroundColor(config.page == "Trending" ? Color.white : Color.secondaryLabel)
+                    Text(config.page == "Trending" ? config.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color.white)
+                }.padding(15)
+                    .background(config.page == "Trending" ? config.accent : Color.clear)
+                    .clipShape(Capsule())
+                    .onTapGesture {
+                        self.config.page = "Trending"
+                        self.config.showOptions = false
+                }
                 //Info
                 HStack {
                     Image(systemName: "info.circle").resizable().frame(width: 20, height: 20).foregroundColor(config.page == "Information" ? Color.white : Color.secondaryLabel)
@@ -174,7 +174,7 @@ struct TabBar : View {
             
             //other tabs
             if self.config.showOptions {
-                TabOptions(evm: self.evm, noFavorites: self.$noFavorites).offset(x: self.config.page == "Discover" ? -30 : 30, y: -60)
+                TabOptions(evm: self.evm, noFavorites: self.$noFavorites).offset(x: self.config.page == "Discover" ? -100 : -35, y: -65)
             }
             
         }//zstack end
@@ -199,7 +199,7 @@ struct TabOptions: View {
                     .resizable().frame(width: 20, height: 20)
                     .foregroundColor(self.config.subPage == "List" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
             }.frame(width: 50, height: 50)
-                .offset(x: 10)
+                .offset(x: 25)
                 .onTapGesture {
                     withAnimation {
                         self.config.subPage = "List"
@@ -216,7 +216,7 @@ struct TabOptions: View {
                     .resizable().frame(width: 20, height: 20)
                     .foregroundColor(self.config.subPage == "Calendar" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
             }.frame(width: 50, height: 50)
-                .offset(y: -30)
+                .offset(y: -50)
                 .onTapGesture {
                     withAnimation {
                         self.config.subPage = "Calendar"
@@ -233,7 +233,7 @@ struct TabOptions: View {
                     .resizable().frame(width: 22, height: 18)
                     .foregroundColor(self.config.subPage == "AR" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
             }.frame(width: 50, height: 50)
-                .offset(y: -30)
+                .offset(y: -50)
                 .onTapGesture {
                     withAnimation {
                         self.config.subPage = "AR"
@@ -255,7 +255,7 @@ struct TabOptions: View {
                     .resizable().frame(width: 20, height: 22)
                     .foregroundColor(self.config.subPage == "Map" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
             }.frame(width: 50, height: 50)
-                .offset(x: -10)
+                .offset(x: -25)
                 .onTapGesture {
                     withAnimation {
                         self.config.subPage = "Map"
