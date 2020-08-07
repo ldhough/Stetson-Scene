@@ -23,8 +23,8 @@ struct CalendarView : View {
             MonthCarousel(selectedDate: self.$selectedDate, month: self.$month, height: 330).frame(height: 330)
             //event list that corresponds to selected day
             List {
-                ForEach(config.eventViewModel.eventList) { event in
-                    if self.compareDates(date1: self.selectedDate, date2: self.getEventDate(event: event)) {
+                ForEach(evm.eventList) { event in
+                    if self.compareDates(date1: self.selectedDate, date2: self.evm.getEventDate(event: event)) {
                         if self.config.page == "Favorites" && event.isFavorite {
                             ListCell(evm: self.evm, event: event)
                         } else if self.config.page == "Discover" {
@@ -34,31 +34,6 @@ struct CalendarView : View {
                 }.padding(.horizontal, 10).listRowBackground((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
             }.frame(alignment: .center)
         }.background((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
-    }
-    
-    func getEventDate(event: EventInstance) -> Date {
-        //var event: EventInstance = event
-        var stringDate: String = event.date ?? "1/1/0001"
-
-        //if date has a single digit month, prepare it for dateFormat by adding a second month digit
-        if stringDate.count != 10 {
-            stringDate = "0" + stringDate
-        }
-
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
-        dateFormatter.dateFormat = "MM/dd/yyyy"
-        let date = dateFormatter.date(from: stringDate)!
-
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.year, .month, .day, .weekday], from: date)
-
-//        event.date = calendar.date(from:components)! //full thing
-//        event.month = String(calendar.component(.month, from: date)) //TODO: get the actual month, not just a number
-//        event.day = String(calendar.component(.day, from: date))
-//        event.weekday = String(calendar.component(.weekday, from: date)) //TODO: get the actual weekday, not just a number
-
-        return calendar.date(from:components)!
     }
 
     //REMOVES TIME- USED ALSO IN MONTH CAROUSEL, MAKE IT GLOBAL IF POSSIBLE
@@ -94,7 +69,7 @@ struct MonthCarousel : UIViewRepresentable {
         //make the Months SwiftUI View into a UIView (essentially)
         let uiMonthView = UIHostingController(rootView: Months(selectedDate: self.$selectedDate, height: self.height, numMonths: numberOfMonths()))
         uiMonthView.view.frame = CGRect(x: 0, y: 0, width: carouselWidth, height: self.height)
-        uiMonthView.view.backgroundColor = config.page == "Favorites" ? config.accentUIColor : UIColor.secondarySystemBackground
+        uiMonthView.view.backgroundColor = UIColor.clear
         
         //add the uiMonthView as a subview of the scrollview
         //(effectively embeds the Months SwiftUI View into the Carousel UIScrollView)

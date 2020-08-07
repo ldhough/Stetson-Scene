@@ -77,9 +77,10 @@ struct MapView: UIViewRepresentable {
             
             //if you're finding/discovering events
             //add buildings with non-virtual events to discover/favorites view
-            for event in config.eventViewModel.eventList {
-                if !config.eventViewModel.determineVirtualList(config: config) {
-                    config.eventViewModel.sanitizeCoords(event: event)
+            allVirtual = evm.determineVirtualList(page: config.page, list: evm.eventList) //probably don't need this multiple places in mapview
+            for event in evm.eventList {
+                if !allVirtual {
+                    evm.sanitizeCoords(event: event)
                     //don't repeat building annotations, only add to favorites view if the event is favorited
                     if !locationsWithAnnotation.contains(event.location) && ((config.page == "Favorites" && event.isFavorite) || config.page == "Discover") {
                         locationsWithAnnotation.append(event.location)
@@ -89,7 +90,7 @@ struct MapView: UIViewRepresentable {
             }
             
             //if all events are virtual, create a single Stetson annotation (immediately return)
-            if mapFindMode && config.eventViewModel.determineVirtualList(config: config) {
+            if mapFindMode && allVirtual {
                 annotations.append(Annotation(title: "Stetson University", info: "", coordinate: CLLocationCoordinate2D(latitude: 29.0349780, longitude: -81.3026430)))
                 return annotations
             }
@@ -157,7 +158,8 @@ final class Coordinator: NSObject, MKMapViewDelegate {
         view.canShowCallout = true
         
         //if all events in list are virtual, allVirtual = true & alert will be sent upon screen initialization ONCE
-        if config.appEventMode && mapFindMode && config.eventViewModel.determineVirtualList(config: config) && !alertSent {
+        allVirtual = evm.determineVirtualList(page: config.page, list: evm.eventList)
+        if config.appEventMode && mapFindMode && allVirtual && !alertSent {
             allVirtual = true
             alertSent = true
         }
@@ -183,7 +185,8 @@ final class Coordinator: NSObject, MKMapViewDelegate {
         
         if config.appEventMode {
             //if all events are virtual and you tap on the Stetson University node, send the virtual events only alert
-            if mapFindMode && config.eventViewModel.determineVirtualList(config: config) && view.annotation?.title!! == "Stetson University" {
+            allVirtual = evm.determineVirtualList(page: config.page, list: evm.eventList)
+            if mapFindMode && allVirtual && view.annotation?.title!! == "Stetson University" {
                 allVirtual = true
                 return
             }
@@ -191,7 +194,7 @@ final class Coordinator: NSObject, MKMapViewDelegate {
             if view.annotation?.title!! != "Stetson University" {
                 if mapFindMode {
                     //event list for buildings
-                    for event in config.eventViewModel.eventList {
+                    for event in evm.eventList {
                         if event.location == view.annotation?.title!! {
                             window?.rootViewController?.present(UIHostingController(rootView: ListView(evm: self.evm, eventLocation: event.location!).environmentObject(self.config).background(Color.secondarySystemBackground)), animated: true)
                         }

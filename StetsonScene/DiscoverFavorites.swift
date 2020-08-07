@@ -32,13 +32,13 @@ struct DiscoverFavoritesView : View {
                             self.filterView = true
                             print("tapped ")
                     }
-                    .sheet(isPresented: $filterView, content: { FilterView(evm: self.evm, filterView: self.$filterView, weeksDisplayed:  Double(self.config.eventViewModel.eventSearchEngine.weeksDisplayed), weekdaysSelected:  self.config.eventViewModel.eventSearchEngine.weekdaysSelected, onlyCultural: self.config.eventViewModel.eventSearchEngine.onlyCultural, eventTypesSelected: {
+                    .sheet(isPresented: $filterView, content: { FilterView(evm: self.evm, filterView: self.$filterView, weeksDisplayed:  Double(self.evm.eventSearchEngine.weeksDisplayed), weekdaysSelected:  self.evm.eventSearchEngine.weekdaysSelected, onlyCultural: self.evm.eventSearchEngine.onlyCultural, eventTypesSelected: {
                         
-                            if self.config.eventViewModel.eventSearchEngine.eventTypeSet == [] && UserDefaults.standard.object(forKey: "firstTypeLoad") == nil {
+                            if self.evm.eventSearchEngine.eventTypeSet == [] && UserDefaults.standard.object(forKey: "firstTypeLoad") == nil {
                                 //If no event types are being filtered on and it is the first time that the eventTypeSet has been computed (which will result in empty set), use the full event type set to have all event types selected in filter view
-                                return self.config.eventViewModel.eventTypeSetFull
+                                return self.evm.eventTypeSetFull
                             } else {
-                                return self.config.eventViewModel.eventSearchEngine.eventTypeSet
+                                return self.evm.eventSearchEngine.eventTypeSet
                             }
                     }() ).environmentObject(self.config)
                         
@@ -53,7 +53,7 @@ struct DiscoverFavoritesView : View {
             }.padding([.vertical, .horizontal])
             
             //IF IT'S FAVORITES PAGE BUT THERE AREN'T ANY FAVORITES
-            if self.config.page == "Favorites" && !config.eventViewModel.doFavoritesExist(config: config) {
+            if self.config.page == "Favorites" && !evm.doFavoritesExist(list: self.evm.eventList) {
                 VStack(alignment: .center, spacing: 10) {
                     Text("No Events Favorited").fontWeight(.light).font(.system(size: 20)).padding([.horizontal]).foregroundColor(config.accent)
                     Text("Add some events to your favorites by using the hard-press shortcut on the event preview or the favorite button on the event detail page.").fontWeight(.light).font(.system(size: 16)).padding([.horizontal]).foregroundColor(Color.label)

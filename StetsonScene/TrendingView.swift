@@ -38,7 +38,7 @@ struct TrendingView : View {
         var id = 0
         
         //pick out trending events
-        for event in config.eventViewModel.eventList {
+        for event in self.evm.eventList {
             //if event.isTrending {
                 allTrending.append(event)
             //}

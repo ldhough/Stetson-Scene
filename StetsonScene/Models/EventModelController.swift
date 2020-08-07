@@ -579,12 +579,15 @@ class EventViewModel: ObservableObject {
     }
     
     //
-    func determineVirtualList(config: Configuration) -> Bool {
-        for event in config.eventViewModel.eventList {
-            config.eventViewModel.isVirtual(event: event)
-            if config.page == "Favorites" && event.isFavorite && !event.isVirtual {
+    func determineVirtualList(page: String, list: [EventInstance]) -> Bool {
+        for event in list {
+            //same as isVirtual, here bc then you save effort of having to pass evm into this function
+            if (event.mainLon == 0.0 && event.mainLat == 0.0) || event.location.lowercased() == "virtual" {
+                event.isVirtual = true
+            }
+            if page == "Favorites" && event.isFavorite && !event.isVirtual {
                 return false
-            } else if config.page != "Favorites" && !event.isVirtual {
+            } else if page != "Favorites" && !event.isVirtual {
                 return false
             }
         }
@@ -592,8 +595,8 @@ class EventViewModel: ObservableObject {
     }
     
     //determine if any events are favorited
-    func doFavoritesExist(config: Configuration) -> Bool {
-        for event in config.eventViewModel.eventList {
+    func doFavoritesExist(list: [EventInstance]) -> Bool {
+        for event in list {
             if event.isFavorite {
                 return true
             }
@@ -619,6 +622,53 @@ class EventViewModel: ObservableObject {
                 let url = URL(string: "http://maps.apple.com/maps?saddr=&daddr=\(lat),\(lon)")
                 UIApplication.shared.open(url!)
               }, secondaryButton: .cancel())
+    }
+    
+        func getEventDate(event: EventInstance) -> Date {
+            //var event: EventInstance = event
+            var stringDate: String = event.date ?? "1/1/0001"
+
+            //if date has a single digit month, prepare it for dateFormat by adding a second month digit
+            if stringDate.count != 10 {
+                stringDate = "0" + stringDate
+            }
+
+            let dateFormatter = DateFormatter()
+            dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
+            dateFormatter.dateFormat = "MM/dd/yyyy"
+            let date = dateFormatter.date(from: stringDate)!
+
+            let calendar = Calendar.current
+            let components = calendar.dateComponents([.year, .month, .day, .weekday], from: date)
+
+    //        event.date = calendar.date(from:components)! //full thing
+    //        event.month = String(calendar.component(.month, from: date)) //TODO: get the actual month, not just a number
+    //        event.day = String(calendar.component(.day, from: date))
+    //        event.weekday = String(calendar.component(.weekday, from: date)) //TODO: get the actual weekday, not just a number
+
+            return calendar.date(from:components)!
+        }
+    
+    //MARK: FOR SHARING
+    //scrapes html for links
+    func makeLink(text: String) -> String {
+        //print("AIUGKSBAKJBKBFEKB")
+        let linkPattern = #"(<a href=")(.)+?(?=")"#
+        do {
+            let linkRegex = try NSRegularExpression(pattern: linkPattern, options: [])
+            if linkRegex.firstMatch(in: text, options: [], range: NSRange(text.startIndex..., in: text)) != nil {
+                //print("matched")
+                let linkCG = linkRegex.firstMatch(in: text, options: [], range: NSRange(text.startIndex..., in: text))
+                let range = linkCG?.range(at: 0)
+                var link:String = (text as NSString).substring(with: range!)
+                let scrapeHTMLPattern = #"(<a href=")"#
+                let scrapeHTMLRegex = try NSRegularExpression(pattern: scrapeHTMLPattern, options: [])
+                link = scrapeHTMLRegex.stringByReplacingMatches(in: link, options: [], range: NSRange(link.startIndex..., in: link), withTemplate: "")
+                //print(link)
+                if !link.contains("http") && !link.contains("https") { return "" } else { return link }
+            }
+        } catch { print("Regex error") }
+        return ""
     }
 }
 

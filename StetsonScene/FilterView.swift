@@ -75,7 +75,7 @@ struct FilterView : View {
             }.foregroundColor(Color.white)
             Divider().background(config.accent)
             //Select event type view
-            FilterEventTypeView(selectAllDeselectAll: {
+            FilterEventTypeView(evm: self.evm, selectAllDeselectAll: {
                 if self.eventTypesSelected.count > self.evm.eventTypeList.count/2 {
                     return false
                 }
@@ -87,9 +87,9 @@ struct FilterView : View {
             Button("Search") { //Calls filter method of EventSearchEngine instance in primary ViewModel instance to interact with the event list and apply correct filter to all elements
                 self.evm.eventSearchEngine.weeksDisplayed = Int(self.weeksDisplayed)
                 self.filterView = false //Dismiss modal
-                self.evm.eventSearchEngine.filter(evm: self.config.eventViewModel)
+                self.evm.eventSearchEngine.filter(evm: self.evm)
                 //Update after filter in case filter needs to load more data we want to keep this accurate as to what is actually loaded
-                self.evm.weeksStored = self.config.eventViewModel.eventSearchEngine.weeksDisplayed > self.config.eventViewModel.weeksStored ? self.config.eventViewModel.eventSearchEngine.weeksDisplayed : self.config.eventViewModel.weeksStored
+                self.evm.weeksStored = self.evm.eventSearchEngine.weeksDisplayed > self.evm.weeksStored ? self.evm.eventSearchEngine.weeksDisplayed : self.evm.weeksStored
             }.buttonStyle(MainButtonStyle(accentColor: config.accent)).padding(.horizontal, Constants.width*0.1)
         }.padding()
     }

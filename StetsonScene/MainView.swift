@@ -57,15 +57,15 @@ struct MainView : View {
                                     .edgesIgnoringSafeArea(.top)
                                     .alert(isPresented: self.$externalAlert) { () -> Alert in
                                         if self.tooFar {
-                                            return self.config.eventViewModel.alert(title: "Too Far to Tour with AR", message: "You're currently too far away from campus to use the AR feature to tour. Try using the map instead.")
+                                            return self.evm.alert(title: "Too Far to Tour with AR", message: "You're currently too far away from campus to use the AR feature to tour. Try using the map instead.")
                                         } else if self.allVirtual {
                                             if config.page == "Favorites" {
-                                                return self.config.eventViewModel.alert(title: "All Favorited Events are Virtual", message: "Unfortunately, there are no events in your favorites list that are on campus at the moment. Check out the virtual event list instead.")
+                                                return self.evm.alert(title: "All Favorited Events are Virtual", message: "Unfortunately, there are no events in your favorites list that are on campus at the moment. Check out the virtual event list instead.")
                                             } else { //config.page == "Discover"
-                                                return self.config.eventViewModel.alert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
+                                                return self.evm.alert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
                                             }
                                         }
-                                        return self.config.eventViewModel.alert(title: "ERROR", message: "Please report as a bug.")
+                                        return self.evm.alert(title: "ERROR", message: "Please report as a bug.")
                                      }
                             } else if config.subPage == "Map" {
                                 MapView(evm: self.evm, mapFindMode: true, internalAlert: .constant(false), externalAlert: .constant(false), tooFar: .constant(false), allVirtual: self.$allVirtual, arrived: .constant(false), eventDetails: .constant(false)).environmentObject(self.config)
@@ -73,7 +73,7 @@ struct MainView : View {
                                     .disabled(config.showOptions ? true : false)
                                     .edgesIgnoringSafeArea(.top)
                                     .alert(isPresented: self.$allVirtual) { () -> Alert in
-                                        return self.config.eventViewModel.alert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
+                                        return self.evm.alert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
                                     }
                             }
                             if config.appEventMode {
@@ -87,14 +87,14 @@ struct MainView : View {
                         }.sheet(isPresented: $listVirtualEvents, content: {
                             ListView(evm: self.evm, allVirtual: true).environmentObject(self.config).background(Color.secondarySystemBackground)
                         }).alert(isPresented: self.$noFavorites) { () -> Alert in //if favorites map or favorites AR & there are no favorites
-                           return self.config.eventViewModel.alert(title: "No Favorites to Show", message: "Add some favorites so we can show you them in \(config.subPage) Mode!")
+                           return self.evm.alert(title: "No Favorites to Show", message: "Add some favorites so we can show you them in \(config.subPage) Mode!")
                         }
                     }
                 } else if config.page == "Information" {
                     InformationView().blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false)
                 } 
                 
-                TabBar(noFavorites: self.$noFavorites)
+                TabBar(evm: self.evm, noFavorites: self.$noFavorites)
                 
             }.edgesIgnoringSafeArea(.bottom)
             
@@ -103,6 +103,7 @@ struct MainView : View {
 }
 
 struct TabBar : View {
+    @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
     @Binding var noFavorites: Bool
     
@@ -150,7 +151,7 @@ struct TabBar : View {
                         }
                         self.config.page = "Favorites"
                         //if there aren't any favorites, send alert through noFavorites & don't allow Map/AR to show by not getting rid of options
-                        if !self.config.eventViewModel.doFavoritesExist(config: self.config) && (self.config.subPage == "AR" || self.config.subPage == "Map") {
+                        if !self.evm.doFavoritesExist(list: self.evm.eventList) && (self.config.subPage == "AR" || self.config.subPage == "Map") {
                             self.noFavorites = true
                             self.config.showOptions = true
                         }
@@ -173,7 +174,7 @@ struct TabBar : View {
             
             //other tabs
             if self.config.showOptions {
-                TabOptions(noFavorites: self.$noFavorites).offset(x: self.config.page == "Discover" ? -30 : 30, y: -60)
+                TabOptions(evm: self.evm, noFavorites: self.$noFavorites).offset(x: self.config.page == "Discover" ? -30 : 30, y: -60)
             }
             
         }//zstack end
@@ -181,6 +182,7 @@ struct TabBar : View {
 }
 
 struct TabOptions: View {
+    @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
     @Environment(\.colorScheme) var colorScheme
     @Binding var noFavorites: Bool
@@ -238,7 +240,7 @@ struct TabOptions: View {
                         self.config.showOptions = false
                     }
                     //if there aren't any favorites, send alert through noFavorites & don't allow AR to show by not getting rid of options
-                    if !self.config.eventViewModel.doFavoritesExist(config: self.config) && self.config.page == "Favorites" {
+                    if !self.evm.doFavoritesExist(list: self.evm.eventList) && self.config.page == "Favorites" {
                         self.noFavorites = true
                         self.config.showOptions = true
                     }
@@ -260,7 +262,7 @@ struct TabOptions: View {
                         self.config.showOptions = false
                     }
                     //if there aren't any favorites, send alert through noFavorites & don't allow Map to show by not getting rid of options
-                    if !self.config.eventViewModel.doFavoritesExist(config: self.config) && self.config.page == "Favorites" {
+                    if !self.evm.doFavoritesExist(list: self.evm.eventList) && self.config.page == "Favorites" {
                         self.noFavorites = true
                         self.config.showOptions = true
                     }

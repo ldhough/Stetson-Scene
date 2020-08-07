@@ -9,16 +9,16 @@
 import SwiftUI
 
 struct FilterEventTypeView: View {
-    
+    @ObservedObject var evm: EventViewModel
     @EnvironmentObject var config: Configuration
     @State var updateSelect:Int = 1
     @State var selectAllDeselectAll:Bool
     @Binding var eventTypesSelected:Set<String> {
         didSet {
-            config.eventViewModel.eventSearchEngine.eventTypeSet = self.eventTypesSelected
+            evm.eventSearchEngine.eventTypeSet = self.eventTypesSelected
             print(self.eventTypesSelected.count)
-            print(self.config.eventViewModel.eventTypeList.count/2)
-            if self.eventTypesSelected.count > self.config.eventViewModel.eventTypeList.count/2 {
+            print(self.evm.eventTypeList.count/2)
+            if self.eventTypesSelected.count > self.evm.eventTypeList.count/2 {
                 print("deselect all")
                 self.selectAllDeselectAll = false
             } else {
@@ -32,7 +32,7 @@ struct FilterEventTypeView: View {
         VStack {
             Button(action: {
                 if self.selectAllDeselectAll {
-                    for element in self.config.eventViewModel.eventTypeList {
+                    for element in self.evm.eventTypeList {
                         self.eventTypesSelected.insert(element)
                     }
                 } else {
@@ -44,7 +44,7 @@ struct FilterEventTypeView: View {
                 ).font(.system(size: 16, weight: .light, design: .default)).foregroundColor(config.accent)
             }.buttonStyle(MainButtonStyle(accentColor: config.accent)).padding(.horizontal, Constants.width*0.1)
             List {
-                ForEach(config.eventViewModel.eventTypeList, id:\.self) { eventType in
+                ForEach(evm.eventTypeList, id:\.self) { eventType in
                     ZStack {
                         HStack {
                             Text(eventType).font(.system(size: 16, weight: .light, design: .default))
@@ -57,8 +57,8 @@ struct FilterEventTypeView: View {
                                             self.eventTypesSelected.insert(eventType)
                                         }
 //                                    print(self.eventTypesSelected.count)
-//                                    print(self.config.eventViewModel.eventTypeList.count/2)
-//                                    if self.eventTypesSelected.count > self.config.eventViewModel.eventTypeList.count/2 {
+//                                    print(self.evm.eventTypeList.count/2)
+//                                    if self.eventTypesSelected.count > self.evm.eventTypeList.count/2 {
 //                                        print("code executing")
 //                                        self.selectAllDeselectAll = !false
 //                                        //return false

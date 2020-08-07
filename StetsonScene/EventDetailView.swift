@@ -19,28 +19,21 @@ struct EventDetailView : View {
     var body: some View {
         VStack {
             RoundedRectangle(cornerRadius: 20).frame(width: Constants.width*0.25, height: 5, alignment: .center).foregroundColor(Color.secondaryLabel.opacity(0.2)).padding(.bottom, 10)
+            //Event name
+            Text(event.name).fontWeight(.medium).font(.system(size: 30)).frame(maxWidth: .infinity, alignment: .center).multilineTextAlignment(.center).foregroundColor(event.hasCultural ? config.accent : Color.label).padding([.horizontal, .vertical])
+            //Info row
+           Text("\(event.date) | \(event.location) | \(event.time)").fontWeight(.light).font(.system(size: 20)).frame(maxWidth: Constants.width, alignment: .center).foregroundColor(event.hasCultural ? Color.label : config.accent)
+            //Buttons
+            Buttons(evm: self.evm, event: event).padding(.vertical, 5)
+            //Divider
+            Rectangle().frame(width: Constants.width*0.75, height: 1, alignment: .center).foregroundColor(Color.secondaryLabel.opacity(0.2)).padding(.vertical, 10)
             
-                //Event name
-            Text(event.name).fontWeight(.medium).font(.system(size: 30)).frame(maxWidth: .infinity, alignment: .center).multilineTextAlignment(.center).foregroundColor(event.hasCultural ? config.accent : Color.label).padding([.horizontal])
-                //Info row
-                HStack(spacing: 20) {
-                    Text(event.date).fontWeight(.light).font(.system(size: 20)).frame(maxWidth: .infinity, alignment: .trailing).foregroundColor(event.hasCultural ? Color.label : config.accent)
-                    VStack {
-                        Image(systemName: "person.fill").resizable().frame(width: 20, height: 20).foregroundColor(event.hasCultural ? Color.label : config.accent)
-                        Text(String(event.numAttending)).fontWeight(.light).font(.system(size: 14)).foregroundColor(event.hasCultural ? Color.label : config.accent)
-                    }
-                    Text(event.time).fontWeight(.light).font(.system(size: 20)).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(event.hasCultural ? Color.label : config.accent)
-                }
-                Rectangle().frame(width: Constants.width*0.75, height: 1, alignment: .center).foregroundColor(Color.secondaryLabel.opacity(0.2)).padding(.vertical, 10)
             ScrollView {
                 //Description
                 Text(event.eventDescription!).fontWeight(.light).font(.system(size: 16)).multilineTextAlignment(.leading).foregroundColor(Color.label).padding(.horizontal, 10)
                 Text("DETAILS").fontWeight(.light).font(.system(size: 16)).foregroundColor(config.accent).padding(.top)
-            }.padding([.horizontal])
-            
-            Spacer()
-            Buttons(evm: self.evm, event: event).padding(.vertical, 5)
-        }.padding([.vertical]).background(Color.secondarySystemBackground).edgesIgnoringSafeArea(.bottom)
+            }.padding([.horizontal]).padding(.bottom, 5)
+        }.background(Color.secondarySystemBackground).edgesIgnoringSafeArea(.bottom)
     }
 }
 
@@ -70,16 +63,16 @@ struct Buttons: View {
                 Image(systemName: "square.and.arrow.up").resizable().frame(width: 18, height: 22).foregroundColor(share ? Color.tertiarySystemBackground : config.accent)
             }.frame(width: 40, height: 40)
                 .onTapGesture {
+                    haptic()
                     self.share.toggle()
-                    self.config.eventViewModel.isVirtual(event: self.event)
+                    self.evm.isVirtual(event: self.event)
                     if self.event.isVirtual {
-                        self.event.linkText = self.makeLink(text: self.event.eventDescription)
+                        self.event.linkText = self.evm.makeLink(text: self.event.eventDescription)
                             if self.event.linkText == "" { self.event.isVirtual = false }
                             self.event.shareDetails = "Check out this event I found via StetsonScene! \(self.event.name!) is happening on \(self.event.date!) at \(self.event.time!)!"
                     } else {
                             self.event.shareDetails = "Check out this event I found via StetsonScene! \(self.event.name!), on \(self.event.date!) at \(self.event.time!), is happening at the \(self.event.location!)!"
                     }
-                    //GIVE HAPTIC
             }
             .sheet(isPresented: $share, content: { //NEED TO LINK TO APPROPRIATE LINKS ONCE APP IS PUBLISHED
                 ShareView(activityItems: [/*"linktoapp.com"*/self.event.isVirtual ? URL(string: self.event.linkText)!:"", self.event.hasCultural ? "\(self.event.shareDetails) It’s even offering a cultural credit!" : "\(self.event.shareDetails)"/*, event.isVirtual ? URL(string: event.linkText)!:""*/], applicationActivities: nil)
@@ -90,10 +83,15 @@ struct Buttons: View {
                 Image(systemName: "calendar.badge.plus").resizable().frame(width: 22, height: 20).foregroundColor(self.event.isInCalendar ? Color.tertiarySystemBackground : config.accent)
             }.frame(width: 40, height: 40)
                 .onTapGesture {
-                    self.calendar = true
                     haptic()
+                    self.calendar = true
             }.actionSheet(isPresented: $calendar) {
-                self.config.eventViewModel.manageCalendar(self.event)
+                self.evm.manageCalendar(self.event)
+            }
+            //NUMATTENDING- not a button
+            VStack {
+                Image(systemName: "person.fill").resizable().frame(width: 16, height: 16).foregroundColor(config.accent)
+                Text(String(event.numAttending)).fontWeight(.light).font(.system(size: 12)).foregroundColor(config.accent)
             }
             //FAVORITE
             ZStack {
@@ -102,7 +100,7 @@ struct Buttons: View {
             }.frame(width: 40, height: 40)
                 .onTapGesture {
                     haptic()
-                    self.config.eventViewModel.toggleFavorite(self.event)
+                    self.evm.toggleFavorite(self.event)
             }
             //NAVIGATE
             ZStack {
@@ -111,7 +109,7 @@ struct Buttons: View {
             }.frame(width: 40, height: 40)
                 .onTapGesture {
                     haptic()
-                    self.config.eventViewModel.isVirtual(event: self.event)
+                    self.evm.isVirtual(event: self.event)
                     //if you're trying to navigate to an event and are too far from campus, alert user and don't go to map
                     let locationManager = CLLocationManager()
                     let StetsonUniversity = CLLocation(latitude: 29.0349780, longitude: -81.3026430)
@@ -147,46 +145,23 @@ struct Buttons: View {
                     }
                 }.alert(isPresented: self.$internalAlert) { () -> Alert in //done in the view
                     if self.arrived {
-                        return self.config.eventViewModel.alert(title: "You've Arrived!", message: "Have fun at \(String(describing: self.event.name!))!")
+                        return self.evm.alert(title: "You've Arrived!", message: "Have fun at \(String(describing: self.event.name!))!")
                     } else if self.eventDetails {
-                        return self.config.eventViewModel.alert(title: "\(self.event.name!)", message: "This event is at \(self.event.time!) on \(self.event.date!).")/*, and you are \(distanceFromBuilding!)m from \(event!.location!)*/
+                        return self.evm.alert(title: "\(self.event.name!)", message: "This event is at \(self.event.time!) on \(self.event.date!).")/*, and you are \(distanceFromBuilding!)m from \(event!.location!)*/
                     }
-                    return self.config.eventViewModel.alert(title: "ERROR", message: "Please report as a bug.")
+                    return self.evm.alert(title: "ERROR", message: "Please report as a bug.")
                 }
             }).alert(isPresented: self.$externalAlert) { () -> Alert in //done outside the view
                 if self.isVirtual {
-                    return self.config.eventViewModel.alert(title: "Virtual Event", message: "Sorry! This event is virtual, so you have no where to navigate to.")
+                    return self.evm.alert(title: "Virtual Event", message: "Sorry! This event is virtual, so you have no where to navigate to.")
                 } else if self.tooFar {
-                    //return self.config.eventViewModel.alert(title: "Too Far to Navigate to Event", message: "You're currently too far away from campus to navigate to this event. You can still view it in the map, and once you get closer to campus, can navigate there.")
-                    return self.config.eventViewModel.navAlert(lat: self.event.mainLat, lon: self.event.mainLon)
+                    //return self.evm.alert(title: "Too Far to Navigate to Event", message: "You're currently too far away from campus to navigate to this event. You can still view it in the map, and once you get closer to campus, can navigate there.")
+                    return self.evm.navAlert(lat: self.event.mainLat, lon: self.event.mainLon)
                 }
-                return self.config.eventViewModel.alert(title: "ERROR", message: "Please report as a bug.")
+                return self.evm.alert(title: "ERROR", message: "Please report as a bug.")
             }
         }
     }
-    
-    //MARK: FOR SHARING
-    //scrapes html for links
-    func makeLink(text: String) -> String {
-        //print("AIUGKSBAKJBKBFEKB")
-        let linkPattern = #"(<a href=")(.)+?(?=")"#
-        do {
-            let linkRegex = try NSRegularExpression(pattern: linkPattern, options: [])
-            if linkRegex.firstMatch(in: text, options: [], range: NSRange(text.startIndex..., in: text)) != nil {
-                //print("matched")
-                let linkCG = linkRegex.firstMatch(in: text, options: [], range: NSRange(text.startIndex..., in: text))
-                let range = linkCG?.range(at: 0)
-                var link:String = (text as NSString).substring(with: range!)
-                let scrapeHTMLPattern = #"(<a href=")"#
-                let scrapeHTMLRegex = try NSRegularExpression(pattern: scrapeHTMLPattern, options: [])
-                link = scrapeHTMLRegex.stringByReplacingMatches(in: link, options: [], range: NSRange(link.startIndex..., in: link), withTemplate: "")
-                //print(link)
-                if !link.contains("http") && !link.contains("https") { return "" } else { return link }
-            }
-        } catch { print("Regex error") }
-        return ""
-    }
-    
 } //end of Buttons struct
 
 //struct SafariView: UIViewControllerRepresentable {

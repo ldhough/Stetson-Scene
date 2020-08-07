@@ -54,27 +54,9 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
     var sceneLocationView = SceneLocationView()
     var distanceFromBuilding:Int! = 0
     //every time user location is updated, update the scene as well
-    var userLocation: CLLocation! {
-        didSet {
-            //if you're navigating to an event with AR, update distanceFromBuilding so it can be displayed on the AR tag
-            if !arFindMode {
-                let building = CLLocation(latitude: navToEvent!.mainLat, longitude: navToEvent!.mainLon)
-                distanceFromBuilding = Int(building.distance(from: userLocation))
-            }
-            if StetsonUniversity.distance(from: userLocation) > 805 && !alertSent { //805m = 0.5mi //if you're too far away from campus, create just one node and send an alert
-                for annotationNode in self.sceneLocationView.locationNodes { annotationNode.removeFromParentNode() } //clean scene
-                createBuildingNode(location: "Stetson University", lat: 29.0349780, lon: -81.3026430, altitude: (userAltitude! + 15)) //just create a stetson node
-                externalAlert = true
-                tooFar = true
-                alertSent = true
-            } else { //if you're within 0.5mi of campus
-                for annotationNode in self.sceneLocationView.locationNodes { annotationNode.removeFromParentNode() } //clean scene
-                determineNodes() //create the appropriate nodes depending on appEventMode & arFindMode
-                externalAlert = false
-                tooFar = false
-            }
-        }
-    }
+    var userLocation: CLLocation!
+    var oldLocation: CLLocation!
+    var newLocation: CLLocation!
     
     //Initialization
     init(evm: EventViewModel, config: Configuration, arFindMode: Bool, navToEvent: EventInstance, internalAlert: Binding<Bool>, externalAlert: Binding<Bool>, tooFar: Binding<Bool>, allVirtual: Binding<Bool>, arrived: Binding<Bool>, eventDetails: Binding<Bool>) {
@@ -121,6 +103,33 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
             userAltitude = lastLocation.altitude
             userLocation = lastLocation
         }
+//        newLocation = userLocation
+//        print("NEW LOCATION: ", newLocation)
+        
+        //if you're navigating to an event with AR, update distanceFromBuilding so it can be displayed on the AR tag
+        if !arFindMode {
+            let building = CLLocation(latitude: navToEvent!.mainLat, longitude: navToEvent!.mainLon)
+            distanceFromBuilding = Int(building.distance(from: userLocation))
+        }
+//        only update the nodes if you have a change in on/off campus
+//        if oldLocation != nil && ((StetsonUniversity.distance(from: oldLocation) > 805 && StetsonUniversity.distance(from: newLocation) <= 805)
+//            || (StetsonUniversity.distance(from: oldLocation) <= 805 && StetsonUniversity.distance(from: newLocation) > 805)) {
+        if StetsonUniversity.distance(from: userLocation) > 805 && !alertSent { //805m = 0.5mi //if you're too far away from campus, create just one node and send an alert
+            for annotationNode in self.sceneLocationView.locationNodes { annotationNode.removeFromParentNode() } //clean scene
+            createBuildingNode(location: "Stetson University", lat: 29.0349780, lon: -81.3026430, altitude: (userAltitude! + 15)) //just create a stetson node
+            externalAlert = true
+            tooFar = true
+            alertSent = true
+        } else { //if you're within 0.5mi of campus
+            for annotationNode in self.sceneLocationView.locationNodes { annotationNode.removeFromParentNode() } //clean scene
+            determineNodes() //create the appropriate nodes depending on appEventMode & arFindMode
+            print("UPDATING USERLOCATION AND CREATING NODES")
+            externalAlert = false
+            tooFar = false
+        }
+        //}
+//        oldLocation = userLocation
+//        print("OLD LOCATION: ", oldLocation)
     }
     
     func determineNodes() {
@@ -144,21 +153,23 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
             }
             
             //if you're touring with AR, create nodes for each building with events
-            for event in config.eventViewModel.eventList {
-                if !config.eventViewModel.determineVirtualList(config: config) {
-                    config.eventViewModel.sanitizeCoords(event: event)
+            allVirtual = evm.determineVirtualList(page: config.page, list: evm.eventList) //probably don't need this multiple places in mapview
+            for event in evm.eventList {
+                if !allVirtual {
+                    evm.sanitizeCoords(event: event)
                     //only add non-virtual events, don't repeat building nodes, only add to favorites view if the event is favorited
                     if (event.location.lowercased() != "virtual") && !locationsWithNode.contains(event.location) && ((config.page == "Favorites" && event.isFavorite) || config.page == "Discover") {
                         locationsWithNode.append(event.location)
+                        print("CREATING NODES")
                         createBuildingNode(location: event.location, lat: event.mainLat, lon: event.mainLon, altitude: (userAltitude! + 15))
                     }
                 }
             }
             
             //if all events are virtual, create a single Stetson node and send an alert
-            if arFindMode && config.eventViewModel.determineVirtualList(config: config) && !alertSent {
+            if arFindMode && allVirtual && !alertSent {
                 createBuildingNode(location: "Stetson University", lat: 29.0349780, lon: -81.3026430, altitude: (userAltitude! + 15))
-                allVirtual = true
+                //allVirtual = true already would be
                 alertSent = true
             }
         } else {
@@ -226,9 +237,10 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
             
             if config.appEventMode {
                 //if all events are virtual and you tap on the Stetson University node, send the virtual events only alert
-                if arFindMode && config.eventViewModel.determineVirtualList(config: config) && (String(describing: hits.name!)) == "Stetson University" {
+                allVirtual = evm.determineVirtualList(page: config.page, list: evm.eventList)
+                if arFindMode && allVirtual && (String(describing: hits.name!)) == "Stetson University" {
                     externalAlert = true
-                    allVirtual = true
+                    //allVirtual = true already assigned
                     return
                 }
                 //if you're too far from campus and you tap the Stetson node, send the too far alert
@@ -241,7 +253,7 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
                 if (String(describing: hits.name!)) != "Stetson University" {
                     if arFindMode {
                         //see event list for a building
-                        for event in config.eventViewModel.eventList {
+                        for event in evm.eventList {
                             if event.location == (String(describing: hits.name!)) {
                                 let eventListByBuilding = UIHostingController(rootView: ListView(evm: self.evm, eventLocation: event.location!).environmentObject(self.config).background(Color.secondarySystemBackground))
                                 present(eventListByBuilding, animated: true)
