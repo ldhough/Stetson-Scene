@@ -21,6 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, ObservableObject {
     var locationAssocationRef:DatabaseReference!
     var connectedRef:DatabaseReference!
     var buildingsRef:DatabaseReference!
+    var updateListRef:DatabaseReference!
     
     lazy var persistentContainer:NSPersistentContainer = {
         let container = NSPersistentContainer(name: "PersistentData")
@@ -52,12 +53,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, ObservableObject {
         FirebaseApp.configure()
         
         //References to relevant data on the Firebase Database are established
-                eventListRef = Database.database().reference(withPath: "Test/eventList")
-                eventTypeAssociationRef = Database.database().reference(withPath: "EventTypeAssociationsTest")
-                locationAssocationRef = Database.database().reference(withPath: "LocationAssociationsTest")
-                eventListOrderRef = Database.database().reference(withPath: "eLocsTest")
-                connectedRef = Database.database().reference(withPath: ".info/connected")
-                buildingsRef = Database.database().reference(withPath: "Buildings")
+        eventListRef = Database.database().reference(withPath: "Test/eventList")
+        eventTypeAssociationRef = Database.database().reference(withPath: "EventTypeAssociationsTest")
+        locationAssocationRef = Database.database().reference(withPath: "LocationAssociationsTest")
+        eventListOrderRef = Database.database().reference(withPath: "eLocsTest")
+        connectedRef = Database.database().reference(withPath: ".info/connected")
+        buildingsRef = Database.database().reference(withPath: "Buildings")
+        updateListRef = Database.database().reference(withPath: "UpdateList")
         
 //        eventListRef = Database.database().reference(withPath: "Events/eventList")
 //        eventTypeAssociationRef = Database.database().reference(withPath: "EventTypeAssociations")

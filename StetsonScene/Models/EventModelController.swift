@@ -48,6 +48,9 @@ class EventViewModel: ObservableObject {
     @Published var locationList:[String] = []
     @Published var locationSetFull:Set<String> = []
     
+    //When events are loaded into the app listeners are put on their numberAttending node to keep this updated live between all users, this set is used to prevent duplicate listeners
+    var beingObservedSet:Set<String> = []
+    
     //Indicates how many weeks worth of database info are currently loaded into the app to prevent unnecessary database queries
     var weeksStored:Int = 1
     @Published var hasFirebaseConnection = true
@@ -188,13 +191,43 @@ class EventViewModel: ObservableObject {
     }
     
     func toggleFavorite(_ event: EventInstance) {
-        self.managePersistentProperties(event, updateFavoriteState: true, updateCalendarState: false)
+        if self.canHitFavorites {
+            haptic()
+            self.timeDelayFavoriteHit()
+            self.managePersistentProperties(event, updateFavoriteState: true, updateCalendarState: false)
+        }
+    }
+    
+    enum NumAttendingState {
+        case inc
+        case dec
+        case same
     }
     
     func managePersistentProperties(_ event: EventInstance, updateFavoriteState: Bool, updateCalendarState: Bool) {
+        
+        let prevAttendState = event.isAttending
+        let prevFavState = event.isFavorite
+        let prevCalState = event.isInCalendar
+        
         event.isFavorite = updateFavoriteState ? !event.isFavorite : event.isFavorite
         event.isInCalendar = updateCalendarState ? !event.isInCalendar : event.isInCalendar
-        event.isAttending = (event.isFavorite || event.isInCalendar) ? !event.isAttending : event.isAttending
+        event.isAttending = (event.isFavorite || event.isInCalendar) ? true : false
+        
+        var incDec:NumAttendingState = .same
+        if prevAttendState && !(prevFavState && prevCalState) { //If was previously attending and only one of calendar and fav is selected, decrement
+            incDec = updateFavoriteState ? (updateFavoriteState == prevFavState ? .dec : .same)  : (updateCalendarState == prevCalState ? .dec : .same)
+            //incDec = .dec
+        } else if prevAttendState && (prevFavState && prevCalState) { //If was previously attending and both were selected, do nothing
+            incDec = .same
+        } else {
+            incDec = .inc
+        }
+        
+        if incDec != .same {
+            self.updateNumberAttending(guid: event.guid, incDec: incDec == .inc ? true : false) //If was not previously attending, increment number attending
+        }
+        
         if event.isAttending {
             if !self.isInPersistentData(guid: event.guid) { //If does not exist in persistent data and attending, add to persistent
                 self.createPersistentData(eI: event)
@@ -358,22 +391,60 @@ class EventViewModel: ObservableObject {
         self.eventList.append(event)
     }
     
+    func updateNumberAttending(guid: String, incDec: Bool) {
+        let ref:DatabaseReference = AppDelegate.shared().eventListRef.child(guid)
+        var numAttending:Int = 0
+        ref.observeSingleEvent(of: .value, with: { (snapshot) in
+            if snapshot.value != nil { //if nil, event has presumably been removed from database/Firebase
+                let event = (snapshot.value as? Dictionary<String, Any>)!
+                numAttending = (event["numberAttending"] as? Int)!
+                numAttending += incDec ? 1 : -1
+                ref.child("numberAttending").setValue(numAttending)
+            }
+        })
+    }
+    
+    var canHitFavorites = true
+    ///Function prevents "spamming" of the favorite button, which can cause erroneous Firebase input
+    func timeDelayFavoriteHit() {
+        canHitFavorites = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
+            self.canHitFavorites = true
+        }
+    }
+    
+    func retrieveFirebaseDataFavorites() {
+        
+    }
+    
     func retrieveFirebaseData(daysIntoYear: Int, doFilter: Bool, searchEngine: EventSearchEngine) {
         //Prevent duplicate observers
         AppDelegate.shared().eventListRef.removeAllObservers()
         self.loadPersistentEventData()
         self.eventList = []
-        AppDelegate.shared().eventListRef.queryOrdered(byChild: "daysIntoYear").queryEnding(atValue: daysIntoYear).observe(.value, with: { snapshot in
-            let fullEventList = snapshot.value as? Dictionary<String, Dictionary<String, Any>>
-            //print(fullEventList)
-            for (_, v) in fullEventList! {
-                let newInstanceCheck = self.readEventData(eventData: v)
-                if newInstanceCheck.1 == .invalid {
-                    continue
-                } else {
-                    self.insertEvent(newInstanceCheck.0)
+        AppDelegate.shared().updateListRef.observe(.value, with: { (snapshot) in
+            self.eventList = []
+//            self.beingObservedSet = []
+//
+            AppDelegate.shared().eventListRef.queryOrdered(byChild: "daysIntoYear").queryEnding(atValue: daysIntoYear).observeSingleEvent(of: .value, with: { snapshot in
+                let fullEventList = snapshot.value as? Dictionary<String, Dictionary<String, Any>>
+                //print(fullEventList)
+                for (_, v) in fullEventList! {
+                    let newInstanceCheck = self.readEventData(eventData: v)
+                    if newInstanceCheck.1 == .invalid {
+                        continue
+                    } else {
+                        self.insertEvent(newInstanceCheck.0)
+                        AppDelegate.shared().eventListRef.child(newInstanceCheck.0.guid).child("numberAttending").observe(.value, with: { snapshot in
+                            newInstanceCheck.0.numAttending = snapshot.value as? Int
+                            self.beingObservedSet.insert(newInstanceCheck.0.guid)
+                        })
+                        if doFilter {
+                            self.eventSearchEngine.checkEvent(newInstanceCheck.0, self)
+                        }
+                    }
                 }
-            }
+            })
         })
         if !hasObtainedAssociations {
             AppDelegate.shared().eventTypeAssociationRef.observe(.childAdded) { snapshot in

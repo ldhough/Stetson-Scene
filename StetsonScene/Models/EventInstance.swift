@@ -47,7 +47,21 @@ class EventInstance: Identifiable, ObservableObject {
     var eventType:[String]! = [] //contains other event types in case an event falls into multiple categories
 
     @Published var isFavorite:Bool = false //Might need to be published
-    var isAttending:Bool = false
+    var isAttending:Bool = false //{
+//        didSet {
+//            print("did a thing")
+//            let ref = AppDelegate.shared().eventListRef.child(self.guid)
+//            var numAttending:Int = 0
+//            ref.observeSingleEvent(of: .value, with: { (snapshot) in
+//                if snapshot.value != nil { //if nil, event has presumably been removed from database/Firebase
+//                    let event = (snapshot.value as? Dictionary<String, Any>)!
+//                    numAttending = (event["numberAttending"] as? Int)!
+//                    numAttending += self.isAttending ? 1 : -1
+//                    ref.child("numberAttending").setValue(numAttending)
+//                }
+//            })
+//        }
+//    }
     @Published var isInCalendar:Bool = false
     @Published var isVirtual:Bool = false
     

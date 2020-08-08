@@ -100,7 +100,7 @@ struct Buttons: View {
                 Image(systemName: "heart").resizable().frame(width: 20, height: 20).foregroundColor(self.event.isFavorite ? Color.tertiarySystemBackground : config.accent)
             }.frame(width: 40, height: 40)
                 .onTapGesture {
-                    haptic()
+                    //haptic()
                     self.evm.toggleFavorite(self.event)
             }
             //NAVIGATE
