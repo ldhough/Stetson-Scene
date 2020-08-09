@@ -43,8 +43,9 @@ struct MainView : View {
         ZStack {
             Color((config.page == "Favorites" && colorScheme == .light) ? config.accentUIColor : UIColor.secondarySystemBackground).edgesIgnoringSafeArea(.all)
             VStack(spacing: 0) {
+                ZStack {
                 if config.page == "Trending" {
-                    TrendingView(evm: self.evm).disabled(config.showOptions ? true : false)
+                    TrendingView(evm: self.evm)
                 } else if config.page == "Discover" || config.page == "Favorites" {
                     if config.subPage == "List" || config.subPage == "Calendar" {
                         DiscoverFavoritesView(evm: self.evm).blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false)
@@ -88,17 +89,17 @@ struct MainView : View {
                             ListView(evm: self.evm, allVirtual: true).environmentObject(self.config).background(Color.secondarySystemBackground)
                         }).alert(isPresented: self.$noFavorites) { () -> Alert in //if favorites map or favorites AR & there are no favorites
                            return self.evm.alert(title: "No Favorites to Show", message: "Add some favorites so we can show you them in \(config.subPage) Mode!")
-                        }
+                        } //end of ZStack
                     }
                 } else if config.page == "Information" {
-                    InformationView().blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false)
+                    InformationView()
                 } 
-                
+                }.onTapGesture { self.config.showOptions = false } //end of ZStack that holds everything above the tab bar
                 TabBar(evm: self.evm, noFavorites: self.$noFavorites)
                 
-            }.edgesIgnoringSafeArea(.bottom)
+            }.edgesIgnoringSafeArea(.bottom)//end of VStack
             
-        }.animation(.spring())
+        }.animation(.spring()) //end of ZStack
     }
 }
 
@@ -192,7 +193,7 @@ struct TabOptions: View {
             //List
             ZStack {
                 Circle()
-                    .stroke(Color.clear)
+                    .stroke(self.config.subPage == "List" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
                     .background(self.config.subPage == "List" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "list.bullet")
@@ -209,7 +210,7 @@ struct TabOptions: View {
             //Calendar
             ZStack {
                 Circle()
-                    .stroke(Color.clear)
+                    .stroke(self.config.subPage == "List" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
                     .background(self.config.subPage == "Calendar" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "calendar")
@@ -226,7 +227,7 @@ struct TabOptions: View {
             //AR
             ZStack {
                 Circle()
-                    .stroke(Color.clear)
+                    .stroke(self.config.subPage == "List" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
                     .background(self.config.subPage == "AR" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "camera")
@@ -248,7 +249,7 @@ struct TabOptions: View {
             //Map
             ZStack {
                 Circle()
-                    .stroke(Color.clear)
+                    .stroke(self.config.subPage == "List" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
                     .background(self.config.subPage == "Map" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "mappin.and.ellipse")

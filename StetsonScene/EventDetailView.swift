@@ -22,7 +22,7 @@ struct EventDetailView : View {
             //Event name
             Text(event.name).fontWeight(.medium).font(.system(size: 30)).frame(maxWidth: .infinity, alignment: .center).multilineTextAlignment(.center).foregroundColor(event.hasCultural ? config.accent : Color.label).padding([.horizontal]).padding(.bottom, 5)
             //Info row
-           Text("\(event.date) | \(event.time)").fontWeight(.light).font(.system(size: 20)).frame(maxWidth: Constants.width, alignment: .center).foregroundColor(event.hasCultural ? Color.label : config.accent)
+            Text("\(event.date) | \(event.time)").fontWeight(.light).font(.system(size: 20)).frame(maxWidth: Constants.width, alignment: .center).foregroundColor(event.hasCultural ? Color.label : config.accent)
             Text("\(event.location)").fontWeight(.light).font(.system(size: 20)).frame(maxWidth: Constants.width, alignment: .center).foregroundColor(event.hasCultural ? Color.label : config.accent)
             //Buttons
             Buttons(evm: self.evm, event: event).padding(.vertical, 5)
@@ -69,15 +69,15 @@ struct Buttons: View {
                     self.evm.isVirtual(event: self.event)
                     if self.event.isVirtual {
                         self.event.linkText = self.evm.makeLink(text: self.event.eventDescription)
-                            if self.event.linkText == "" { self.event.isVirtual = false }
-                            self.event.shareDetails = "Check out this event I found via StetsonScene! \(self.event.name!) is happening on \(self.event.date!) at \(self.event.time!)!"
+                        if self.event.linkText == "" { self.event.isVirtual = false }
+                        self.event.shareDetails = "Check out this event I found via StetsonScene! \(self.event.name!) is happening on \(self.event.date!) at \(self.event.time!)!"
                     } else {
-                            self.event.shareDetails = "Check out this event I found via StetsonScene! \(self.event.name!), on \(self.event.date!) at \(self.event.time!), is happening at the \(self.event.location!)!"
+                        self.event.shareDetails = "Check out this event I found via StetsonScene! \(self.event.name!), on \(self.event.date!) at \(self.event.time!), is happening at the \(self.event.location!)!"
                     }
             }
-            .sheet(isPresented: $share, content: { //NEED TO LINK TO APPROPRIATE LINKS ONCE APP IS PUBLISHED
-                ShareView(activityItems: [/*"linktoapp.com"*/(self.event.isVirtual && URL(string: self.event.linkText) != nil) ? URL(string: self.event.linkText)!:"", self.event.hasCultural ? "\(self.event.shareDetails) It’s even offering a cultural credit!" : "\(self.event.shareDetails)"/*, event.isVirtual ? URL(string: event.linkText)!:""*/], applicationActivities: nil)
-            })
+                .sheet(isPresented: $share, content: { //NEED TO LINK TO APPROPRIATE LINKS ONCE APP IS PUBLISHED
+                    ShareView(activityItems: [/*"linktoapp.com"*/(self.event.isVirtual && URL(string: self.event.linkText) != nil) ? URL(string: self.event.linkText)!:"", self.event.hasCultural ? "\(self.event.shareDetails) It’s even offering a cultural credit!" : "\(self.event.shareDetails)"/*, event.isVirtual ? URL(string: event.linkText)!:""*/], applicationActivities: nil)
+                })
             //ADD TO CALENDAR
             ZStack {
                 Circle().foregroundColor(self.event.isInCalendar ? config.accent : Color.tertiarySystemBackground).clipShape(Circle())
@@ -115,9 +115,9 @@ struct Buttons: View {
                     let locationManager = CLLocationManager()
                     let StetsonUniversity = CLLocation(latitude: 29.0349780, longitude: -81.3026430)
                     if !self.event.isVirtual && locationManager.location != nil && (CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways) && StetsonUniversity.distance(from: locationManager.location!) > 805 {
-                            self.externalAlert = true
-                            self.tooFar = true
-                            self.navigate = false
+                        self.externalAlert = true
+                        self.tooFar = true
+                        self.navigate = false
                     } else if self.event.isVirtual { //if you're trying to navigate to a virtual event, alert user and don't go to map
                         //TODO: add in the capability to follow a link to register or something
                         self.externalAlert = true
@@ -130,20 +130,25 @@ struct Buttons: View {
                         self.navigate = true
                     }
             }.sheet(isPresented: $navigate, content: {
-                ZStack {
-                    if self.arMode && !self.event.isVirtual {
-                        ARNavigationIndicator(evm: self.evm, arFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
-                    } else if !self.event.isVirtual { //mapMode
-                        MapView(evm: self.evm, mapFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
-                    }
-                    if self.config.appEventMode {
-                        ZStack {
-                            Text(self.arMode ? "Map View" : "AR View").fontWeight(.light).font(.system(size: 18)).foregroundColor(self.config.accent)
-                        }.padding(10)
-                            .background(RoundedRectangle(cornerRadius: 15).stroke(Color.clear).foregroundColor(Color.tertiarySystemBackground.opacity(0.8)).background(RoundedRectangle(cornerRadius: 10).foregroundColor(Color.tertiarySystemBackground.opacity(0.8))))
-                            .onTapGesture { withAnimation { self.arMode.toggle() } }
-                            .offset(y: Constants.height*0.4)
-                    }
+                    ZStack {
+                        if self.arMode && !self.event.isVirtual {
+                            ARNavigationIndicator(evm: self.evm, arFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
+                        } else if !self.event.isVirtual { //mapMode
+                            MapView(evm: self.evm, mapFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
+                        }
+                        if self.config.appEventMode {
+                            ZStack {
+                                Text(self.arMode ? "Map View" : "AR View").fontWeight(.light).font(.system(size: 18)).foregroundColor(self.config.accent)
+                            }.padding(10)
+                                .background(RoundedRectangle(cornerRadius: 15).stroke(Color.clear).foregroundColor(Color.tertiarySystemBackground.opacity(0.8)).background(RoundedRectangle(cornerRadius: 10).foregroundColor(Color.tertiarySystemBackground.opacity(0.8))))
+                                .onTapGesture { withAnimation { self.arMode.toggle() } }
+                                .offset(y: Constants.height*0.4)
+                        }
+                        VStack {
+                        RoundedRectangle(cornerRadius: 20).frame(width: Constants.width*0.25, height: 5, alignment: .center).foregroundColor(Color.secondaryLabel.opacity(0.2)).padding(.vertical, 10)
+                            Spacer()
+                            Spacer()
+                        }
                 }.alert(isPresented: self.$internalAlert) { () -> Alert in //done in the view
                     if self.arrived {
                         return self.evm.alert(title: "You've Arrived!", message: "Have fun at \(String(describing: self.event.name!))!")
