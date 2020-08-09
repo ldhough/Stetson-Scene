@@ -195,6 +195,9 @@ class EventViewModel: ObservableObject {
             haptic()
             self.timeDelayFavoriteHit()
             self.managePersistentProperties(event, updateFavoriteState: true, updateCalendarState: false)
+            let tempEvent = self.eventList[self.eventList.count-1] //Force updates to views that watch the list - mostly to update favorite view when an event changes favorite state
+            self.eventList.removeLast()
+            self.eventList.append(tempEvent)
         }
     }
     
@@ -413,7 +416,7 @@ class EventViewModel: ObservableObject {
         }
     }
     
-    func retrieveFirebaseDataFavorites() {
+    func retrieveFirebaseDataFavorites(doFilter: Bool, searchEngine: EventSearchEngine) {
         
     }
     
