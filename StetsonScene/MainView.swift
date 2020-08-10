@@ -47,10 +47,21 @@ struct MainView : View {
                 ZStack {
                 if config.page == "Trending" {
                     TrendingView(evm: self.evm)
-                } else if config.page == "Discover" || config.page == "Favorites" {
-                    if config.subPage == "List" || config.subPage == "Calendar" {
-                        DiscoverFavoritesView(evm: self.evm).blur(radius: self.showOptions ? 5 : 0).disabled(self.showOptions ? true : false)
-                    } else { //AR or Map
+                }
+                if config.page == "Discover" || config.page == "Favorites" {
+                    if config.subPage == "List" {
+                        VStack {
+                            DiscoverFavoritesView(evm: self.evm)
+                            ListView(evm: self.evm)
+                        }.blur(radius: self.showOptions ? 5 : 0).disabled(self.showOptions ? true : false)
+                    }
+                    if config.subPage == "Calendar" {
+                        VStack {
+                            DiscoverFavoritesView(evm: self.evm)
+                            CalendarView(evm: self.evm)
+                        }.blur(radius: self.showOptions ? 5 : 0).disabled(self.showOptions ? true : false)
+                    }
+                    if config.subPage == "AR"  ||  config.subPage == "Map" { //AR or Map
                         ZStack {
                             if config.subPage == "AR" {
                                 ARNavigationIndicator(evm: self.evm, arFindMode: true, internalAlert: .constant(false), externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: self.$allVirtual, arrived: .constant(false), eventDetails: .constant(false)).environmentObject(self.config)
@@ -69,7 +80,8 @@ struct MainView : View {
                                         }
                                         return self.evm.alert(title: "ERROR", message: "Please report as a bug.")
                                      }
-                            } else if config.subPage == "Map" {
+                            }
+                            if config.subPage == "Map" {
                                 MapView(evm: self.evm, mapFindMode: true, internalAlert: .constant(false), externalAlert: .constant(false), tooFar: .constant(false), allVirtual: self.$allVirtual, arrived: .constant(false), eventDetails: .constant(false)).environmentObject(self.config)
                                     .blur(radius: self.showOptions ? 5 : 0)
                                     .disabled(self.showOptions ? true : false)
@@ -92,7 +104,8 @@ struct MainView : View {
                            return self.evm.alert(title: "No Favorites to Show", message: "Add some favorites so we can show you them in \(config.subPage) Mode!")
                         } //end of ZStack
                     }
-                } else if config.page == "Information" {
+                }
+                if config.page == "Information" {
                     InformationView()
                 } 
                 }.onTapGesture { self.self.showOptions = false } //end of ZStack that holds everything above the tab bar
@@ -121,6 +134,7 @@ struct TabBar : View {
                     .background(config.page == "Discover" ? config.accent : Color.clear)
                     .clipShape(Capsule())
                     .onTapGesture {
+                        print("tapped \(self.config.page)")
                         if self.config.page == "Discover" {
                             self.self.showOptions.toggle()
                         } else {
@@ -136,6 +150,7 @@ struct TabBar : View {
                     .background(config.page == "Favorites" ? config.accent : Color.clear)
                     .clipShape(Capsule())
                     .onTapGesture {
+                        print("tapped \(self.config.page)")
                         if self.config.page == "Favorites" {
                             self.self.showOptions.toggle()
                         } else {
@@ -156,6 +171,7 @@ struct TabBar : View {
                     .background(config.page == "Trending" ? config.accent : Color.clear)
                     .clipShape(Capsule())
                     .onTapGesture {
+                        print("tapped \(self.config.page)")
                         self.config.page = "Trending"
                         self.self.showOptions = false
                 }
@@ -167,6 +183,7 @@ struct TabBar : View {
                     .background(config.page == "Information" ? config.accent : Color.clear)
                     .clipShape(Capsule())
                     .onTapGesture {
+                        print("tapped \(self.config.page)")
                         self.config.page = "Information"
                         self.self.showOptions = false
                 }

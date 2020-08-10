@@ -62,11 +62,11 @@ struct DiscoverFavoritesView : View {
                 }
             }
             //LIST OR CALENDAR
-            else if config.subPage == "List" {
-                ListView(evm: self.evm)
-            } else if config.subPage == "Calendar" {
-                CalendarView(evm: self.evm)
-            }
+//            else if config.subPage == "List" {
+//                ListView(evm: self.evm)
+//            } else if config.subPage == "Calendar" {
+//                CalendarView(evm: self.evm)
+//            }
             
         }.background((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
     }
