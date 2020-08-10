@@ -134,6 +134,16 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
     
     func determineNodes() {
         var locationsWithNode: [String] = []
+        //determine if all events are virtual
+        //start with allVirtual = true
+        for event in evm.eventList {
+            evm.isVirtual(event: event)
+            if self.config.page == "Favorites" && event.isFavorite && !event.isVirtual {
+                allVirtual = false
+            } else if self.config.page != "Favorites" && !event.isVirtual {
+                allVirtual = false
+            }
+        }
         if config.appEventMode {
             //if you're navigating to a single event and are close enough to campus to navigate, create just one node for it
             if !arFindMode && navToEvent != nil && StetsonUniversity.distance(from: userLocation) <= 805 {
@@ -153,7 +163,6 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
             }
             
             //if you're touring with AR, create nodes for each building with events
-            allVirtual = evm.determineVirtualList(page: config.page, list: evm.eventList) //probably don't need this multiple places in mapview
             for event in evm.eventList {
                 if !allVirtual {
                     evm.sanitizeCoords(event: event)
@@ -169,7 +178,7 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
             //if all events are virtual, create a single Stetson node and send an alert
             if arFindMode && allVirtual && !alertSent {
                 createBuildingNode(location: "Stetson University", lat: 29.0349780, lon: -81.3026430, altitude: (userAltitude! + 15))
-                //allVirtual = true already would be
+                //allVirtual = true //already would be
                 alertSent = true
             }
         } else {
@@ -237,10 +246,9 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
             
             if config.appEventMode {
                 //if all events are virtual and you tap on the Stetson University node, send the virtual events only alert
-                allVirtual = evm.determineVirtualList(page: config.page, list: evm.eventList)
                 if arFindMode && allVirtual && (String(describing: hits.name!)) == "Stetson University" {
                     externalAlert = true
-                    //allVirtual = true already assigned
+                    //allVirtual = true //already assigned
                     return
                 }
                 //if you're too far from campus and you tap the Stetson node, send the too far alert

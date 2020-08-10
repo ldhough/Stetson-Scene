@@ -56,7 +56,6 @@ struct MapView: UIViewRepresentable {
     func determineAnnotations() -> [Annotation] {
         var annotations:[Annotation] = []
         var locationsWithAnnotation: [String] = []
-        
         //app event mode
         if config.appEventMode {
             //if you're navigating to a single event, create just one annotation for it
@@ -77,7 +76,6 @@ struct MapView: UIViewRepresentable {
             
             //if you're finding/discovering events
             //add buildings with non-virtual events to discover/favorites view
-            allVirtual = evm.determineVirtualList(page: config.page, list: evm.eventList) //probably don't need this multiple places in mapview
             for event in evm.eventList {
                 if !allVirtual {
                     evm.sanitizeCoords(event: event)
@@ -158,7 +156,16 @@ final class Coordinator: NSObject, MKMapViewDelegate {
         view.canShowCallout = true
         
         //if all events in list are virtual, allVirtual = true & alert will be sent upon screen initialization ONCE
-        allVirtual = evm.determineVirtualList(page: config.page, list: evm.eventList)
+        //determine if all events are virtual
+        //start with allVirtual = true
+        for event in evm.eventList {
+            evm.isVirtual(event: event)
+            if self.config.page == "Favorites" && event.isFavorite && !event.isVirtual {
+                allVirtual = false
+            } else if self.config.page != "Favorites" && !event.isVirtual {
+                allVirtual = false
+            }
+        }
         if config.appEventMode && mapFindMode && allVirtual && !alertSent {
             allVirtual = true
             alertSent = true
@@ -185,9 +192,8 @@ final class Coordinator: NSObject, MKMapViewDelegate {
         
         if config.appEventMode {
             //if all events are virtual and you tap on the Stetson University node, send the virtual events only alert
-            allVirtual = evm.determineVirtualList(page: config.page, list: evm.eventList)
             if mapFindMode && allVirtual && view.annotation?.title!! == "Stetson University" {
-                allVirtual = true
+                //allVirtual = true
                 return
             }
             //if you click on an actual event or building, not Stetson University pin

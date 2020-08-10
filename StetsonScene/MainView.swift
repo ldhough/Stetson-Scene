@@ -34,10 +34,11 @@ struct MainView : View {
     @Environment(\.colorScheme) var colorScheme
     @State var listVirtualEvents:Bool = false
     @State var noFavorites: Bool = false
+    @State var showOptions: Bool = false
     //for alerts
     @State var externalAlert: Bool = false
     @State var tooFar: Bool = false
-    @State var allVirtual: Bool = false
+    @State var allVirtual: Bool = true
     
     var body: some View {
         ZStack {
@@ -48,13 +49,13 @@ struct MainView : View {
                     TrendingView(evm: self.evm)
                 } else if config.page == "Discover" || config.page == "Favorites" {
                     if config.subPage == "List" || config.subPage == "Calendar" {
-                        DiscoverFavoritesView(evm: self.evm).blur(radius: config.showOptions ? 5 : 0).disabled(config.showOptions ? true : false)
+                        DiscoverFavoritesView(evm: self.evm).blur(radius: self.showOptions ? 5 : 0).disabled(self.showOptions ? true : false)
                     } else { //AR or Map
                         ZStack {
                             if config.subPage == "AR" {
                                 ARNavigationIndicator(evm: self.evm, arFindMode: true, internalAlert: .constant(false), externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: self.$allVirtual, arrived: .constant(false), eventDetails: .constant(false)).environmentObject(self.config)
-                                    .blur(radius: config.showOptions ? 5 : 0)
-                                    .disabled(config.showOptions ? true : false)
+                                    .blur(radius: self.showOptions ? 5 : 0)
+                                    .disabled(self.showOptions ? true : false)
                                     .edgesIgnoringSafeArea(.top)
                                     .alert(isPresented: self.$externalAlert) { () -> Alert in
                                         if self.tooFar {
@@ -70,8 +71,8 @@ struct MainView : View {
                                      }
                             } else if config.subPage == "Map" {
                                 MapView(evm: self.evm, mapFindMode: true, internalAlert: .constant(false), externalAlert: .constant(false), tooFar: .constant(false), allVirtual: self.$allVirtual, arrived: .constant(false), eventDetails: .constant(false)).environmentObject(self.config)
-                                    .blur(radius: config.showOptions ? 5 : 0)
-                                    .disabled(config.showOptions ? true : false)
+                                    .blur(radius: self.showOptions ? 5 : 0)
+                                    .disabled(self.showOptions ? true : false)
                                     .edgesIgnoringSafeArea(.top)
                                     .alert(isPresented: self.$allVirtual) { () -> Alert in
                                         return self.evm.alert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
@@ -94,8 +95,8 @@ struct MainView : View {
                 } else if config.page == "Information" {
                     InformationView()
                 } 
-                }.onTapGesture { self.config.showOptions = false } //end of ZStack that holds everything above the tab bar
-                TabBar(evm: self.evm, noFavorites: self.$noFavorites)
+                }.onTapGesture { self.self.showOptions = false } //end of ZStack that holds everything above the tab bar
+                TabBar(evm: self.evm, showOptions: self.$showOptions, noFavorites: self.$noFavorites)
                 
             }.edgesIgnoringSafeArea(.bottom)//end of VStack
             
@@ -106,6 +107,7 @@ struct MainView : View {
 struct TabBar : View {
     @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
+    @Binding var showOptions: Bool
     @Binding var noFavorites: Bool
     
     var body: some View {
@@ -120,9 +122,9 @@ struct TabBar : View {
                     .clipShape(Capsule())
                     .onTapGesture {
                         if self.config.page == "Discover" {
-                            self.config.showOptions.toggle()
+                            self.self.showOptions.toggle()
                         } else {
-                            self.config.showOptions = true
+                            self.self.showOptions = true
                         }
                         self.config.page = "Discover"
                 }
@@ -135,15 +137,15 @@ struct TabBar : View {
                     .clipShape(Capsule())
                     .onTapGesture {
                         if self.config.page == "Favorites" {
-                            self.config.showOptions.toggle()
+                            self.self.showOptions.toggle()
                         } else {
-                            self.config.showOptions = true
+                            self.self.showOptions = true
                         }
                         self.config.page = "Favorites"
                         //if there aren't any favorites, send alert through noFavorites & don't allow Map/AR to show by not getting rid of options
                         if !self.evm.doFavoritesExist(list: self.evm.eventList) && (self.config.subPage == "AR" || self.config.subPage == "Map") {
                             self.noFavorites = true
-                            self.config.showOptions = true
+                            self.self.showOptions = true
                         }
                 }
                 //Trending
@@ -155,7 +157,7 @@ struct TabBar : View {
                     .clipShape(Capsule())
                     .onTapGesture {
                         self.config.page = "Trending"
-                        self.config.showOptions = false
+                        self.self.showOptions = false
                 }
                 //Info
                 HStack {
@@ -166,7 +168,7 @@ struct TabBar : View {
                     .clipShape(Capsule())
                     .onTapGesture {
                         self.config.page = "Information"
-                        self.config.showOptions = false
+                        self.self.showOptions = false
                 }
             }.padding(.vertical, 10)
                 .frame(width: Constants.width)
@@ -174,8 +176,8 @@ struct TabBar : View {
                 .animation(.default) //hstack end
             
             //other tabs
-            if self.config.showOptions {
-                TabOptions(evm: self.evm, noFavorites: self.$noFavorites).offset(x: self.config.page == "Discover" ? -100 : -35, y: -65)
+            if self.self.showOptions {
+                TabOptions(evm: self.evm, showOptions: self.$showOptions, noFavorites: self.$noFavorites).offset(x: self.config.page == "Discover" ? -100 : -35, y: -65)
             }
             
         }//zstack end
@@ -185,6 +187,7 @@ struct TabBar : View {
 struct TabOptions: View {
     @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
+    @Binding var showOptions: Bool
     @Environment(\.colorScheme) var colorScheme
     @Binding var noFavorites: Bool
     
@@ -204,13 +207,13 @@ struct TabOptions: View {
                 .onTapGesture {
                     withAnimation {
                         self.config.subPage = "List"
-                        self.config.showOptions = false
+                        self.self.showOptions = false
                     }
             }
             //Calendar
             ZStack {
                 Circle()
-                    .stroke(self.config.subPage == "List" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
+                    .stroke(self.config.subPage == "Calendar" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
                     .background(self.config.subPage == "Calendar" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "calendar")
@@ -221,13 +224,13 @@ struct TabOptions: View {
                 .onTapGesture {
                     withAnimation {
                         self.config.subPage = "Calendar"
-                        self.config.showOptions = false
+                        self.self.showOptions = false
                     }
             }
             //AR
             ZStack {
                 Circle()
-                    .stroke(self.config.subPage == "List" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
+                    .stroke(self.config.subPage == "AR" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
                     .background(self.config.subPage == "AR" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "camera")
@@ -238,18 +241,18 @@ struct TabOptions: View {
                 .onTapGesture {
                     withAnimation {
                         self.config.subPage = "AR"
-                        self.config.showOptions = false
+                        self.self.showOptions = false
                     }
                     //if there aren't any favorites, send alert through noFavorites & don't allow AR to show by not getting rid of options
                     if !self.evm.doFavoritesExist(list: self.evm.eventList) && self.config.page == "Favorites" {
                         self.noFavorites = true
-                        self.config.showOptions = true
+                        self.self.showOptions = true
                     }
             }
             //Map
             ZStack {
                 Circle()
-                    .stroke(self.config.subPage == "List" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
+                    .stroke(self.config.subPage == "Map" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
                     .background(self.config.subPage == "Map" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "mappin.and.ellipse")
@@ -260,12 +263,12 @@ struct TabOptions: View {
                 .onTapGesture {
                     withAnimation {
                         self.config.subPage = "Map"
-                        self.config.showOptions = false
+                        self.self.showOptions = false
                     }
                     //if there aren't any favorites, send alert through noFavorites & don't allow Map to show by not getting rid of options
                     if !self.evm.doFavoritesExist(list: self.evm.eventList) && self.config.page == "Favorites" {
                         self.noFavorites = true
-                        self.config.showOptions = true
+                        self.self.showOptions = true
                     }
             }
         }.transition(.scale) //hstack

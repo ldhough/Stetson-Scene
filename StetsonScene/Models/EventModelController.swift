@@ -652,22 +652,6 @@ class EventViewModel: ObservableObject {
         }
     }
     
-    //
-    func determineVirtualList(page: String, list: [EventInstance]) -> Bool {
-        for event in list {
-            //same as isVirtual, here bc then you save effort of having to pass evm into this function
-            if (event.mainLon == 0.0 && event.mainLat == 0.0) || event.location.lowercased() == "virtual" {
-                event.isVirtual = true
-            }
-            if page == "Favorites" && event.isFavorite && !event.isVirtual {
-                return false
-            } else if page != "Favorites" && !event.isVirtual {
-                return false
-            }
-        }
-        return true
-    }
-    
     //determine if any events are favorited
     func doFavoritesExist(list: [EventInstance]) -> Bool {
         for event in list {
@@ -743,6 +727,16 @@ class EventViewModel: ObservableObject {
             }
         } catch { print("Regex error") }
         return ""
+    }
+    
+    func compareDates(date1: Date, date2: Date) -> Bool {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        if dateFormatter.string(from: date1) == dateFormatter.string(from: date2) {
+            return true
+        } else {
+            return false
+        }
     }
 }
 

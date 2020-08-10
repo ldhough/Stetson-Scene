@@ -27,6 +27,11 @@ struct FilterView : View {
             evm.eventSearchEngine.onlyCultural = self.onlyCultural
         }
     }
+    @State var onlyVirtual:Bool {
+           didSet {
+               evm.eventSearchEngine.onlyVirtual = self.onlyVirtual
+           }
+       }
     
     @State var eventTypesSelected:Set<String> //Passed down to FilterEventTypeView
     
@@ -63,11 +68,25 @@ struct FilterView : View {
                 self.onlyCultural.toggle()
             }) {
                 HStack {
-                    Text("Cultural Credits").foregroundColor(self.config.accent).padding()
+                    Text("Cultural Credits Only").foregroundColor(self.config.accent).padding()
                     Spacer()
                     ZStack {
                         Image(systemName: "square").foregroundColor(Color.secondarySystemBackground).scaleEffect(1.5).padding()
                         if self.onlyCultural {
+                            Image(systemName: "checkmark").foregroundColor(self.config.accent).padding()
+                        }
+                    }
+                }
+            }.foregroundColor(Color.white)
+            Button(action: { //If checked only events that have cultural credits should be presented after filtering
+                self.onlyVirtual.toggle()
+            }) {
+                HStack {
+                    Text("Virtual Events Only").foregroundColor(self.config.accent).padding()
+                    Spacer()
+                    ZStack {
+                        Image(systemName: "square").foregroundColor(Color.secondarySystemBackground).scaleEffect(1.5).padding()
+                        if self.onlyVirtual {
                             Image(systemName: "checkmark").foregroundColor(self.config.accent).padding()
                         }
                     }

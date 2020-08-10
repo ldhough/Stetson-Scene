@@ -42,12 +42,6 @@ class Configuration: ObservableObject {
         }
     }
     
-    var showOptions: Bool = false {
-        didSet {
-            objectWillChange.send(self)
-        }
-    }
-    
     var accent: Color = Color(UserDefaults.standard.object(forKey: "accent") != nil ? setColor(color).1 : UIColor.systemIndigo) {
         didSet {
             UserDefaults.standard.set(color, forKey: "accent")

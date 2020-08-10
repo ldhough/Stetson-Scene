@@ -36,6 +36,19 @@ class EventSearchEngine {
         }
     }
     
+    //Whether the user wants only events w/ cultural credits to be displayed
+    var onlyVirtual:Bool = {
+        if UserDefaults.standard.object(forKey: "onlyVirtual") != nil {
+            return UserDefaults.standard.bool(forKey: "onlyVirtual")
+        } else {
+            return false
+        }
+    }() {
+        didSet {
+            UserDefaults.standard.set(self.onlyVirtual, forKey: "onlyVirtual")
+        }
+    }
+    
     //What days of the week the user wants displayed
     var weekdaysSelected:[Bool] = {
         if UserDefaults.standard.object(forKey: "weekdaysSelected") != nil {
@@ -97,6 +110,14 @@ class EventSearchEngine {
         block: if true {
             if self.onlyCultural && !ei.hasCultural { //Check cultural
                 print("Failed cultural check")
+                filteredState = false
+                break block
+            }
+            for event in evm.eventList {
+                evm.isVirtual(event: event)
+            }
+            if self.onlyVirtual && !ei.isVirtual { //Check cultural
+                print("Failed virtual check")
                 filteredState = false
                 break block
             }

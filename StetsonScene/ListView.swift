@@ -38,7 +38,7 @@ struct ListView : View {
                         }
                     }
                 }.listRowBackground((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
-            }
+            }.background((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
         }
     } //end of View
 }
@@ -84,7 +84,7 @@ struct ListCell : View {
             }.padding(.vertical, config.subPage == "Calendar" ? 5 : 10).padding(.horizontal, config.subPage == "Calendar" ? 5 : 10) //padding within the cell, between words and borders
         }.background(RoundedRectangle(cornerRadius: 10).stroke(Color.clear).foregroundColor(Color.label).background(RoundedRectangle(cornerRadius: 10).foregroundColor(config.page == "Favorites" ? (colorScheme == .light ? Color.secondarySystemBackground : config.accent.opacity(0.1)) : Color.tertiarySystemBackground)))
             .padding(.top, (self.config.subPage == "AR" || self.config.subPage == "Map") ? 15 : 0)
-            .onTapGesture { self.detailView = true }
+            .onTapGesture {self.detailView = true }
             .contextMenu {
                 //SHARE
                 Button(action: {
@@ -123,10 +123,6 @@ struct ListCell : View {
                 
                 //NAVIGATE
                 Button(action: {
-                    print(self.event.location)
-                    print(self.event.mainLat)
-                    print(self.event.mainLon)
-                    print(self.event.isVirtual)
                     haptic()
                     self.evm.isVirtual(event: self.event)
                     //if you're trying to navigate to an event and are too far from campus, alert user and don't go to map

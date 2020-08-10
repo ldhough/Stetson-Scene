@@ -20,11 +20,11 @@ struct CalendarView : View {
         //CALENDAR & SUB-LIST
         VStack(spacing: 0) {
             //horizontal months list
-            MonthCarousel(selectedDate: self.$selectedDate, month: self.$month, height: 330).frame(height: 330)
+            MonthCarousel(evm: self.evm, selectedDate: self.$selectedDate, month: self.$month, height: 330).frame(height: 330)
             //event list that corresponds to selected day
             List {
                 ForEach(evm.eventList) { event in
-                    if self.compareDates(date1: self.selectedDate, date2: self.evm.getEventDate(event: event)) {
+                    if self.evm.compareDates(date1: self.selectedDate, date2: self.evm.getEventDate(event: event)) {
                         if self.config.page == "Favorites" && event.isFavorite {
                             ListCell(evm: self.evm, event: event)
                         } else if self.config.page == "Discover" {
@@ -35,31 +35,22 @@ struct CalendarView : View {
             }.frame(alignment: .center)
         }.background((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
     }
-
-    //REMOVES TIME- USED ALSO IN MONTH CAROUSEL, MAKE IT GLOBAL IF POSSIBLE
-    func compareDates(date1: Date, date2: Date) -> Bool {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .short
-        if dateFormatter.string(from: date1) == dateFormatter.string(from: date2) {
-            return true
-        } else {
-            return false
-        }
-    }
 }
 
 //MARK: MONTHCAROUSEL DISPLAYS EACH MONTH IN A HORIZONTAL CAROUSEL
 struct MonthCarousel : UIViewRepresentable {
+    @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
     @Binding var selectedDate: Date
     @Binding var month : Int
     var height : CGFloat
+    let numMonths = 12 //year
     
     //create and update the Carousel UIScrollView
     func makeUIView(context: Context) -> UIScrollView{
         //create a scrollview to hold cards
         let scrollview = UIScrollView()
-        let carouselWidth = UIScreen.main.bounds.width * CGFloat(numberOfMonths())
+        let carouselWidth = UIScreen.main.bounds.width * CGFloat(numMonths) //CGFloat(numberOfMonths()) //for width
         scrollview.contentSize = CGSize(width: carouselWidth, height: 1.0) //setting height to 1.0 disables verical scroll
         scrollview.isPagingEnabled = true
         scrollview.bounces = true
@@ -67,9 +58,9 @@ struct MonthCarousel : UIViewRepresentable {
         scrollview.showsHorizontalScrollIndicator = false
         
         //make the Months SwiftUI View into a UIView (essentially)
-        let uiMonthView = UIHostingController(rootView: Months(selectedDate: self.$selectedDate, height: self.height, numMonths: numberOfMonths()))
+        let uiMonthView = UIHostingController(rootView: Months(evm: self.evm, selectedDate: self.$selectedDate, height: self.height, numMonths: numMonths)) //numberOfMonths()))
         uiMonthView.view.frame = CGRect(x: 0, y: 0, width: carouselWidth, height: self.height)
-        uiMonthView.view.backgroundColor = UIColor.clear
+        uiMonthView.view.backgroundColor = .clear
         
         //add the uiMonthView as a subview of the scrollview
         //(effectively embeds the Months SwiftUI View into the Carousel UIScrollView)
@@ -80,18 +71,19 @@ struct MonthCarousel : UIViewRepresentable {
     func updateUIView(_ uiView: UIScrollView, context: Context) {}
     
     //function to determine number of months & consequently width
-    func numberOfMonths() -> Int {
-        let minimumDate: Date = Date()
-        let maximumDate: Date = Date().addingTimeInterval(60*60*24*365)
-        var components = Calendar.current.dateComponents([.year, .month, .day], from: maximumDate)
-        components.month! += 1
-        components.day = 0
-        return Calendar.current.dateComponents([.month], from:minimumDate, to: Calendar.current.date(from: components)!).month! + 1
-    }
+//    func numberOfMonths() -> Int {
+//        let minimumDate: Date = Date()
+//        let maximumDate: Date = Date().addingTimeInterval(60*60*24*365)
+//        var components = Calendar.current.dateComponents([.year, .month, .day], from: maximumDate)
+//        components.month! += 1
+//        components.day = 0
+//        return Calendar.current.dateComponents([.month], from:minimumDate, to: Calendar.current.date(from: components)!).month! + 1
+//    }
 }
 
 //MARK: MONTHS DISPLAYS EACH MONTH IN THE NUMBER OF MONTHS WE WANT TO SEE (DEFAULT IS A YEAR)
 struct Months: View {
+    @ObservedObject var evm:EventViewModel
     @Binding var selectedDate: Date
     var height: CGFloat
     var numMonths: Int
@@ -99,7 +91,7 @@ struct Months: View {
     var body: some View {
         HStack {
             ForEach(0..<numMonths) { index in
-                Month(selectedDate: self.$selectedDate, height: self.height, monthOffset: index)
+                Month(evm: self.evm, selectedDate: self.$selectedDate, height: self.height, monthOffset: index)
             }.padding(.horizontal, 10)
         }
     }
@@ -108,6 +100,7 @@ struct Months: View {
 //MARK: MONTH DISPLAYS EACH MONTH FOR THE NEXT YEAR AND ALLOWS SELECTION OF EVENTS ON THAT DAY
 //USES A SYSTEM CALENDAR TO DETERMINE THE CALENDAR VIEW
 struct Month: View {
+    @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
     @Binding var selectedDate: Date
     @Environment(\.colorScheme) var colorScheme
@@ -139,7 +132,7 @@ struct Month: View {
                             HStack {
                                 Spacer()
                                 if Calendar.current.isDate(column, equalTo: self.firstOfMonth(), toGranularity: .month) {
-                                    DateCell(date: column, match: self.compareDates(date1: column, date2: self.selectedDate), cellWidth: self.height/11)
+                                    DateCell(date: column, match: self.evm.compareDates(date1: column, date2: self.selectedDate), cellWidth: self.height/11)
                                         .onTapGesture { self.selectedDate = column }
                                 } else {
                                     Text("").frame(width: self.height/11, height: self.height/11)
@@ -151,16 +144,6 @@ struct Month: View {
                 }
             }.frame(minWidth: 0, maxWidth: .infinity).padding(.bottom, 15)
         }.background(RoundedRectangle(cornerRadius: 10)).foregroundColor(config.page == "Favorites" ? Color.tertiarySystemBackground : config.accent)
-    }
-    
-    func compareDates(date1: Date, date2: Date) -> Bool {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .short
-        if dateFormatter.string(from: date1) == dateFormatter.string(from: date2) {
-            return true
-        } else {
-            return false
-        }
     }
     
     //MONTH OFFSET

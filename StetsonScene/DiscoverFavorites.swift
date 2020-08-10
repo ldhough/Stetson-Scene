@@ -32,7 +32,7 @@ struct DiscoverFavoritesView : View {
                             self.filterView = true
                             print("tapped ")
                     }
-                    .sheet(isPresented: $filterView, content: { FilterView(evm: self.evm, filterView: self.$filterView, weeksDisplayed:  Double(self.evm.eventSearchEngine.weeksDisplayed), weekdaysSelected:  self.evm.eventSearchEngine.weekdaysSelected, onlyCultural: self.evm.eventSearchEngine.onlyCultural, eventTypesSelected: {
+                    .sheet(isPresented: $filterView, content: { FilterView(evm: self.evm, filterView: self.$filterView, weeksDisplayed:  Double(self.evm.eventSearchEngine.weeksDisplayed), weekdaysSelected:  self.evm.eventSearchEngine.weekdaysSelected, onlyCultural: self.evm.eventSearchEngine.onlyCultural, onlyVirtual: self.evm.eventSearchEngine.onlyVirtual, eventTypesSelected: {
                         
                             if self.evm.eventSearchEngine.eventTypeSet == [] && UserDefaults.standard.object(forKey: "firstTypeLoad") == nil {
                                 //If no event types are being filtered on and it is the first time that the eventTypeSet has been computed (which will result in empty set), use the full event type set to have all event types selected in filter view
