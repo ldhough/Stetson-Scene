@@ -27,6 +27,9 @@ struct MapView: UIViewRepresentable {
     @State var alertSent: Bool = false //keeps the alerts from being obnoxious
     let locationManager = CLLocationManager()
     
+    @Binding var page:String
+    @Binding var subPage:String
+    
     //handle UIView with makeUIView and updateUIView
     func makeUIView(context: Context) -> MKMapView {
         let map = MKMapView()
@@ -80,7 +83,7 @@ struct MapView: UIViewRepresentable {
                 if !allVirtual {
                     evm.sanitizeCoords(event: event)
                     //don't repeat building annotations, only add to favorites view if the event is favorited
-                    if !locationsWithAnnotation.contains(event.location) && ((config.page == "Favorites" && event.isFavorite) || config.page == "Discover") {
+                    if !locationsWithAnnotation.contains(event.location) && ((self.page == "Favorites" && event.isFavorite) || self.page == "Discover") {
                         locationsWithAnnotation.append(event.location)
                         annotations.append(Annotation(title: event.location, info: event.eventDescription, coordinate: CLLocationCoordinate2D(latitude: (event.mainLat)!, longitude: (event.mainLon)!)))
                     }
@@ -101,7 +104,7 @@ struct MapView: UIViewRepresentable {
     
     //make a coordinator to handle updating values during the view session
     func makeCoordinator() -> Coordinator {
-        Coordinator(evm: self.evm, self, config: config, locationManager: locationManager, mapFindMode: mapFindMode, navToEvent: navToEvent, internalAlert: $internalAlert, externalAlert: $externalAlert, tooFar: $tooFar, allVirtual: $allVirtual, arrived: $arrived, eventDetails: $eventDetails, alertSent: $alertSent)
+        Coordinator(evm: self.evm, self, config: config, locationManager: locationManager, mapFindMode: mapFindMode, navToEvent: navToEvent, internalAlert: $internalAlert, externalAlert: $externalAlert, tooFar: $tooFar, allVirtual: $allVirtual, arrived: $arrived, eventDetails: $eventDetails, alertSent: $alertSent, page: self.$page, subPage: self.$subPage)
     }
 }
 
@@ -121,8 +124,11 @@ final class Coordinator: NSObject, MKMapViewDelegate {
     @Binding var eventDetails: Bool
     @Binding var alertSent: Bool //keeps the alerts from being obnoxious
     
+    @Binding var page:String
+    @Binding var subPage:String
+    
     //initialize
-    init(evm: EventViewModel, _ parent: MapView, config: Configuration, locationManager: CLLocationManager, mapFindMode: Bool, navToEvent: EventInstance?, internalAlert: Binding<Bool>, externalAlert: Binding<Bool>, tooFar: Binding<Bool>, allVirtual: Binding<Bool>, arrived: Binding<Bool>, eventDetails: Binding<Bool>, alertSent: Binding<Bool>) {
+    init(evm: EventViewModel, _ parent: MapView, config: Configuration, locationManager: CLLocationManager, mapFindMode: Bool, navToEvent: EventInstance?, internalAlert: Binding<Bool>, externalAlert: Binding<Bool>, tooFar: Binding<Bool>, allVirtual: Binding<Bool>, arrived: Binding<Bool>, eventDetails: Binding<Bool>, alertSent: Binding<Bool>, page: Binding<String>, subPage: Binding<String>) {
         self.evm = evm
         self.parent = parent
         self.config = config
@@ -136,6 +142,8 @@ final class Coordinator: NSObject, MKMapViewDelegate {
         self._arrived = arrived
         self._eventDetails = eventDetails
         self._alertSent = alertSent
+        self._page = page
+        self._subPage = subPage
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
@@ -160,9 +168,9 @@ final class Coordinator: NSObject, MKMapViewDelegate {
         //start with allVirtual = true
         for event in evm.eventList {
             evm.isVirtual(event: event)
-            if self.config.page == "Favorites" && event.isFavorite && !event.isVirtual {
+            if self.page == "Favorites" && event.isFavorite && !event.isVirtual {
                 allVirtual = false
-            } else if self.config.page != "Favorites" && !event.isVirtual {
+            } else if self.page != "Favorites" && !event.isVirtual {
                 allVirtual = false
             }
         }
@@ -202,7 +210,7 @@ final class Coordinator: NSObject, MKMapViewDelegate {
                     //event list for buildings
                     for event in evm.eventList {
                         if event.location == view.annotation?.title!! {
-                            window?.rootViewController?.present(UIHostingController(rootView: ListView(evm: self.evm, eventLocation: event.location!).environmentObject(self.config).background(Color.secondarySystemBackground)), animated: true)
+                            window?.rootViewController?.present(UIHostingController(rootView: ListView(evm: self.evm, eventLocation: event.location!, page: self.$page, subPage: self.$subPage).environmentObject(self.config).background(Color.secondarySystemBackground)), animated: true)
                         }
                     }
                 } else {

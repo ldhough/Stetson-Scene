@@ -10,6 +10,12 @@ import Foundation
 import SwiftUI
 import CoreLocation
 
+func print5(_ str: String) {
+    for _ in 0..<5 {
+        print("did thing " + str)
+    }
+}
+
 struct ListView : View {
     @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
@@ -17,29 +23,67 @@ struct ListView : View {
     var eventLocation: String? = ""
     var allVirtual: Bool? = false
     
-    var body: some View { 
-        VStack(spacing: 0) {
-            //LIST
-            List {
+    @Binding var page:String
+    @Binding var subPage:String
+    
+    func returnCorrectList() -> some View {
+        if (self.subPage == "AR" || self.subPage == "Map") {
+            print5("mapar")
+            return AnyView(List {
                 ForEach(self.evm.eventList) { event in
-                    //have to do this by subpage then page to get the correct sub-lists
-                    if (self.config.subPage == "AR" || self.config.subPage == "Map") {
-                        if event.isVirtual && self.allVirtual == true { //listing only virtual events
-                            ListCell(evm: self.evm, event: event)
-                        }
-                        if event.location! == self.eventLocation! { //navigating to a specific event
-                            if self.config.page == "Discover" || (self.config.page == "Favorites" && event.isFavorite) {
-                                ListCell(evm: self.evm, event: event)
-                            }
-                        }
-                    } else if (self.config.subPage == "List" || self.config.subPage == "Calendar") && event.filteredOn {
-                        if (self.config.page == "Discover" && event.filteredOn) || (self.config.page == "Favorites" && event.isFavorite) {
-                            ListCell(evm: self.evm, event: event)
-                        }
+                    if event.isVirtual && self.allVirtual! {
+                        ListCell(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage)
                     }
-                }.listRowBackground((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
-            }.background((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
+                }.listRowBackground((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
+            }.background((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground))
         }
+        if self.page == "Favorites" {
+            print5("fav")
+            return AnyView(List {
+                ForEach(self.evm.eventList) { event in
+                    if event.isFavorite {
+                        ListCell(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage)
+                    }
+                }.listRowBackground((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
+            }.background((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground))
+        }
+        if self.page == "Discover" {
+            print5("discover")
+            return AnyView(List {
+                ForEach(self.evm.eventList) { event in
+                    if event.filteredOn {
+                        ListCell(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage)
+                    }
+                }.listRowBackground((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
+            }.background((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground))
+        }
+        return AnyView(EmptyView())
+    }
+    
+    var body: some View {
+        returnCorrectList()
+//        VStack(spacing: 0) {
+////            //LIST
+//            List {
+//                ForEach(self.evm.eventList) { event in
+////                    //have to do this by subpage then page to get the correct sub-lists
+////                    //if (self.config.subPage == "AR" || self.config.subPage == "Map") {
+////                        //if event.isVirtual && self.allVirtual == true { //listing only virtual events
+//                            ListCell(evm: self.evm, event: event)
+////                        //}
+////                        //if event.location! == self.eventLocation! { //navigating to a specific event
+////                          //  if self.config.page == "Discover" || (self.config.page == "Favorites" && event.isFavorite) {
+////                            //    ListCell(evm: self.evm, event: event)
+////                            //}
+////                        //}
+////                    //} //else if (self.config.subPage == "List") {//|| self.config.subPage == "Calendar") && event.filteredOn {
+////                    //if (self.config.page == "Discover") {// && event.filteredOn) || (self.config.page == "Favorites" && event.isFavorite) {
+////                      //      ListCell(evm: self.evm, event: event)
+//                        //}
+//                    //}
+//                }.listRowBackground((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
+//            }.background((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
+//        }
     } //end of View
 }
 
@@ -63,27 +107,30 @@ struct ListCell : View {
     @State var eventDetails: Bool = false
     @State var isVirtual: Bool = false
     
+    @Binding var page:String
+    @Binding var subPage:String
+    
     var body: some View {
         ZStack {
             HStack {
                 //Date & Time, Left Side
                 VStack(alignment: .trailing) {
                     //TODO: CHANGE DATESTRING TO MONTH + DAY
-                    Text(event.date).fontWeight(.medium).font(.system(size: config.subPage == "Calendar" ? 12 : 16)).foregroundColor(config.accent).padding(.vertical, config.subPage == "Calendar" ? 2 : 5)
-                    Text(event.time).fontWeight(.medium).font(.system(size: config.subPage == "Calendar" ? 10 : 12)).foregroundColor(Color.secondaryLabel).padding(.bottom, config.subPage == "Calendar" ? 2 : 5)
+                    Text(event.date).fontWeight(.medium).font(.system(size: self.subPage == "Calendar" ? 12 : 16)).foregroundColor(config.accent).padding(.vertical, self.subPage == "Calendar" ? 2 : 5)
+                    Text(event.time).fontWeight(.medium).font(.system(size: self.subPage == "Calendar" ? 10 : 12)).foregroundColor(Color.secondaryLabel).padding(.bottom, self.subPage == "Calendar" ? 2 : 5)
                     //Duration?
                 }.padding(.horizontal, 5)
                 
                 //Name & Location, Right Side
                 VStack(alignment: .leading) {
-                    Text(event.name).fontWeight(.medium).font(.system(size: config.subPage == "Calendar" ? 16 : 22)).lineLimit(1).foregroundColor(event.hasCultural ? config.accent :  Color.label).padding(.vertical, config.subPage == "Calendar" ? 2 : 5)
-                    Text(event.location).fontWeight(.light).font(.system(size: config.subPage == "Calendar" ? 12 : 16)).foregroundColor(Color.secondaryLabel).padding(.bottom, config.subPage == "Calendar" ? 2 : 5)
+                    Text(event.name).fontWeight(.medium).font(.system(size: self.subPage == "Calendar" ? 16 : 22)).lineLimit(1).foregroundColor(event.hasCultural ? config.accent :  Color.label).padding(.vertical, self.subPage == "Calendar" ? 2 : 5)
+                    Text(event.location).fontWeight(.light).font(.system(size: self.subPage == "Calendar" ? 12 : 16)).foregroundColor(Color.secondaryLabel).padding(.bottom, self.subPage == "Calendar" ? 2 : 5)
                 }
                 
                 Spacer() //fill out rest of cell
-            }.padding(.vertical, config.subPage == "Calendar" ? 5 : 10).padding(.horizontal, config.subPage == "Calendar" ? 5 : 10) //padding within the cell, between words and borders
-        }.background(RoundedRectangle(cornerRadius: 10).stroke(Color.clear).foregroundColor(Color.label).background(RoundedRectangle(cornerRadius: 10).foregroundColor(config.page == "Favorites" ? (colorScheme == .light ? Color.secondarySystemBackground : config.accent.opacity(0.1)) : Color.tertiarySystemBackground)))
-            .padding(.top, (self.config.subPage == "AR" || self.config.subPage == "Map") ? 15 : 0)
+            }.padding(.vertical, self.subPage == "Calendar" ? 5 : 10).padding(.horizontal, self.subPage == "Calendar" ? 5 : 10) //padding within the cell, between words and borders
+        }.background(RoundedRectangle(cornerRadius: 10).stroke(Color.clear).foregroundColor(Color.label).background(RoundedRectangle(cornerRadius: 10).foregroundColor(self.page == "Favorites" ? (colorScheme == .light ? Color.secondarySystemBackground : config.accent.opacity(0.1)) : Color.tertiarySystemBackground)))
+            .padding(.top, (self.subPage == "AR" || self.subPage == "Map") ? 15 : 0)
             .onTapGesture {self.detailView = true }
             .contextMenu {
                 //SHARE
@@ -149,13 +196,13 @@ struct ListCell : View {
                 }
         } //end of context menu
             .background(EmptyView().sheet(isPresented: $detailView, content: { //notice that these backgrounds are nested- weird but it works
-                EventDetailView(evm: self.evm, event: self.event).environmentObject(self.config)
+                EventDetailView(evm: self.evm, event: self.event, page: self.$page, subPage: self.$subPage).environmentObject(self.config)
             }).background(EmptyView().sheet(isPresented: $navigate, content: {
                 ZStack {
                     if self.arMode && !self.event.isVirtual {
-                        ARNavigationIndicator(evm: self.evm, arFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
+                        ARNavigationIndicator(evm: self.evm, arFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails, page: self.$page, subPage: self.$subPage).environmentObject(self.config)
                     } else if !self.event.isVirtual { //mapMode
-                        MapView(evm: self.evm, mapFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
+                        MapView(evm: self.evm, mapFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails, page: self.$page, subPage: self.$subPage).environmentObject(self.config)
                     }
                     if self.config.appEventMode {
                         ZStack {

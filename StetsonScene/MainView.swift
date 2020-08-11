@@ -22,8 +22,11 @@ struct ARNavigationIndicator: UIViewControllerRepresentable {
     @Binding var arrived: Bool
     @Binding var eventDetails: Bool
     
+    @Binding var page:String
+    @Binding var subPage:String
+    
     func makeUIViewController(context: Context) -> ARView {
-        return ARView(evm: self.evm, config: self.config, arFindMode: self.arFindMode, navToEvent: self.navToEvent ?? EventInstance(), internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: self.$allVirtual, arrived: self.$arrived, eventDetails: self.$eventDetails)
+        return ARView(evm: self.evm, config: self.config, arFindMode: self.arFindMode, navToEvent: self.navToEvent ?? EventInstance(), internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: self.$allVirtual, arrived: self.$arrived, eventDetails: self.$eventDetails, page: self.$page, subPage: self.$subPage)
     }
     func updateUIViewController(_ uiViewController: ARNavigationIndicator.UIViewControllerType, context: UIViewControllerRepresentableContext<ARNavigationIndicator>) { }
 }
@@ -40,31 +43,36 @@ struct MainView : View {
     @State var tooFar: Bool = false
     @State var allVirtual: Bool = true
     
+    
+    @State var page:String = "Discover" //Discover, Favorites, Trending, Information
+    @State var subPage:String = "List" //List, Calendar, AR, Map
+    
+    
     var body: some View {
         ZStack {
-            Color((config.page == "Favorites" && colorScheme == .light) ? config.accentUIColor : UIColor.secondarySystemBackground).edgesIgnoringSafeArea(.all)
+            Color((self.page == "Favorites" && colorScheme == .light) ? config.accentUIColor : UIColor.secondarySystemBackground).edgesIgnoringSafeArea(.all)
             VStack(spacing: 0) {
                 ZStack {
-                if config.page == "Trending" {
-                    TrendingView(evm: self.evm)
+                    if self.page == "Trending" {
+                    TrendingView(evm: self.evm, page: self.$page, subPage: self.$subPage)
                 }
-                if config.page == "Discover" || config.page == "Favorites" {
-                    if config.subPage == "List" {
+                if self.page == "Discover" || self.page == "Favorites" {
+                    if self.subPage == "List" {
                         VStack {
-                            DiscoverFavoritesView(evm: self.evm)
-                            ListView(evm: self.evm)
+                            DiscoverFavoritesView(evm: self.evm, page: self.$page, subPage: self.$subPage)
+                            ListView(evm: self.evm, page: self.$page, subPage: self.$subPage)
                         }.blur(radius: self.showOptions ? 5 : 0).disabled(self.showOptions ? true : false)
                     }
-                    if config.subPage == "Calendar" {
+                    if self.subPage == "Calendar" {
                         VStack {
-                            DiscoverFavoritesView(evm: self.evm)
-                            CalendarView(evm: self.evm)
+                            DiscoverFavoritesView(evm: self.evm, page: self.$page, subPage: self.$subPage)
+                            CalendarView(evm: self.evm, page: self.$page, subPage: self.$subPage)
                         }.blur(radius: self.showOptions ? 5 : 0).disabled(self.showOptions ? true : false)
                     }
-                    if config.subPage == "AR"  ||  config.subPage == "Map" { //AR or Map
+                    if self.subPage == "AR"  ||  self.subPage == "Map" { //AR or Map
                         ZStack {
-                            if config.subPage == "AR" {
-                                ARNavigationIndicator(evm: self.evm, arFindMode: true, internalAlert: .constant(false), externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: self.$allVirtual, arrived: .constant(false), eventDetails: .constant(false)).environmentObject(self.config)
+                            if self.subPage == "AR" {
+                                ARNavigationIndicator(evm: self.evm, arFindMode: true, internalAlert: .constant(false), externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: self.$allVirtual, arrived: .constant(false), eventDetails: .constant(false), page: self.$page, subPage: self.$subPage).environmentObject(self.config)
                                     .blur(radius: self.showOptions ? 5 : 0)
                                     .disabled(self.showOptions ? true : false)
                                     .edgesIgnoringSafeArea(.top)
@@ -72,7 +80,7 @@ struct MainView : View {
                                         if self.tooFar {
                                             return self.evm.alert(title: "Too Far to Tour with AR", message: "You're currently too far away from campus to use the AR feature to tour. Try using the map instead.")
                                         } else if self.allVirtual {
-                                            if config.page == "Favorites" {
+                                            if self.page == "Favorites" {
                                                 return self.evm.alert(title: "All Favorited Events are Virtual", message: "Unfortunately, there are no events in your favorites list that are on campus at the moment. Check out the virtual event list instead.")
                                             } else { //config.page == "Discover"
                                                 return self.evm.alert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
@@ -81,8 +89,8 @@ struct MainView : View {
                                         return self.evm.alert(title: "ERROR", message: "Please report as a bug.")
                                      }
                             }
-                            if config.subPage == "Map" {
-                                MapView(evm: self.evm, mapFindMode: true, internalAlert: .constant(false), externalAlert: .constant(false), tooFar: .constant(false), allVirtual: self.$allVirtual, arrived: .constant(false), eventDetails: .constant(false)).environmentObject(self.config)
+                            if self.subPage == "Map" {
+                                MapView(evm: self.evm, mapFindMode: true, internalAlert: .constant(false), externalAlert: .constant(false), tooFar: .constant(false), allVirtual: self.$allVirtual, arrived: .constant(false), eventDetails: .constant(false), page: self.$page, subPage: self.$subPage).environmentObject(self.config)
                                     .blur(radius: self.showOptions ? 5 : 0)
                                     .disabled(self.showOptions ? true : false)
                                     .edgesIgnoringSafeArea(.top)
@@ -99,17 +107,17 @@ struct MainView : View {
                                     .offset(y: Constants.height*0.38)
                             }
                         }.sheet(isPresented: $listVirtualEvents, content: {
-                            ListView(evm: self.evm, allVirtual: true).environmentObject(self.config).background(Color.secondarySystemBackground)
+                            ListView(evm: self.evm, allVirtual: true, page: self.$page, subPage: self.$subPage).environmentObject(self.config).background(Color.secondarySystemBackground)
                         }).alert(isPresented: self.$noFavorites) { () -> Alert in //if favorites map or favorites AR & there are no favorites
-                           return self.evm.alert(title: "No Favorites to Show", message: "Add some favorites so we can show you them in \(config.subPage) Mode!")
+                           return self.evm.alert(title: "No Favorites to Show", message: "Add some favorites so we can show you them in \(self.subPage) Mode!")
                         } //end of ZStack
                     }
                 }
-                if config.page == "Information" {
+                if self.page == "Information" {
                     InformationView()
                 } 
                 }.onTapGesture { self.self.showOptions = false } //end of ZStack that holds everything above the tab bar
-                TabBar(evm: self.evm, showOptions: self.$showOptions, noFavorites: self.$noFavorites)
+                TabBar(evm: self.evm, showOptions: self.$showOptions, noFavorites: self.$noFavorites, page: self.$page, subPage: self.$subPage)
                 
             }.edgesIgnoringSafeArea(.bottom)//end of VStack
             
@@ -123,68 +131,75 @@ struct TabBar : View {
     @Binding var showOptions: Bool
     @Binding var noFavorites: Bool
     
+    @Binding var page:String
+    @Binding var subPage:String
+    
     var body: some View {
         ZStack {
             HStack(spacing: 20){
                 //Discover
                 HStack {
-                    Image(systemName: "magnifyingglass").resizable().frame(width: 20, height: 20).foregroundColor(config.page == "Discover" ? Color.white : Color.secondaryLabel)
-                    Text(config.page == "Discover" ? config.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color.white)
+                    Image(systemName: "magnifyingglass").resizable().frame(width: 20, height: 20).foregroundColor(self.page == "Discover" ? Color.white : Color.secondaryLabel)
+                    Text(self.page == "Discover" ? self.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color.white)
                 }.padding(15)
-                    .background(config.page == "Discover" ? config.accent : Color.clear)
+                    .background(self.page == "Discover" ? config.accent : Color.clear)
                     .clipShape(Capsule())
                     .onTapGesture {
-                        print("tapped \(self.config.page)")
-                        if self.config.page == "Discover" {
+                        print("tapped \(self.page)")
+                        if self.page == "Discover" {
                             self.self.showOptions.toggle()
                         } else {
                             self.self.showOptions = true
                         }
-                        self.config.page = "Discover"
+                        self.page = "Discover"
+                        print(self.evm.eventList)
+//                        let tempEvent = self.evm.eventList[self.evm.eventList.count-1]
+//                        self.evm.eventList.removeLast()
+//                        self.evm.eventList.append(tempEvent)
                 }
                 //Favorites
                 HStack {
-                    Image(systemName: "heart").resizable().frame(width: 20, height: 20).foregroundColor(config.page == "Favorites" ? Color.white : Color.secondaryLabel)
-                    Text(config.page == "Favorites" ? config.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color.white)
+                    Image(systemName: "heart").resizable().frame(width: 20, height: 20).foregroundColor(self.page == "Favorites" ? Color.white : Color.secondaryLabel)
+                    Text(self.page == "Favorites" ? self.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color.white)
                 }.padding(15)
-                    .background(config.page == "Favorites" ? config.accent : Color.clear)
+                    .background(self.page == "Favorites" ? config.accent : Color.clear)
                     .clipShape(Capsule())
                     .onTapGesture {
-                        print("tapped \(self.config.page)")
-                        if self.config.page == "Favorites" {
+                        print("tapped \(self.page)")
+                        if self.page == "Favorites" {
                             self.self.showOptions.toggle()
                         } else {
                             self.self.showOptions = true
                         }
-                        self.config.page = "Favorites"
+                        self.page = "Favorites"
                         //if there aren't any favorites, send alert through noFavorites & don't allow Map/AR to show by not getting rid of options
-                        if !self.evm.doFavoritesExist(list: self.evm.eventList) && (self.config.subPage == "AR" || self.config.subPage == "Map") {
+                        if !self.evm.doFavoritesExist(list: self.evm.eventList) && (self.subPage == "AR" || self.subPage == "Map") {
                             self.noFavorites = true
                             self.self.showOptions = true
                         }
                 }
                 //Trending
                 HStack {
-                    Image(systemName: "hand.thumbsup").resizable().frame(width: 20, height: 20).foregroundColor(config.page == "Trending" ? Color.white : Color.secondaryLabel)
-                    Text(config.page == "Trending" ? config.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color.white)
+                    Image(systemName: "hand.thumbsup").resizable().frame(width: 20, height: 20).foregroundColor(self.page == "Trending" ? Color.white : Color.secondaryLabel)
+                    Text(self.page == "Trending" ? self.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color.white)
                 }.padding(15)
-                    .background(config.page == "Trending" ? config.accent : Color.clear)
+                    .background(self.page == "Trending" ? config.accent : Color.clear)
                     .clipShape(Capsule())
                     .onTapGesture {
-                        print("tapped \(self.config.page)")
-                        self.config.page = "Trending"
+                        print("tapped \(self.page)")
+                        self.page = "Trending"
                         self.self.showOptions = false
                 }
                 //Info
                 HStack {
-                    Image(systemName: "info.circle").resizable().frame(width: 20, height: 20).foregroundColor(config.page == "Information" ? Color.white : Color.secondaryLabel)
-                    Text(config.page == "Information" ? config.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color.white)
+                    Image(systemName: "info.circle").resizable().frame(width: 20, height: 20).foregroundColor(self.page == "Information" ? Color.white : Color.secondaryLabel)
+                    Text(self.page == "Information" ? self.page : "").fontWeight(.light).font(.system(size: 14)).foregroundColor(Color.white)
                 }.padding(15)
-                    .background(config.page == "Information" ? config.accent : Color.clear)
+                    .background(self.page == "Information" ? config.accent : Color.clear)
                     .clipShape(Capsule())
                     .onTapGesture {
-                        print("tapped \(self.config.page)")
-                        self.config.page = "Information"
+                        print("tapped \(self.page)")
+                        self.page = "Information"
                         self.self.showOptions = false
                 }
             }.padding(.vertical, 10)
@@ -194,7 +209,7 @@ struct TabBar : View {
             
             //other tabs
             if self.self.showOptions {
-                TabOptions(evm: self.evm, showOptions: self.$showOptions, noFavorites: self.$noFavorites).offset(x: self.config.page == "Discover" ? -100 : -35, y: -65)
+                TabOptions(evm: self.evm, showOptions: self.$showOptions, noFavorites: self.$noFavorites, page: self.$page, subPage: self.$subPage).offset(x: self.page == "Discover" ? -100 : -35, y: -65)
             }
             
         }//zstack end
@@ -208,60 +223,63 @@ struct TabOptions: View {
     @Environment(\.colorScheme) var colorScheme
     @Binding var noFavorites: Bool
     
+    @Binding var page:String
+    @Binding var subPage:String
+    
     var body: some View {
         HStack {
             //List
             ZStack {
                 Circle()
-                    .stroke(self.config.subPage == "List" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
-                    .background(self.config.subPage == "List" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
+                    .stroke(self.subPage == "List" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
+                    .background(self.subPage == "List" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "list.bullet")
                     .resizable().frame(width: 20, height: 20)
-                    .foregroundColor(self.config.subPage == "List" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
+                    .foregroundColor(self.subPage == "List" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
             }.frame(width: 50, height: 50)
                 .offset(x: 25)
                 .onTapGesture {
                     withAnimation {
-                        self.config.subPage = "List"
+                        self.subPage = "List"
                         self.self.showOptions = false
                     }
             }
             //Calendar
             ZStack {
                 Circle()
-                    .stroke(self.config.subPage == "Calendar" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
-                    .background(self.config.subPage == "Calendar" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
+                    .stroke(self.subPage == "Calendar" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
+                    .background(self.subPage == "Calendar" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "calendar")
                     .resizable().frame(width: 20, height: 20)
-                    .foregroundColor(self.config.subPage == "Calendar" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
+                    .foregroundColor(self.subPage == "Calendar" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
             }.frame(width: 50, height: 50)
                 .offset(y: -50)
                 .onTapGesture {
                     withAnimation {
-                        self.config.subPage = "Calendar"
+                        self.subPage = "Calendar"
                         self.self.showOptions = false
                     }
             }
             //AR
             ZStack {
                 Circle()
-                    .stroke(self.config.subPage == "AR" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
-                    .background(self.config.subPage == "AR" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
+                    .stroke(self.subPage == "AR" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
+                    .background(self.subPage == "AR" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "camera")
                     .resizable().frame(width: 22, height: 18)
-                    .foregroundColor(self.config.subPage == "AR" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
+                    .foregroundColor(self.subPage == "AR" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
             }.frame(width: 50, height: 50)
                 .offset(y: -50)
                 .onTapGesture {
                     withAnimation {
-                        self.config.subPage = "AR"
+                        self.subPage = "AR"
                         self.self.showOptions = false
                     }
                     //if there aren't any favorites, send alert through noFavorites & don't allow AR to show by not getting rid of options
-                    if !self.evm.doFavoritesExist(list: self.evm.eventList) && self.config.page == "Favorites" {
+                    if !self.evm.doFavoritesExist(list: self.evm.eventList) && self.page == "Favorites" {
                         self.noFavorites = true
                         self.self.showOptions = true
                     }
@@ -269,21 +287,21 @@ struct TabOptions: View {
             //Map
             ZStack {
                 Circle()
-                    .stroke(self.config.subPage == "Map" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
-                    .background(self.config.subPage == "Map" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
+                    .stroke(self.subPage == "Map" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
+                    .background(self.subPage == "Map" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
                     .clipShape(Circle())
                 Image(systemName: "mappin.and.ellipse")
                     .resizable().frame(width: 20, height: 22)
-                    .foregroundColor(self.config.subPage == "Map" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
+                    .foregroundColor(self.subPage == "Map" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
             }.frame(width: 50, height: 50)
                 .offset(x: -25)
                 .onTapGesture {
                     withAnimation {
-                        self.config.subPage = "Map"
+                        self.subPage = "Map"
                         self.self.showOptions = false
                     }
                     //if there aren't any favorites, send alert through noFavorites & don't allow Map to show by not getting rid of options
-                    if !self.evm.doFavoritesExist(list: self.evm.eventList) && self.config.page == "Favorites" {
+                    if !self.evm.doFavoritesExist(list: self.evm.eventList) && self.page == "Favorites" {
                         self.noFavorites = true
                         self.self.showOptions = true
                     }

@@ -45,6 +45,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let se = EventSearchEngine()
         vm.retrieveFirebaseData(daysIntoYear: vm.getDaysIntoYear(nowPlusWeeks: 1), doFilter: false, searchEngine: se)
         self.config = Configuration(vm)
+        //vm.config = self.config
         
         //Keeps List views from having cell dividers
         UITableView.appearance().separatorStyle = .none

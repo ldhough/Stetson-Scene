@@ -14,6 +14,9 @@ struct TrendingView : View {
     @EnvironmentObject var config: Configuration
     @State var card = 0
     
+    @Binding var page:String
+    @Binding var subPage:String
+    
     var body: some View {
         VStack {
             Text("Trending").fontWeight(.heavy).font(.system(size: 50)).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(Color.label).padding([.vertical, .horizontal]).padding(.bottom, 10)
@@ -24,10 +27,10 @@ struct TrendingView : View {
             
             //Carousel List- using GeomtryReader to detect the remaining height on the screen (smart scaling)
             GeometryReader{ geometry in
-                Carousel(evm: self.evm, trendingList: self.trendingList(), card: self.$card, height: geometry.frame(in: .global).height)
+                Carousel(evm: self.evm, trendingList: self.trendingList(), card: self.$card, height: geometry.frame(in: .global).height, page: self.$page, subPage: self.$subPage)
             }
             //dots that show which card is being displayed
-            CardControl(trendingList: self.trendingList(), card: self.$card).padding(.bottom, 10)
+            CardControl(trendingList: self.trendingList(), card: self.$card, page: self.$page, subPage: self.$subPage).padding(.bottom, 10)
             
         }
     }
@@ -64,6 +67,9 @@ struct Carousel : UIViewRepresentable {
     @Binding var card : Int
     var height : CGFloat
     
+    @Binding var page:String
+    @Binding var subPage:String
+    
     //create and update the Carousel UIScrollView
     func makeUIView(context: Context) -> UIScrollView{
         //create a scrollview to hold cards
@@ -77,7 +83,7 @@ struct Carousel : UIViewRepresentable {
         scrollview.delegate = context.coordinator
         
         //make the Card SwiftUI View into a UIView (essentially)
-        let uiCardView = UIHostingController(rootView: Cards(evm: self.evm, trendingList: trendingList, height: height*0.9))
+        let uiCardView = UIHostingController(rootView: Cards(evm: self.evm, trendingList: trendingList, height: height*0.9, page: self.$page, subPage: self.$subPage))
         uiCardView.view.frame = CGRect(x: 0, y: 0, width: carouselWidth, height: self.height)
         uiCardView.view.backgroundColor = .clear
         
@@ -117,6 +123,9 @@ struct Cards : View {
     let cardWidth = Constants.width*0.9
     @State var selectedEvent: EventInstance? = nil
     
+    @Binding var page:String
+    @Binding var subPage:String
+    
     var body: some View {
         //horizontal list of events in list
         HStack(spacing: 0) {
@@ -154,7 +163,7 @@ struct Cards : View {
                 }.frame(width: Constants.width).animation(.default) //end of vstack
             } //end of foreach
         }.sheet(item: $selectedEvent) { event in
-            EventDetailView(evm: self.evm, event: event).environmentObject(self.config)
+            EventDetailView(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage).environmentObject(self.config)
         }//end of hstack
     }
     
@@ -164,6 +173,9 @@ struct Cards : View {
 struct CardControl : UIViewRepresentable {
     var trendingList: [EventInstance]
     @Binding var card : Int
+    
+    @Binding var page:String
+    @Binding var subPage:String
     
     func makeUIView(context: Context) -> UIPageControl {
         let cardControl = UIPageControl()

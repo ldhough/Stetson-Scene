@@ -20,6 +20,8 @@ enum SuccessCheck {
 /// ViewModel class for MVVM design pattern.  A single instance is created and injected into various views.
 class EventViewModel: ObservableObject {
     
+    //var config: Configuration = Configuration(EventViewModel())
+    
     var hasObtainedAssociations:Bool = false //Determines if listeners have been put on event and location association nodes
     var eventSearchEngine = EventSearchEngine()
     

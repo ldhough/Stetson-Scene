@@ -16,6 +16,9 @@ struct EventDetailView : View {
     @Environment(\.colorScheme) var colorScheme
     @ObservedObject var event: EventInstance
     
+    @Binding var page:String
+    @Binding var subPage:String
+    
     var body: some View {
         VStack {
             RoundedRectangle(cornerRadius: 20).frame(width: Constants.width*0.25, height: 5, alignment: .center).foregroundColor(Color.secondaryLabel.opacity(0.2)).padding(.vertical, 10)
@@ -25,7 +28,7 @@ struct EventDetailView : View {
             Text("\(event.date) | \(event.time)").fontWeight(.light).font(.system(size: 20)).frame(maxWidth: Constants.width, alignment: .center).foregroundColor(event.hasCultural ? Color.label : config.accent)
             Text("\(event.location)").fontWeight(.light).font(.system(size: 20)).frame(maxWidth: Constants.width, alignment: .center).foregroundColor(event.hasCultural ? Color.label : config.accent)
             //Buttons
-            Buttons(evm: self.evm, event: event).padding(.vertical, 5)
+            Buttons(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage).padding(.vertical, 5)
             //Divider
             Rectangle().frame(width: Constants.width*0.75, height: 1, alignment: .center).foregroundColor(Color.secondaryLabel.opacity(0.2)).padding(.vertical, 10)
             
@@ -54,6 +57,9 @@ struct Buttons: View {
     @State var arrived: Bool = false
     @State var eventDetails: Bool = false
     @State var isVirtual: Bool = false
+    
+    @Binding var page:String
+    @Binding var subPage:String
     
     //MARK: VIEW
     var body: some View {
@@ -132,9 +138,9 @@ struct Buttons: View {
             }.sheet(isPresented: $navigate, content: {
                     ZStack {
                         if self.arMode && !self.event.isVirtual {
-                            ARNavigationIndicator(evm: self.evm, arFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
+                            ARNavigationIndicator(evm: self.evm, arFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails, page: self.$page, subPage: self.$subPage).environmentObject(self.config)
                         } else if !self.event.isVirtual { //mapMode
-                            MapView(evm: self.evm, mapFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails).environmentObject(self.config)
+                            MapView(evm: self.evm, mapFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails, page: self.$page, subPage: self.$subPage).environmentObject(self.config)
                         }
                         if self.config.appEventMode {
                             ZStack {

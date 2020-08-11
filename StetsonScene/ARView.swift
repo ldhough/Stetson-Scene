@@ -28,8 +28,11 @@ struct ARViewIndicator: UIViewControllerRepresentable {
     @Binding var arrived: Bool
     @Binding var eventDetails: Bool
     
+    @Binding var page:String
+    @Binding var subPage:String
+    
     func makeUIViewController(context: Context) -> ARView {
-        return ARView(evm: self.evm, config: self.config, arFindMode: self.arFindMode, navToEvent: self.navToEvent ?? EventInstance(), internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: self.$allVirtual, arrived: self.$arrived, eventDetails: self.$eventDetails)
+        return ARView(evm: self.evm, config: self.config, arFindMode: self.arFindMode, navToEvent: self.navToEvent ?? EventInstance(), internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: self.$tooFar, allVirtual: self.$allVirtual, arrived: self.$arrived, eventDetails: self.$eventDetails, page: self.$page, subPage: self.$subPage)
     }
     func updateUIViewController(_ uiViewController: ARViewIndicator.UIViewControllerType, context: UIViewControllerRepresentableContext<ARViewIndicator>) { }
 }
@@ -58,8 +61,11 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
     var oldLocation: CLLocation!
     var newLocation: CLLocation!
     
+    @Binding var page:String
+    @Binding var subPage:String
+    
     //Initialization
-    init(evm: EventViewModel, config: Configuration, arFindMode: Bool, navToEvent: EventInstance, internalAlert: Binding<Bool>, externalAlert: Binding<Bool>, tooFar: Binding<Bool>, allVirtual: Binding<Bool>, arrived: Binding<Bool>, eventDetails: Binding<Bool>) {
+    init(evm: EventViewModel, config: Configuration, arFindMode: Bool, navToEvent: EventInstance, internalAlert: Binding<Bool>, externalAlert: Binding<Bool>, tooFar: Binding<Bool>, allVirtual: Binding<Bool>, arrived: Binding<Bool>, eventDetails: Binding<Bool>, page: Binding<String>, subPage: Binding<String>) {
         self.evm = evm
         self.config = config
         self.arFindMode = arFindMode
@@ -70,6 +76,8 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
         self._allVirtual = allVirtual
         self._arrived = arrived
         self._eventDetails = eventDetails
+        self._page = page
+        self._subPage = subPage
         super.init(nibName: nil, bundle: nil)
     }
     required init?(coder: NSCoder) {
@@ -138,9 +146,9 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
         //start with allVirtual = true
         for event in evm.eventList {
             evm.isVirtual(event: event)
-            if self.config.page == "Favorites" && event.isFavorite && !event.isVirtual {
+            if self.page == "Favorites" && event.isFavorite && !event.isVirtual {
                 allVirtual = false
-            } else if self.config.page != "Favorites" && !event.isVirtual {
+            } else if self.page != "Favorites" && !event.isVirtual {
                 allVirtual = false
             }
         }
@@ -167,7 +175,7 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
                 if !allVirtual {
                     evm.sanitizeCoords(event: event)
                     //only add non-virtual events, don't repeat building nodes, only add to favorites view if the event is favorited
-                    if (event.location.lowercased() != "virtual") && !locationsWithNode.contains(event.location) && ((config.page == "Favorites" && event.isFavorite) || config.page == "Discover") {
+                    if (event.location.lowercased() != "virtual") && !locationsWithNode.contains(event.location) && ((self.page == "Favorites" && event.isFavorite) || self.page == "Discover") {
                         locationsWithNode.append(event.location)
                         print("CREATING NODES")
                         createBuildingNode(location: event.location, lat: event.mainLat, lon: event.mainLon, altitude: (userAltitude! + 15))
@@ -263,7 +271,7 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
                         //see event list for a building
                         for event in evm.eventList {
                             if event.location == (String(describing: hits.name!)) {
-                                let eventListByBuilding = UIHostingController(rootView: ListView(evm: self.evm, eventLocation: event.location!).environmentObject(self.config).background(Color.secondarySystemBackground))
+                                let eventListByBuilding = UIHostingController(rootView: ListView(evm: self.evm, eventLocation: event.location!, page: self.$page, subPage: self.$subPage).environmentObject(self.config).background(Color.secondarySystemBackground))
                                 present(eventListByBuilding, animated: true)
                             }
                         }

@@ -16,15 +16,18 @@ struct DiscoverFavoritesView : View {
     @State var filterApplied: Bool = false
     @State var filterView: Bool = false
     
+    @Binding var page:String
+    @Binding var subPage:String
+    
     var body: some View {
         VStack(spacing: 0) {
             //HEADER
             HStack {
                 //Title
-                Text(config.page).fontWeight(.heavy).font(.system(size: 50)).frame(maxWidth: .infinity, alignment: .leading).foregroundColor((config.page == "Favorites" && colorScheme == .light) ? Color.tertiarySystemBackground : Color.label)
+                Text(self.page).fontWeight(.heavy).font(.system(size: 50)).frame(maxWidth: .infinity, alignment: .leading).foregroundColor((self.page == "Favorites" && colorScheme == .light) ? Color.tertiarySystemBackground : Color.label)
                 
                 //Filter Button
-                if config.page == "Discover" {
+                if self.page == "Discover" {
                     Image(systemName: "line.horizontal.3.decrease.circle")
                         .resizable().frame(width: 25, height: 25).padding(.trailing, 10)
                         .foregroundColor(filterApplied ? config.accent : Color.secondaryLabel)
@@ -48,12 +51,12 @@ struct DiscoverFavoritesView : View {
                 //Quick Search Button
                 Image(systemName: "magnifyingglass")
                     .resizable().frame(width: 25, height: 25).padding(.trailing, 10)
-                    .foregroundColor((config.page == "Favorites" && colorScheme == .light) ? Color.secondarySystemBackground : Color.secondaryLabel)
+                    .foregroundColor((self.page == "Favorites" && colorScheme == .light) ? Color.secondarySystemBackground : Color.secondaryLabel)
                 
             }.padding([.vertical, .horizontal])
             
             //IF IT'S FAVORITES PAGE BUT THERE AREN'T ANY FAVORITES
-            if self.config.page == "Favorites" && !evm.doFavoritesExist(list: self.evm.eventList) {
+            if self.page == "Favorites" && !evm.doFavoritesExist(list: self.evm.eventList) {
                 VStack(alignment: .center, spacing: 10) {
                     Text("No Events Favorited").fontWeight(.light).font(.system(size: 20)).padding([.horizontal]).foregroundColor(config.accent)
                     Text("Add some events to your favorites by using the hard-press shortcut on the event preview or the favorite button on the event detail page.").fontWeight(.light).font(.system(size: 16)).padding([.horizontal]).foregroundColor(Color.label)
@@ -68,6 +71,6 @@ struct DiscoverFavoritesView : View {
 //                CalendarView(evm: self.evm)
 //            }
             
-        }.background((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
+        }.background((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
     }
 }

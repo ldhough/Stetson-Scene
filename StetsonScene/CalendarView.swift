@@ -16,24 +16,27 @@ struct CalendarView : View {
     @State var selectedDate: Date = Date()
     @State var month = 0
     
+    @Binding var page:String
+    @Binding var subPage:String
+    
     var body: some View {
         //CALENDAR & SUB-LIST
         VStack(spacing: 0) {
             //horizontal months list
-            MonthCarousel(evm: self.evm, selectedDate: self.$selectedDate, month: self.$month, height: 330).frame(height: 330)
+            MonthCarousel(evm: self.evm, selectedDate: self.$selectedDate, month: self.$month, height: 330, page: self.$page, subPage: self.$subPage).frame(height: 330)
             //event list that corresponds to selected day
             List {
                 ForEach(evm.eventList) { event in
                     if self.evm.compareDates(date1: self.selectedDate, date2: self.evm.getEventDate(event: event)) {
-                        if self.config.page == "Favorites" && event.isFavorite {
-                            ListCell(evm: self.evm, event: event)
-                        } else if self.config.page == "Discover" {
-                            ListCell(evm: self.evm, event: event)
+                        if self.page == "Favorites" && event.isFavorite {
+                            ListCell(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage)
+                        } else if self.page == "Discover" {
+                            ListCell(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage)
                         }
                     }
-                }.padding(.horizontal, 10).listRowBackground((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
+                }.padding(.horizontal, 10).listRowBackground((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
             }.frame(alignment: .center)
-        }.background((config.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
+        }.background((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
     }
 }
 
@@ -45,6 +48,9 @@ struct MonthCarousel : UIViewRepresentable {
     @Binding var month : Int
     var height : CGFloat
     let numMonths = 12 //year
+    
+    @Binding var page:String
+    @Binding var subPage:String
     
     //create and update the Carousel UIScrollView
     func makeUIView(context: Context) -> UIScrollView{
@@ -58,7 +64,7 @@ struct MonthCarousel : UIViewRepresentable {
         scrollview.showsHorizontalScrollIndicator = false
         
         //make the Months SwiftUI View into a UIView (essentially)
-        let uiMonthView = UIHostingController(rootView: Months(evm: self.evm, selectedDate: self.$selectedDate, height: self.height, numMonths: numMonths)) //numberOfMonths()))
+        let uiMonthView = UIHostingController(rootView: Months(evm: self.evm, selectedDate: self.$selectedDate, height: self.height, numMonths: numMonths, page: self.$page, subPage: self.$subPage)) //numberOfMonths()))
         uiMonthView.view.frame = CGRect(x: 0, y: 0, width: carouselWidth, height: self.height)
         uiMonthView.view.backgroundColor = .clear
         
@@ -88,10 +94,13 @@ struct Months: View {
     var height: CGFloat
     var numMonths: Int
     
+    @Binding var page:String
+    @Binding var subPage:String
+    
     var body: some View {
         HStack {
             ForEach(0..<numMonths) { index in
-                Month(evm: self.evm, selectedDate: self.$selectedDate, height: self.height, monthOffset: index)
+                Month(evm: self.evm, selectedDate: self.$selectedDate, height: self.height, monthOffset: index, page: self.$page, subPage: self.$subPage)
             }.padding(.horizontal, 10)
         }
     }
@@ -110,16 +119,19 @@ struct Month: View {
     var monthsArray: [[Date]] { monthArray() }
     var weekdaysArray : [String] = ["S", "M", "T", "W", "T", "F", "S"]
     
+    @Binding var page:String
+    @Binding var subPage:String
+    
     var body: some View {
         //Discover
         //back: blue
         VStack(alignment: HorizontalAlignment.center, spacing: 10) {
-            Text(getMonthHeader()).fontWeight(.medium).font(.system(size: 30)).foregroundColor((config.page == "Favorites" || self.colorScheme == .dark) ? Color.label : Color.secondarySystemBackground).padding(.top, 15)
+            Text(getMonthHeader()).fontWeight(.medium).font(.system(size: 30)).foregroundColor((self.page == "Favorites" || self.colorScheme == .dark) ? Color.label : Color.secondarySystemBackground).padding(.top, 15)
             //weekday header
             HStack {
                 ForEach(weekdaysArray, id: \.self) { weekday in
                     Text(weekday).fontWeight(Font.Weight.light).font(.system(size: 18))
-                        .foregroundColor((self.config.page == "Favorites" || self.colorScheme == .dark) ? Color.secondaryLabel : Color.tertiarySystemBackground).frame(minWidth: 0, maxWidth: .infinity)
+                        .foregroundColor((self.page == "Favorites" || self.colorScheme == .dark) ? Color.secondaryLabel : Color.tertiarySystemBackground).frame(minWidth: 0, maxWidth: .infinity)
                 }
             }
             //month
@@ -132,7 +144,7 @@ struct Month: View {
                             HStack {
                                 Spacer()
                                 if Calendar.current.isDate(column, equalTo: self.firstOfMonth(), toGranularity: .month) {
-                                    DateCell(date: column, match: self.evm.compareDates(date1: column, date2: self.selectedDate), cellWidth: self.height/11)
+                                    DateCell(date: column, match: self.evm.compareDates(date1: column, date2: self.selectedDate), cellWidth: self.height/11, page: self.$page, subPage: self.$subPage)
                                         .onTapGesture { self.selectedDate = column }
                                 } else {
                                     Text("").frame(width: self.height/11, height: self.height/11)
@@ -143,7 +155,7 @@ struct Month: View {
                     }
                 }
             }.frame(minWidth: 0, maxWidth: .infinity).padding(.bottom, 15)
-        }.background(RoundedRectangle(cornerRadius: 10)).foregroundColor(config.page == "Favorites" ? Color.tertiarySystemBackground : config.accent)
+        }.background(RoundedRectangle(cornerRadius: 10)).foregroundColor(self.page == "Favorites" ? Color.tertiarySystemBackground : config.accent)
     }
     
     //MONTH OFFSET
@@ -195,14 +207,16 @@ struct DateCell: View {
     var match: Bool
     var cellWidth: CGFloat
     
+    @Binding var page:String
+    @Binding var subPage:String
     
     var body: some View {
         Text(self.getDate(date: date))
             .fontWeight(Font.Weight.light)
-            .foregroundColor(match ? (config.page == "Favorites" ? Color.tertiarySystemBackground : config.accent) : Color.label)
+            .foregroundColor(match ? (self.page == "Favorites" ? Color.tertiarySystemBackground : config.accent) : Color.label)
             .frame(width: cellWidth, height: cellWidth)
             .font(.system(size: 18))
-            .background(match ? (config.page == "Favorites" ? config.accent : Color.white) : Color.clear)
+            .background(match ? (self.page == "Favorites" ? config.accent : Color.white) : Color.clear)
             .clipShape(Circle())
     }
     
