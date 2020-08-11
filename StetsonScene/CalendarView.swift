@@ -213,7 +213,9 @@ struct DateCell: View {
     var body: some View {
         Text(self.getDate(date: date))
             .fontWeight(Font.Weight.light)
-            .foregroundColor(match ? (self.page == "Favorites" ? Color.tertiarySystemBackground : config.accent) : Color.label)
+            // self.date < Date()
+            .foregroundColor(match ? (self.page == "Favorites" ? (self.date > Date() ? Color.tertiarySystemBackground : Color.red) : (self.date >= Date() ? config.accent : Color.red)) : (self.date > Date() ? Color.label : Color.red))
+            //.foregroundColor(match ? (self.page == "Favorites" ? Color.tertiarySystemBackground : config.accent) : Color.label)
             .frame(width: cellWidth, height: cellWidth)
             .font(.system(size: 18))
             .background(match ? (self.page == "Favorites" ? config.accent : Color.white) : Color.clear)
