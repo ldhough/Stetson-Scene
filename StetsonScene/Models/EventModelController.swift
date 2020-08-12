@@ -471,6 +471,16 @@ class EventViewModel: ObservableObject {
         hasObtainedAssociations = true
     }
     
+    //Persistent coords stored as ["Building", "10.0:-5.0"]
+    var persistentLocations:Dictionary<String, String> = {
+        return UserDefaults.standard.object(forKey: "persistentLocations") != nil ?
+            UserDefaults.standard.object(forKey: "persistentLocations") as! Dictionary<String, String> : [:]
+    }() {
+        didSet {
+            UserDefaults.standard.set(self.persistentLocations, forKey: "persistentLocations")
+        }
+    }
+    
     func readEventData(eventData: Dictionary<String, Any>) -> (EventInstance, DataState) {
         let newInstance = EventInstance()
         for (k, v) in eventData {
@@ -537,6 +547,23 @@ class EventViewModel: ObservableObject {
             }
         }
         
+        print(self.persistentLocations)
+        
+        if persistentLocations[newInstance.location!] == nil && !self.checkBadCoords(String(newInstance.mainLat!)) {
+            let saveCoords = String(newInstance.mainLat!) + ":" + String(newInstance.mainLon!)
+            persistentLocations[newInstance.location!] = saveCoords
+        }
+        
+        if newInstance.location!.lowercased() != "virtual" && self.checkBadCoords(String(newInstance.mainLat!)) {
+            if persistentLocations[newInstance.location!] != nil {
+                let coords = persistentLocations[newInstance.location!]?.components(separatedBy: ":")
+                let lat:String = coords![0]
+                let lon:String = coords![1]
+                newInstance.mainLat = Double(lat)
+                newInstance.mainLon = Double(lon)
+            }
+        }
+        
         //Convert strings relating to date and time to a DateTimeInfo object - if this cannot be done, the event data is invalid because users wouldn't know when the event is occuring.
         let dateTimeInfoStart = makeDateTimeInfo(dateStr: newInstance.date, timeStr: newInstance.time)
         let dateTimeInfoEnd = makeDateTimeInfo(dateStr: newInstance.endDate, timeStr: newInstance.endTime)
@@ -582,6 +609,13 @@ class EventViewModel: ObservableObject {
     }
     
     // ===== SUPPORT FUNCTIONS ===== //
+    
+    func checkBadCoords(_ coord: String) -> Bool {
+        if coord == "" || coord == "0.0" || coord == "0" {
+            return true
+        }
+        return false
+    }
     
     func makeDateTimeInfo(dateStr: String, timeStr: String) -> (DateTimeInfo, Bool) {
         let dateComponents:(Int, Int, Int, Bool) = {
