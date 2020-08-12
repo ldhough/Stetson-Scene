@@ -25,18 +25,22 @@ struct ListView : View {
     
     @Binding var page:String
     @Binding var subPage:String
+    //ListView(evm: self.evm, eventLocation: event.location!, page: self.$page, subPage: self.$subPage)
     
     func returnCorrectList() -> some View {
         if (self.subPage == "AR" || self.subPage == "Map") {
             print5("mapar")
             return AnyView(List {
                 ForEach(self.evm.eventList) { event in
-                    if event.isVirtual && self.allVirtual! {
-                        ListCell(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage)
+                    if (self.page == "Favorites" && event.isFavorite) || self.page == "Discover" { //if favorites screen, only favorites... otherwise any
+                        if (event.isVirtual && self.allVirtual!) || (event.location! == self.eventLocation!) { //listing only virtual events OR navigating to a specific event
+                            ListCell(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage)
+                        }
                     }
                 }.listRowBackground((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
             }.background((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground))
         }
+        if (self.subPage == "List" || self.subPage == "Calendar") { //just to clarify
         if self.page == "Favorites" {
             print5("fav")
             return AnyView(List {
@@ -56,6 +60,7 @@ struct ListView : View {
                     }
                 }.listRowBackground((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
             }.background((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground))
+        }
         }
         return AnyView(EmptyView())
     }

@@ -18,6 +18,7 @@
 		3C290C1F24BFCE54008D83F0 /* FilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C290C1E24BFCE54008D83F0 /* FilterView.swift */; };
 		3C290C2124BFCEE1008D83F0 /* EventDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C290C2024BFCEE1008D83F0 /* EventDetailView.swift */; };
 		3C290C2324BFD677008D83F0 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C290C2224BFD677008D83F0 /* CalendarView.swift */; };
+		3C3A140F24E37A70007232E6 /* BuildingDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C3A140E24E37A70007232E6 /* BuildingDetailView.swift */; };
 		3C3A46F424C4BC75004B2785 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C3A46F324C4BC75004B2785 /* MapView.swift */; };
 		3C4D64FE24BF3F4900477A22 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3C4D64FD24BF3F4900477A22 /* GoogleService-Info.plist */; };
 		3C732FBA24C39C6A005C0FA6 /* ARView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C732FB924C39C6A005C0FA6 /* ARView.swift */; };
@@ -49,6 +50,7 @@
 		3C290C1E24BFCE54008D83F0 /* FilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterView.swift; sourceTree = "<group>"; };
 		3C290C2024BFCEE1008D83F0 /* EventDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventDetailView.swift; sourceTree = "<group>"; };
 		3C290C2224BFD677008D83F0 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
+		3C3A140E24E37A70007232E6 /* BuildingDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildingDetailView.swift; sourceTree = "<group>"; };
 		3C3A46F324C4BC75004B2785 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		3C4D64FD24BF3F4900477A22 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		3C732FB924C39C6A005C0FA6 /* ARView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARView.swift; sourceTree = "<group>"; };
@@ -111,6 +113,7 @@
 				3C7A740E24BF5E16005DA0B1 /* ListView.swift */,
 				3C290C2224BFD677008D83F0 /* CalendarView.swift */,
 				3C290C2024BFCEE1008D83F0 /* EventDetailView.swift */,
+				3C3A140E24E37A70007232E6 /* BuildingDetailView.swift */,
 				3C290C1E24BFCE54008D83F0 /* FilterView.swift */,
 				4802FCFA24D272120096EA49 /* FilterEventTypeView.swift */,
 				3C732FB924C39C6A005C0FA6 /* ARView.swift */,
@@ -271,6 +274,7 @@
 				3C290C2324BFD677008D83F0 /* CalendarView.swift in Sources */,
 				3C7A741324BF68E8005DA0B1 /* InformationView.swift in Sources */,
 				3CBC5FA123EB9BA800111972 /* MainView.swift in Sources */,
+				3C3A140F24E37A70007232E6 /* BuildingDetailView.swift in Sources */,
 				3C732FBA24C39C6A005C0FA6 /* ARView.swift in Sources */,
 				3CD01BCA24C4D10D0042FACD /* DiscoverFavorites.swift in Sources */,
 				3C0F523623EDC11B00C91790 /* EventModelController.swift in Sources */,
@@ -425,7 +429,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = NXHV9N6K45;
+				DEVELOPMENT_TEAM = UVSFW3HDBB;
 				INFOPLIST_FILE = StetsonScene/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -446,7 +450,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = NXHV9N6K45;
+				DEVELOPMENT_TEAM = UVSFW3HDBB;
 				INFOPLIST_FILE = StetsonScene/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = (

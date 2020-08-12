@@ -96,8 +96,12 @@ struct MapView: UIViewRepresentable {
                 return annotations
             }
         } else { //app tour mode
-            //TODO
-            //create all building annotations
+            for building in self.evm.buildingModelController.buildingList {
+                if !locationsWithAnnotation.contains(building.buildingName!) {
+                    locationsWithAnnotation.append(building.buildingName!)
+                    annotations.append(Annotation(title: building.buildingName!, info: building.buildingSummary, coordinate: CLLocationCoordinate2D(latitude: (building.buildingLat)!, longitude: (building.buildingLon)!)))
+                }
+            }
         }
         return annotations
     }
@@ -210,6 +214,8 @@ final class Coordinator: NSObject, MKMapViewDelegate {
                     //event list for buildings
                     for event in evm.eventList {
                         if event.location == view.annotation?.title!! {
+                            //let eventListByBuilding = UIHostingController(rootView: ListView(evm: self.evm, eventLocation: event.location!, page: self.$page, subPage: self.$subPage).environmentObject(self.config).background(Color.secondarySystemBackground))
+                            //present(eventListByBuilding, animated: true)
                             window?.rootViewController?.present(UIHostingController(rootView: ListView(evm: self.evm, eventLocation: event.location!, page: self.$page, subPage: self.$subPage).environmentObject(self.config).background(Color.secondarySystemBackground)), animated: true)
                         }
                     }
@@ -220,8 +226,7 @@ final class Coordinator: NSObject, MKMapViewDelegate {
                 }
             }
         } else {
-            //TODO
-            //present detail views for buildings
+            window?.rootViewController?.present(UIHostingController(rootView: BuildingDetailView(evm: self.evm, buildingInstance: self.evm.buildingModelController.buildingDic[(view.annotation?.title!!)!]!, page: self.$page, subPage: self.$subPage).environmentObject(self.config)), animated: true)
         }
     }
     

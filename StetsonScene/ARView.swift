@@ -111,17 +111,17 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
             userAltitude = lastLocation.altitude
             userLocation = lastLocation
         }
-//        newLocation = userLocation
-//        print("NEW LOCATION: ", newLocation)
+        //        newLocation = userLocation
+        //        print("NEW LOCATION: ", newLocation)
         
         //if you're navigating to an event with AR, update distanceFromBuilding so it can be displayed on the AR tag
         if !arFindMode {
             let building = CLLocation(latitude: navToEvent!.mainLat, longitude: navToEvent!.mainLon)
             distanceFromBuilding = Int(building.distance(from: userLocation))
         }
-//        only update the nodes if you have a change in on/off campus
-//        if oldLocation != nil && ((StetsonUniversity.distance(from: oldLocation) > 805 && StetsonUniversity.distance(from: newLocation) <= 805)
-//            || (StetsonUniversity.distance(from: oldLocation) <= 805 && StetsonUniversity.distance(from: newLocation) > 805)) {
+        //        only update the nodes if you have a change in on/off campus
+        //        if oldLocation != nil && ((StetsonUniversity.distance(from: oldLocation) > 805 && StetsonUniversity.distance(from: newLocation) <= 805)
+        //            || (StetsonUniversity.distance(from: oldLocation) <= 805 && StetsonUniversity.distance(from: newLocation) > 805)) {
         if StetsonUniversity.distance(from: userLocation) > 805 && !alertSent { //805m = 0.5mi //if you're too far away from campus, create just one node and send an alert
             for annotationNode in self.sceneLocationView.locationNodes { annotationNode.removeFromParentNode() } //clean scene
             createBuildingNode(location: "Stetson University", lat: 29.0349780, lon: -81.3026430, altitude: (userAltitude! + 15)) //just create a stetson node
@@ -136,8 +136,8 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
             tooFar = false
         }
         //}
-//        oldLocation = userLocation
-//        print("OLD LOCATION: ", oldLocation)
+        //        oldLocation = userLocation
+        //        print("OLD LOCATION: ", oldLocation)
     }
     
     func determineNodes() {
@@ -190,8 +190,12 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
                 alertSent = true
             }
         } else {
-            //TODO
-            //create all building nodes
+            for building in self.evm.buildingModelController.buildingList {
+                if !locationsWithNode.contains(building.buildingName!) {
+                    locationsWithNode.append(building.buildingName!)
+                    createBuildingNode(location: building.buildingName!, lat: building.buildingLat, lon: building.buildingLon, altitude: (userAltitude! + 15))
+                }
+            }
         }
     }
     
@@ -282,8 +286,8 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
                     }
                 }
             } else {
-                //TODO
-                //present detail views for buildings
+                let buildingList = UIHostingController(rootView: BuildingDetailView(evm: self.evm, buildingInstance: self.evm.buildingModelController.buildingDic[(String(describing: hits.name!))]!, page: self.$page, subPage: self.$subPage).environmentObject(self.config))
+                present(buildingList, animated: true)
             }
         }
     }

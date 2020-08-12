@@ -47,7 +47,7 @@ struct MonthCarousel : UIViewRepresentable {
     @Binding var selectedDate: Date
     @Binding var month : Int
     var height : CGFloat
-    let numMonths = 12 //year
+    let numMonths = 6 //year
     
     @Binding var page:String
     @Binding var subPage:String

@@ -50,6 +50,8 @@ class EventViewModel: ObservableObject {
     @Published var locationList:[String] = []
     @Published var locationSetFull:Set<String> = []
     
+    @Published var buildingModelController = BuildingModelController()
+    
     //When events are loaded into the app listeners are put on their numberAttending node to keep this updated live between all users, this set is used to prevent duplicate listeners
     var beingObservedSet:Set<String> = []
     
@@ -457,7 +459,7 @@ class EventViewModel: ObservableObject {
                 self.eventTypeSetFull.insert(snapshot.key)
                 //self.displayEventTypeList.append(true)
                 self.eventTypeAssociations[snapshot.key] = snapshot.value as? Dictionary<String, String>
-                print(self.eventTypeAssociations)
+                //print(self.eventTypeAssociations)
             }
         
             AppDelegate.shared().locationAssocationRef.observe(.childAdded) { snapshot in
@@ -649,7 +651,7 @@ class EventViewModel: ObservableObject {
     }
     
     func isVirtual(event: EventInstance) {
-        if (event.mainLon == 0.0 && event.mainLat == 0.0) || event.location.lowercased() == "virtual" {
+        if event.mainLon == 0.0 && event.mainLat == 0.0 && (event.location.lowercased() == "virtual" || event.location == "") {
             event.isVirtual = true
         }
     }

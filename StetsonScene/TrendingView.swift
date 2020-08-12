@@ -139,6 +139,7 @@ struct Cards : View {
                             .aspectRatio(contentMode: .fill)
                             .frame(width: self.cardWidth, height: self.height)
                             .cornerRadius(20)
+                        //FirebaseImage(id: self.evm.buildingModelController.buildingDic[event.location]!.photoInfo, evm: self.evm).resizable().aspectRatio(contentMode: .fill).frame(width: self.cardWidth, height: self.height).cornerRadius(20)
                         //Layer over image
                         VStack {
                             //Spacer
@@ -165,8 +166,7 @@ struct Cards : View {
         }.sheet(item: $selectedEvent) { event in
             EventDetailView(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage).environmentObject(self.config)
         }//end of hstack
-    }
-    
+    } //end of view
 }
 
 //CARDCONTROL: shows which card is currently displayed
