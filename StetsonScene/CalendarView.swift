@@ -25,17 +25,23 @@ struct CalendarView : View {
             //horizontal months list
             MonthCarousel(evm: self.evm, selectedDate: self.$selectedDate, month: self.$month, height: 330, page: self.$page, subPage: self.$subPage).frame(height: 330)
             //event list that corresponds to selected day
-            List {
-                ForEach(evm.eventList) { event in
-                    if self.evm.compareDates(date1: self.selectedDate, date2: self.evm.getEventDate(event: event)) {
-                        if self.page == "Favorites" && event.isFavorite {
-                            ListCell(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage)
-                        } else if self.page == "Discover" {
-                            ListCell(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage)
+            if self.evm.dataReturnedFromSnapshot {
+                List {
+                    ForEach(evm.eventList) { event in
+                        if self.evm.compareDates(date1: self.selectedDate, date2: self.evm.getEventDate(event: event)) {
+                            if self.page == "Favorites" && event.isFavorite {
+                                ListCell(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage)
+                            } else if self.page == "Discover" {
+                                ListCell(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage)
+                            }
                         }
-                    }
-                }.padding(.horizontal, 10).listRowBackground((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
-            }.frame(alignment: .center)
+                    }.padding(.horizontal, 10).listRowBackground((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
+                }.frame(alignment: .center)
+            } else {
+                Spacer()
+                ActivityIndicator(color: config.accentUIColor, isAnimating: .constant(true), style: .large)
+                Spacer()
+            }
         }.background((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
     }
 }

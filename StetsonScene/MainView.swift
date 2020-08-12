@@ -31,6 +31,23 @@ struct ARNavigationIndicator: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: ARNavigationIndicator.UIViewControllerType, context: UIViewControllerRepresentableContext<ARNavigationIndicator>) { }
 }
 
+struct ActivityIndicator: UIViewRepresentable { //loading wheel
+    let color:UIColor
+    //let brightYellow = UIColor(red: 255/255, green: 196/255, blue: 0/255, alpha: 1.0)
+    @Binding var isAnimating: Bool
+    let style: UIActivityIndicatorView.Style
+
+    func makeUIView(context: UIViewRepresentableContext<ActivityIndicator>) -> UIActivityIndicatorView {
+        let activityIndicator = UIActivityIndicatorView(style: style)
+        activityIndicator.color = color
+        return activityIndicator//UIActivityIndicatorView(style: style)
+    }
+
+    func updateUIView(_ uiView: UIActivityIndicatorView, context: UIViewRepresentableContext<ActivityIndicator>) {
+        isAnimating ? uiView.startAnimating() : uiView.stopAnimating()
+    }
+}
+
 struct MainView : View {
     @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
@@ -60,7 +77,13 @@ struct MainView : View {
                         if self.subPage == "List" {
                             VStack {
                                 DiscoverFavoritesView(evm: self.evm, page: self.$page, subPage: self.$subPage)
-                                ListView(evm: self.evm, page: self.$page, subPage: self.$subPage)
+                                if self.evm.dataReturnedFromSnapshot {
+                                    ListView(evm: self.evm, page: self.$page, subPage: self.$subPage)
+                                } else {
+                                    Spacer()
+                                    ActivityIndicator(color: config.accentUIColor ,isAnimating: .constant(true), style: .large)
+                                    Spacer()
+                                }
                             }.blur(radius: self.showOptions ? 5 : 0).disabled(self.showOptions ? true : false)
                         }
                         if self.subPage == "Calendar" {

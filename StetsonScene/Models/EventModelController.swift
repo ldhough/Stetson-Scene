@@ -57,6 +57,7 @@ class EventViewModel: ObservableObject {
     
     //Indicates how many weeks worth of database info are currently loaded into the app to prevent unnecessary database queries
     var weeksStored:Int = 1
+    @Published var dataReturnedFromSnapshot:Bool = false
     @Published var hasFirebaseConnection = true
     
     private enum ParentChildRelationship {
@@ -425,6 +426,7 @@ class EventViewModel: ObservableObject {
     }
     
     func retrieveFirebaseData(daysIntoYear: Int, doFilter: Bool, searchEngine: EventSearchEngine) {
+        self.dataReturnedFromSnapshot = false
         //Prevent duplicate observers
         AppDelegate.shared().eventListRef.removeAllObservers()
         self.loadPersistentEventData()
@@ -451,6 +453,7 @@ class EventViewModel: ObservableObject {
                         }
                     }
                 }
+                self.dataReturnedFromSnapshot = true
             })
         })
         if !hasObtainedAssociations {
