@@ -25,17 +25,23 @@ struct CalendarView : View {
             //horizontal months list
             MonthCarousel(evm: self.evm, selectedDate: self.$selectedDate, month: self.$month, height: 330, page: self.$page, subPage: self.$subPage).frame(height: 330)
             //event list that corresponds to selected day
-            List {
-                ForEach(evm.eventList) { event in
-                    if self.evm.compareDates(date1: self.selectedDate, date2: self.evm.getEventDate(event: event)) {
-                        if self.page == "Favorites" && event.isFavorite {
-                            ListCell(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage)
-                        } else if self.page == "Discover" {
-                            ListCell(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage)
+            if self.evm.dataReturnedFromSnapshot {
+                List {
+                    ForEach(evm.eventList) { event in
+                        if self.evm.compareDates(date1: self.selectedDate, date2: self.evm.getEventDate(event: event)) {
+                            if self.page == "Favorites" && event.isFavorite {
+                                ListCell(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage)
+                            } else if self.page == "Discover" {
+                                ListCell(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage)
+                            }
                         }
-                    }
-                }.padding(.horizontal, 10).listRowBackground((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
-            }.frame(alignment: .center)
+                    }.padding(.horizontal, 10).listRowBackground((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
+                }.frame(alignment: .center)
+            } else {
+                Spacer()
+                ActivityIndicator(color: config.accentUIColor, isAnimating: .constant(true), style: .large)
+                Spacer()
+            }
         }.background((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
     }
 }
@@ -210,11 +216,63 @@ struct DateCell: View {
     @Binding var page:String
     @Binding var subPage:String
     
+    func getDayMonthYear(date: Date) -> (String, String, String) { //month, date, year
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy"
+        let year = dateFormatter.string(from: date)
+        dateFormatter.dateFormat = "M"
+        let month = dateFormatter.string(from: date)
+        dateFormatter.dateFormat = "d"
+        let day = dateFormatter.string(from: date)
+        return (month, day, year)
+    }
+    
+    func makeColor() -> Color { //could be made a lot shorter lol oops
+        let currentDate = getDayMonthYear(date: Date())
+        let checkDate = getDayMonthYear(date: self.date)
+        
+        if self.page == "Favorites" {
+            if Int(checkDate.0)! < Int(currentDate.0)! { //If month before than current month
+                if Int(checkDate.2)! >=  Int(currentDate.2)! {
+                    return Color.label
+                }
+                return Color.red
+            } else if Int(checkDate.0)! > Int(currentDate.0)! {
+                if Int(checkDate.2)! >= Int(currentDate.2)! {
+                    return Color.label
+                }
+                return Color.red
+            }
+            if Int(checkDate.1)! < Int(currentDate.1)! {
+                return Color.red
+            } else {
+                return Color.label//Color.tertiarySystemBackground
+            }
+        } else {
+            if Int(checkDate.0)! < Int(currentDate.0)! { //If month before than current month
+                if Int(checkDate.2)! >=  Int(currentDate.2)! {
+                    return Color.label
+                }
+                return Color.red
+            } else if Int(checkDate.0)! > Int(currentDate.0)! {
+                if Int(checkDate.2)! >= Int(currentDate.2)! {
+                    return Color.label
+                }
+                return Color.red
+            }
+            if Int(checkDate.1)! < Int(currentDate.1)! {
+                return Color.red
+            } else {
+                return Color.label//config.accent
+            }
+        }
+    }
+    
     var body: some View {
         Text(self.getDate(date: date))
             .fontWeight(Font.Weight.light)
             // self.date < Date()
-            .foregroundColor(match ? (self.page == "Favorites" ? (self.date > Date() ? Color.tertiarySystemBackground : Color.red) : (self.date >= Date() ? config.accent : Color.red)) : (self.date > Date() ? Color.label : Color.red))
+            .foregroundColor(match ? (self.page == "Favorites" ? Color.tertiarySystemBackground : config.accent) : makeColor())//Color.label)
             //.foregroundColor(match ? (self.page == "Favorites" ? Color.tertiarySystemBackground : config.accent) : Color.label)
             .frame(width: cellWidth, height: cellWidth)
             .font(.system(size: 18))

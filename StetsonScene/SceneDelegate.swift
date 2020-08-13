@@ -43,7 +43,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         //ViewModel Initiation
         let vm = EventViewModel()
         let se = EventSearchEngine()
-        vm.retrieveFirebaseData(daysIntoYear: vm.getDaysIntoYear(nowPlusWeeks: 1), doFilter: false, searchEngine: se)
+        vm.retrieveFirebaseData(daysIntoYear: vm.getDaysIntoYear(nowPlusWeeks: 4), doFilter: false, searchEngine: se)
         vm.buildingModelController.retrieveFirebaseDataBuildings()
         self.config = Configuration(vm)
         //vm.config = self.config
