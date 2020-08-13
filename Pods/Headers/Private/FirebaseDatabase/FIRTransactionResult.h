@@ -1,1 +1,1 @@
-../../../FirebaseDatabase/Firebase/Database/Public/FIRTransactionResult.h
+../../../FirebaseDatabase/FirebaseDatabase/Sources/Public/FirebaseDatabase/FIRTransactionResult.h

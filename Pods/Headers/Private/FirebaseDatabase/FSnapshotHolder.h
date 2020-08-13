@@ -1,1 +1,1 @@
-../../../FirebaseDatabase/Firebase/Database/Core/FSnapshotHolder.h
+../../../FirebaseDatabase/FirebaseDatabase/Sources/Core/FSnapshotHolder.h

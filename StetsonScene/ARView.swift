@@ -175,7 +175,7 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
                 if !allVirtual {
                     evm.sanitizeCoords(event: event)
                     //only add non-virtual events, don't repeat building nodes, only add to favorites view if the event is favorited
-                    if (event.location.lowercased() != "virtual") && !locationsWithNode.contains(event.location) && ((self.page == "Favorites" && event.isFavorite) || self.page == "Discover") {
+                    if (event.location.lowercased() != "virtual") && (event.location.filter({ !$0.isWhitespace }) != "") && !locationsWithNode.contains(event.location) && ((self.page == "Favorites" && event.isFavorite) || self.page == "Discover") {
                         locationsWithNode.append(event.location)
                         print("CREATING NODES")
                         createBuildingNode(location: event.location, lat: event.mainLat, lon: event.mainLon, altitude: (userAltitude! + 15))

@@ -1,1 +1,1 @@
-../../../FirebaseDatabase/Firebase/Database/Login/FAuthTokenProvider.h
+../../../FirebaseDatabase/FirebaseDatabase/Sources/Login/FAuthTokenProvider.h

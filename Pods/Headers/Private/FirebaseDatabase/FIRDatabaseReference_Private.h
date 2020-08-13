@@ -1,1 +1,1 @@
-../../../FirebaseDatabase/Firebase/Database/Api/Private/FIRDatabaseReference_Private.h
+../../../FirebaseDatabase/FirebaseDatabase/Sources/Api/Private/FIRDatabaseReference_Private.h

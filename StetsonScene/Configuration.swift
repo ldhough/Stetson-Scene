@@ -28,23 +28,6 @@ class Configuration: ObservableObject {
         }
     }
     
-    //Trending, Discover, Favorites, Information 
-//    var page: String = "Discover" {
-//        didSet {
-//            for i in 0..<3 {
-//                print("THIS HAPPENED")
-//            }
-//            objectWillChange.send(self)
-//        }
-//    }
-//
-//    //List, Calendar, AR, Map
-//    var subPage: String = "List" {
-//        didSet {
-//            objectWillChange.send(self)
-//        }
-//    }
-    
     var accent: Color = Color(UserDefaults.standard.object(forKey: "accent") != nil ? setColor(color).1 : UIColor.systemIndigo) {
         didSet {
             UserDefaults.standard.set(color, forKey: "accent")

@@ -1,1 +1,1 @@
-../../../FirebaseDatabase/Firebase/Database/Api/Private/FIRTransactionResult_Private.h
+../../../FirebaseDatabase/FirebaseDatabase/Sources/Api/Private/FIRTransactionResult_Private.h

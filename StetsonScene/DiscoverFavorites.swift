@@ -27,7 +27,7 @@ struct DiscoverFavoritesView : View {
                 Text(self.page).fontWeight(.heavy).font(.system(size: 50)).frame(maxWidth: .infinity, alignment: .leading).foregroundColor((self.page == "Favorites" && colorScheme == .light) ? Color.tertiarySystemBackground : Color.label)
                 
                 //Filter Button
-                if self.page == "Discover" {
+                if self.page == "Discover" && self.subPage == "List" {
                     Image(systemName: "line.horizontal.3.decrease.circle")
                         .resizable().frame(width: 25, height: 25).padding(.trailing, 10)
                         .foregroundColor(filterApplied ? config.accent : Color.secondaryLabel)
@@ -35,7 +35,7 @@ struct DiscoverFavoritesView : View {
                             self.filterView = true
                             print("tapped ")
                     }
-                    .sheet(isPresented: $filterView, content: { FilterView(evm: self.evm, filterView: self.$filterView, weeksDisplayed:  Double(self.evm.eventSearchEngine.weeksDisplayed), weekdaysSelected:  self.evm.eventSearchEngine.weekdaysSelected, onlyCultural: self.evm.eventSearchEngine.onlyCultural, onlyVirtual: self.evm.eventSearchEngine.onlyVirtual, eventTypesSelected: {
+                    .sheet(isPresented: $filterView, content: { FilterView(evm: self.evm, filterView: self.$filterView, filterApplied: self.$filterApplied, weeksDisplayed:  Double(self.evm.eventSearchEngine.weeksDisplayed), weekdaysSelected:  self.evm.eventSearchEngine.weekdaysSelected, onlyCultural: self.evm.eventSearchEngine.onlyCultural, onlyVirtual: self.evm.eventSearchEngine.onlyVirtual, eventTypesSelected: { 
                         
                             if self.evm.eventSearchEngine.eventTypeSet == [] && UserDefaults.standard.object(forKey: "firstTypeLoad") == nil {
                                 //If no event types are being filtered on and it is the first time that the eventTypeSet has been computed (which will result in empty set), use the full event type set to have all event types selected in filter view
@@ -53,23 +53,7 @@ struct DiscoverFavoritesView : View {
                     .resizable().frame(width: 25, height: 25).padding(.trailing, 10)
                     .foregroundColor((self.page == "Favorites" && colorScheme == .light) ? Color.secondarySystemBackground : Color.secondaryLabel)
                 
-            }.padding([.vertical, .horizontal])
-            
-            //IF IT'S FAVORITES PAGE BUT THERE AREN'T ANY FAVORITES
-            if self.page == "Favorites" && !evm.doFavoritesExist(list: self.evm.eventList) {
-                VStack(alignment: .center, spacing: 10) {
-                    Text("No Events Favorited").fontWeight(.light).font(.system(size: 20)).padding([.horizontal]).foregroundColor(config.accent)
-                    Text("Add some events to your favorites by using the hard-press shortcut on the event preview or the favorite button on the event detail page.").fontWeight(.light).font(.system(size: 16)).padding([.horizontal]).foregroundColor(Color.label)
-                    Spacer()
-                    Spacer()
-                }
-            }
-            //LIST OR CALENDAR
-//            else if config.subPage == "List" {
-//                ListView(evm: self.evm)
-//            } else if config.subPage == "Calendar" {
-//                CalendarView(evm: self.evm)
-//            }
+            }.padding([.top, .horizontal])
             
         }.background((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
     }

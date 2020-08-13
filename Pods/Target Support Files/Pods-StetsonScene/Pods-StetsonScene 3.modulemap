@@ -1,6 +1,0 @@
-module Pods_StetsonScene {
-  umbrella header "Pods-StetsonScene-umbrella.h"
-
-  export *
-  module * { export * }
-}

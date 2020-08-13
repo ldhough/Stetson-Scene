@@ -1,1 +1,1 @@
-../../../FirebaseDatabase/Firebase/Database/Core/FQuerySpec.h
+../../../FirebaseDatabase/FirebaseDatabase/Sources/Core/FQuerySpec.h

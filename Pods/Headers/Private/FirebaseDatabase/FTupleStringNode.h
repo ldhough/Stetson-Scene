@@ -1,1 +1,1 @@
-../../../FirebaseDatabase/Firebase/Database/Utilities/Tuples/FTupleStringNode.h
+../../../FirebaseDatabase/FirebaseDatabase/Sources/Utilities/Tuples/FTupleStringNode.h

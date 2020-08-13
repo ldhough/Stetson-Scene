@@ -1,1 +1,1 @@
-../../../FirebaseDatabase/Firebase/Database/Api/FIRDatabaseComponent.h
+../../../FirebaseDatabase/FirebaseDatabase/Sources/Api/FIRDatabaseComponent.h

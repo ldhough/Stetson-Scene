@@ -1,1 +1,1 @@
-../../../FirebaseDatabase/Firebase/Database/third_party/SocketRocket/FSRWebSocket.h
+../../../FirebaseDatabase/FirebaseDatabase/Sources/third_party/SocketRocket/FSRWebSocket.h

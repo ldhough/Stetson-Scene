@@ -1,1 +1,1 @@
-../../../FirebaseDatabase/Firebase/Database/Api/FIRDatabaseConfig.h
+../../../FirebaseDatabase/FirebaseDatabase/Sources/Api/FIRDatabaseConfig.h

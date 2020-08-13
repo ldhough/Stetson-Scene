@@ -1,1 +1,1 @@
-../../../FirebaseDatabase/Firebase/Database/Core/View/FKeepSyncedEventRegistration.h
+../../../FirebaseDatabase/FirebaseDatabase/Sources/Core/View/FKeepSyncedEventRegistration.h

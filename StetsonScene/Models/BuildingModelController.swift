@@ -13,6 +13,7 @@ import SwiftUI
 import Combine
 
 class BuildingModelController: ObservableObject {
+    @EnvironmentObject var config: Configuration
     @Published var buildingList:[BuildingInstance]!
     @Published var buildingDic:Dictionary<String, BuildingInstance>!
     @Published var image = Image(systemName: "circle.fill") //placeholder init
@@ -64,36 +65,58 @@ class BuildingModelController: ObservableObject {
     func retrieveImg(forKey key: String) -> UIImage? {
         if let imageData = UserDefaults.standard.object(forKey: key) as? Data,
             let image = UIImage(data: imageData) {
-                return image
-            }
+            return image
+        }
         return UIImage()
     }
     
     func isKeyInUserDefaults(key: String) -> Bool {
         return UserDefaults.standard.object(forKey: key) != nil
     }
-
+    
+    func getImage(evm: EventViewModel, eventLocation: String) -> Image {
+        var eventInDic = ""
+        var photoInfoKey = ""
+        if buildingDic[eventLocation] != nil { //make sure the eventLocation has a spot in the buildingDic
+            eventInDic = eventLocation
+            if buildingDic[eventInDic]?.photoInfo != nil { //make sure the eventLocation has photoInfo in the buildingDic
+                photoInfoKey = buildingDic[eventInDic]!.photoInfo
+                if buildingDic[eventInDic]!.hasImg && photoInfoKey != "" {
+                    if !isKeyInUserDefaults(key: photoInfoKey) {
+                        return FirebaseImage(id: photoInfoKey, evm: evm).image!
+                    } else {
+                        return Image(uiImage: retrieveImg(forKey: photoInfoKey)!)
+                    }
+                }
+            }
+        }
+        return Image("StetsonUniversity")
+    }
+    
 }
 
-let placeholder:UIImage = UIImage()//UIImage(named: "App-Icon.png")!
+let placeholder:UIImage = UIImage()
 
 struct FirebaseImage: View {
     @ObservedObject var evm:EventViewModel
-
+    
     init(id: String, evm: EventViewModel) {
         self.imageLoader = Loader(id, evm: evm)
         self.evm = evm
     }
-
+    
     @ObservedObject private var imageLoader:Loader
-
-    var image: UIImage? {
+    
+    var uiimage: UIImage? {
         imageLoader.data.flatMap(UIImage.init)
     }
-
+    
+    var image: Image? {
+        Image(uiImage: uiimage ?? placeholder)
+    }
+    
     var body: some View {
-        Image(uiImage: image ?? placeholder).resizable().aspectRatio(contentMode: .fit)
-
+        image
     }
 }
 
@@ -101,15 +124,12 @@ final class Loader: ObservableObject {
     var evm:EventViewModel
     let didChange = PassthroughSubject<Data?, Never>()
     @Published var data:Data? = nil
-//    var data: Data? = nil {
-//        didSet { didChange.send(data) }
-//    }
-
+    
     init(_ id: String, evm: EventViewModel) {
         self.evm = evm
         self.evm.buildingModelController.imgLoaded = false
         // the path to the image
-        let url = id + ".png"//"images/\(id)"
+        let url = id + ".png"
         let storage = Storage.storage()
         let ref = storage.reference().child(url)
         ref.getData(maxSize: 25 * 1024 * 1024) { data, error in
@@ -117,7 +137,7 @@ final class Loader: ObservableObject {
                 print("\(error)")
                 print("THERE WAS AN ERROR * * * * *")
             }
-
+            
             DispatchQueue.main.async {
                 self.data = data
                 print("LOADED IMAGE * * * * *")

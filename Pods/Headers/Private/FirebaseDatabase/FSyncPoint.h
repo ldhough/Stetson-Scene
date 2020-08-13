@@ -1,1 +1,1 @@
-../../../FirebaseDatabase/Firebase/Database/Core/FSyncPoint.h
+../../../FirebaseDatabase/FirebaseDatabase/Sources/Core/FSyncPoint.h

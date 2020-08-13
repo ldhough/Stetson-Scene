@@ -12,11 +12,17 @@ import SwiftUI
 struct FilterView : View {
     @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
-    
     @Binding var filterView:Bool
+    @Binding var filterApplied:Bool
     
     //Filter properties linked to search engine
     @State var weeksDisplayed:Double
+    
+//    @State var filterApplied:Bool {
+//        didSet {
+//            evm.eventSearchEngine.filterApplied = self.filterApplied
+//        }
+//    }
     @State var weekdaysSelected:[Bool] {
         didSet {
             evm.eventSearchEngine.weekdaysSelected = self.weekdaysSelected
@@ -32,6 +38,7 @@ struct FilterView : View {
                evm.eventSearchEngine.onlyVirtual = self.onlyVirtual
            }
        }
+    
     
     @State var eventTypesSelected:Set<String> //Passed down to FilterEventTypeView
     
@@ -109,6 +116,20 @@ struct FilterView : View {
                 self.evm.eventSearchEngine.filter(evm: self.evm)
                 //Update after filter in case filter needs to load more data we want to keep this accurate as to what is actually loaded
                 self.evm.weeksStored = self.evm.eventSearchEngine.weeksDisplayed > self.evm.weeksStored ? self.evm.eventSearchEngine.weeksDisplayed : self.evm.weeksStored
+                //show that filter is applied
+                self.filterApplied = false //reset it- it will save
+                for i in 0 ..< self.weekdaysSelected.count { //if one of the weekdays is NOT selected (e.g. not the default every day of the week)
+                    if !self.weekdaysSelected[i] {
+                        self.filterApplied = true
+                    }
+                }
+                if self.onlyCultural || self.onlyVirtual { //if cultural or virtual filters are selected
+                    self.filterApplied = true
+                }
+                //TODO: add something for the event types filter
+                if self.evm.eventTypeList.count != self.evm.eventSearchEngine.eventTypeSet.count {
+                    self.filterApplied = true
+                }
             }.buttonStyle(MainButtonStyle(accentColor: config.accent)).padding(.horizontal, Constants.width*0.1)
         }.padding()
     }

@@ -135,11 +135,7 @@ struct Cards : View {
                     //card view
                     ZStack {
                         //Background Image
-                        Image("SS").resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: self.cardWidth, height: self.height)
-                            .cornerRadius(20)
-                        //FirebaseImage(id: self.evm.buildingModelController.buildingDic[event.location]!.photoInfo, evm: self.evm).resizable().aspectRatio(contentMode: .fill).frame(width: self.cardWidth, height: self.height).cornerRadius(20)
+                        self.evm.buildingModelController.getImage(evm: self.evm, eventLocation: event.location).resizable().aspectRatio(contentMode: .fill).frame(width: self.cardWidth, height: self.height).cornerRadius(20)
                         //Layer over image
                         VStack {
                             //Spacer
@@ -167,7 +163,8 @@ struct Cards : View {
             EventDetailView(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage).environmentObject(self.config)
         }//end of hstack
     } //end of view
-}
+    
+} //end of struct
 
 //CARDCONTROL: shows which card is currently displayed
 struct CardControl : UIViewRepresentable {

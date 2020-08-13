@@ -1,4 +1,4 @@
-platform :ios, '11.2'
+#platform :ios, '11.2'
   
 target 'StetsonScene' do
   #Comment out next line if you don't want dynamic frameworks

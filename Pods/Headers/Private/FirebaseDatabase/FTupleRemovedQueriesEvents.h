@@ -1,1 +1,1 @@
-../../../FirebaseDatabase/Firebase/Database/Utilities/Tuples/FTupleRemovedQueriesEvents.h
+../../../FirebaseDatabase/FirebaseDatabase/Sources/Utilities/Tuples/FTupleRemovedQueriesEvents.h

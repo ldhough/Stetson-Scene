@@ -10,6 +10,19 @@ import Foundation
 
 class EventSearchEngine {
     
+    //If there's a filter actively applied or not
+//    var filterApplied:Bool = {
+//        if UserDefaults.standard.object(forKey: "filterApplied") != nil {
+//            return UserDefaults.standard.bool(forKey: "filterApplied")
+//        } else {
+//            return false
+//        }
+//    }() {
+//        didSet {
+//            UserDefaults.standard.set(self.filterApplied, forKey: "filterApplied")
+//        }
+//    }
+    
     //Number displayed on the slider for weeks displayed & how many weeks the user wants displayed
     var weeksDisplayed:Int = {
         if UserDefaults.standard.object(forKey: "weeksDisplayed") != nil {
