@@ -62,7 +62,7 @@ struct MainView : View {
     
     
     @State var page:String = "Discover" //Discover, Favorites, Trending, Information
-    @State var subPage:String = "Calendar" //List, Calendar, AR, Map
+    @State var subPage:String = "List" //List, Calendar, AR, Map
     
     
     var body: some View {
@@ -77,19 +77,39 @@ struct MainView : View {
                         if self.subPage == "List" {
                             VStack {
                                 DiscoverFavoritesView(evm: self.evm, page: self.$page, subPage: self.$subPage)
-                                if self.evm.dataReturnedFromSnapshot {
-                                    ListView(evm: self.evm, page: self.$page, subPage: self.$subPage)
+                                //IF IT'S FAVORITES PAGE BUT THERE AREN'T ANY FAVORITES
+                                if self.page == "Favorites" && !evm.doFavoritesExist(list: self.evm.eventList) {
+                                    VStack(alignment: .center, spacing: 10) {
+                                        Text("No Events Favorited").fontWeight(.light).font(.system(size: 20)).padding([.horizontal]).foregroundColor(config.accent)
+                                        Text("Add some events to your favorites by using the hard-press shortcut on the event preview or the favorite button on the event detail page.").fontWeight(.light).font(.system(size: 16)).padding([.horizontal]).foregroundColor(Color.label)
+                                        Spacer()
+                                        Spacer()
+                                    }
                                 } else {
-                                    Spacer()
-                                    ActivityIndicator(color: config.accentUIColor ,isAnimating: .constant(true), style: .large)
-                                    Spacer()
+                                    if self.evm.dataReturnedFromSnapshot {
+                                        ListView(evm: self.evm, page: self.$page, subPage: self.$subPage)
+                                    } else {
+                                        Spacer()
+                                        ActivityIndicator(color: config.accentUIColor ,isAnimating: .constant(true), style: .large)
+                                        Spacer()
+                                    }
                                 }
                             }.blur(radius: self.showOptions ? 5 : 0).disabled(self.showOptions ? true : false)
                         }
                         if self.subPage == "Calendar" {
                             VStack {
                                 DiscoverFavoritesView(evm: self.evm, page: self.$page, subPage: self.$subPage)
-                                CalendarView(evm: self.evm, page: self.$page, subPage: self.$subPage)
+                                //IF IT'S FAVORITES PAGE BUT THERE AREN'T ANY FAVORITES
+                                if self.page == "Favorites" && !evm.doFavoritesExist(list: self.evm.eventList) {
+                                    VStack(alignment: .center, spacing: 10) {
+                                        Text("No Events Favorited").fontWeight(.light).font(.system(size: 20)).padding([.horizontal]).foregroundColor(config.accent)
+                                        Text("Add some events to your favorites by using the hard-press shortcut on the event preview or the favorite button on the event detail page.").fontWeight(.light).font(.system(size: 16)).padding([.horizontal]).foregroundColor(Color.label)
+                                        Spacer()
+                                        Spacer()
+                                    }
+                                } else {
+                                    CalendarView(evm: self.evm, page: self.$page, subPage: self.$subPage)
+                                }
                             }.blur(radius: self.showOptions ? 5 : 0).disabled(self.showOptions ? true : false)
                         }
                         if self.subPage == "AR"  ||  self.subPage == "Map" { //AR or Map
@@ -298,23 +318,6 @@ struct TabOptions: View {
     
     var body: some View {
         HStack {
-            //Calendar
-            ZStack {
-                Circle()
-                    .stroke(self.subPage == "Calendar" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
-                    .background(self.subPage == "Calendar" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
-                    .clipShape(Circle())
-                Image(systemName: "calendar")
-                    .resizable().frame(width: 20, height: 20)
-                    .foregroundColor(self.subPage == "Calendar" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
-            }.frame(width: 50, height: 50)
-                .offset(x: 25)
-                .onTapGesture {
-                    withAnimation {
-                        self.subPage = "Calendar"
-                        self.showOptions = false
-                    }
-            }
             //List
             ZStack {
                 Circle()
@@ -325,10 +328,27 @@ struct TabOptions: View {
                     .resizable().frame(width: 20, height: 20)
                     .foregroundColor(self.subPage == "List" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
             }.frame(width: 50, height: 50)
-                .offset(y: -50)
+                .offset(x: 25)
                 .onTapGesture {
                     withAnimation {
                         self.subPage = "List"
+                        self.showOptions = false
+                    }
+            }
+            //Calendar
+            ZStack {
+                Circle()
+                    .stroke(self.subPage == "Calendar" && colorScheme == .light ? Color.tertiarySystemBackground : Color.clear)
+                    .background(self.subPage == "Calendar" ? selectedColor(element: "background") : nonselectedColor(element: "background"))
+                    .clipShape(Circle())
+                Image(systemName: "calendar")
+                    .resizable().frame(width: 20, height: 20)
+                    .foregroundColor(self.subPage == "Calendar" ? selectedColor(element: "foreground") : nonselectedColor(element: "foreground"))
+            }.frame(width: 50, height: 50)
+                .offset(y: -50)
+                .onTapGesture {
+                    withAnimation {
+                        self.subPage = "Calendar"
                         self.showOptions = false
                     }
             }
