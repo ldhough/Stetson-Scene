@@ -30,6 +30,7 @@
 		3CDCC95E2453588100B6AB9D /* App-Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3CDCC95D2453588100B6AB9D /* App-Icon.png */; };
 		4802FCFB24D272120096EA49 /* FilterEventTypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4802FCFA24D272120096EA49 /* FilterEventTypeView.swift */; };
 		483ACD85242A970C003E2DE6 /* RecommendationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483ACD84242A970B003E2DE6 /* RecommendationEngine.swift */; };
+		4844EAA224E9D89C00F084F2 /* SearchBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4844EAA124E9D89C00F084F2 /* SearchBarView.swift */; };
 		4898798323F1A9FD00062714 /* PersistentData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4898798123F1A9FD00062714 /* PersistentData.xcdatamodeld */; };
 		48BF664B24C7E889002B0F4E /* SearchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48BF664A24C7E889002B0F4E /* SearchEngine.swift */; };
 		48D30A14246A3D49004E84A6 /* BuildingInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48D30A13246A3D49004E84A6 /* BuildingInstance.swift */; };
@@ -65,6 +66,7 @@
 		3CDCC95D2453588100B6AB9D /* App-Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "App-Icon.png"; sourceTree = "<group>"; };
 		4802FCFA24D272120096EA49 /* FilterEventTypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterEventTypeView.swift; sourceTree = "<group>"; };
 		483ACD84242A970B003E2DE6 /* RecommendationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendationEngine.swift; sourceTree = "<group>"; };
+		4844EAA124E9D89C00F084F2 /* SearchBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBarView.swift; sourceTree = "<group>"; };
 		4898798223F1A9FD00062714 /* PersistentData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PersistentData.xcdatamodel; sourceTree = "<group>"; };
 		48BF664A24C7E889002B0F4E /* SearchEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchEngine.swift; sourceTree = "<group>"; };
 		48D30A13246A3D49004E84A6 /* BuildingInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildingInstance.swift; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 				3C732FB924C39C6A005C0FA6 /* ARView.swift */,
 				3C3A46F324C4BC75004B2785 /* MapView.swift */,
 				3C7A741224BF68E8005DA0B1 /* InformationView.swift */,
+				4844EAA124E9D89C00F084F2 /* SearchBarView.swift */,
 				3C23C9C924699902003E254D /* Configuration.swift */,
 				4898798123F1A9FD00062714 /* PersistentData.xcdatamodeld */,
 				3CBC5FA223EB9CAC00111972 /* Models */,
@@ -267,6 +270,7 @@
 				3C0F520823EBA72600C91790 /* AppDelegate.swift in Sources */,
 				48D30A14246A3D49004E84A6 /* BuildingInstance.swift in Sources */,
 				48D30A16246A4C53004E84A6 /* BuildingModelController.swift in Sources */,
+				4844EAA224E9D89C00F084F2 /* SearchBarView.swift in Sources */,
 				4802FCFB24D272120096EA49 /* FilterEventTypeView.swift in Sources */,
 				3C7A740D24BF5E01005DA0B1 /* TrendingView.swift in Sources */,
 				3C290C1F24BFCE54008D83F0 /* FilterView.swift in Sources */,
