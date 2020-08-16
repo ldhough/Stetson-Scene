@@ -10,19 +10,6 @@ import Foundation
 
 class EventSearchEngine {
     
-    //If there's a filter actively applied or not
-//    var filterApplied:Bool = {
-//        if UserDefaults.standard.object(forKey: "filterApplied") != nil {
-//            return UserDefaults.standard.bool(forKey: "filterApplied")
-//        } else {
-//            return false
-//        }
-//    }() {
-//        didSet {
-//            UserDefaults.standard.set(self.filterApplied, forKey: "filterApplied")
-//        }
-//    }
-    
     //Number displayed on the slider for weeks displayed & how many weeks the user wants displayed
     var weeksDisplayed:Int = {
         if UserDefaults.standard.object(forKey: "weeksDisplayed") != nil {
@@ -118,9 +105,9 @@ class EventSearchEngine {
         }
     }
     
-    func checkEvent(_ ei: EventInstance, _ evm: EventViewModel) {
+    func checkEvent(_ ei: EventInstance, _ evm: EventViewModel, checkOnlyTime: Bool = false) {
         var filteredState = true
-        block: if true {
+        block: if !checkOnlyTime {
             if self.onlyCultural && !ei.hasCultural { //Check cultural
                 print("Failed cultural check")
                 filteredState = false
@@ -160,6 +147,12 @@ class EventSearchEngine {
                 print("Failed weeks displayed check")
                 filteredState = false
             }
+        } else { //Base filtering only on time criteria.
+            let maxDays = evm.getDaysIntoYear(nowPlusWeeks: 4)
+            if ei.daysIntoYear > maxDays {
+                print("Failed weeks displayed check")
+                filteredState = false
+            }
         }
         if filteredState {
             print("Passed all checks")
@@ -168,3 +161,16 @@ class EventSearchEngine {
     }
     
 }
+
+//If there's a filter actively applied or not
+//    var filterApplied:Bool = {
+//        if UserDefaults.standard.object(forKey: "filterApplied") != nil {
+//            return UserDefaults.standard.bool(forKey: "filterApplied")
+//        } else {
+//            return false
+//        }
+//    }() {
+//        didSet {
+//            UserDefaults.standard.set(self.filterApplied, forKey: "filterApplied")
+//        }
+//    }
