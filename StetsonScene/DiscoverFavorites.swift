@@ -51,13 +51,14 @@ struct DiscoverFavoritesView : View {
                 }
                 
                 //Quick Search Button
-                Image(systemName: "magnifyingglass")
-                    .resizable().frame(width: 25, height: 25).padding(.trailing, 10)
-                    .foregroundColor((self.page == "Favorites" && colorScheme == .light) ? Color.secondarySystemBackground : Color.secondaryLabel)
-                    .onTapGesture {
-                        self.searchBarVisible.toggle()
-                    }
-                
+                if self.page == "Discover" && self.subPage == "List" {
+                    Image(systemName: "magnifyingglass")
+                        .resizable().frame(width: 25, height: 25).padding(.trailing, 10)
+                        .foregroundColor((self.page == "Favorites" && colorScheme == .light) ? Color.secondarySystemBackground : Color.secondaryLabel)
+                        .onTapGesture {
+                            self.searchBarVisible.toggle()
+                        }
+                }
             }.padding([.top, .horizontal])
             
             if searchBarVisible {

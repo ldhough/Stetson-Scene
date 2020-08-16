@@ -38,6 +38,7 @@ struct FilterEventTypeView: View {
                 } else {
                     self.eventTypesSelected = []
                 }
+                haptic()
                 //self.selectAllDeselectAll.toggle()
             }) {
                 Text(self.selectAllDeselectAll ? "Select All" : "Deselect All"
