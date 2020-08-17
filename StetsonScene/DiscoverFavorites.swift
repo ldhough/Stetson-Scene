@@ -19,6 +19,8 @@ struct DiscoverFavoritesView : View {
     @Binding var page:String
     @Binding var subPage:String
     
+    @State var searchBarVisible = false
+    
     var body: some View {
         VStack(spacing: 0) {
             //HEADER
@@ -49,11 +51,19 @@ struct DiscoverFavoritesView : View {
                 }
                 
                 //Quick Search Button
-                Image(systemName: "magnifyingglass")
-                    .resizable().frame(width: 25, height: 25).padding(.trailing, 10)
-                    .foregroundColor((self.page == "Favorites" && colorScheme == .light) ? Color.secondarySystemBackground : Color.secondaryLabel)
-                
+                if self.page == "Discover" && self.subPage == "List" {
+                    Image(systemName: "magnifyingglass")
+                        .resizable().frame(width: 25, height: 25).padding(.trailing, 10)
+                        .foregroundColor((self.page == "Favorites" && colorScheme == .light) ? Color.secondarySystemBackground : Color.secondaryLabel)
+                        .onTapGesture {
+                            self.searchBarVisible.toggle()
+                        }
+                }
             }.padding([.top, .horizontal])
+            
+            if searchBarVisible {
+                SearchBar(evm: self.evm)
+            }
             
         }.background((self.page == "Favorites" && colorScheme == .light) ? config.accent : Color.secondarySystemBackground)
     }

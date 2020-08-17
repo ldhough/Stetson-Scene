@@ -130,6 +130,7 @@ struct FilterView : View {
                 if self.evm.eventTypeList.count != self.evm.eventSearchEngine.eventTypeSet.count {
                     self.filterApplied = true
                 }
+                haptic()
             }.buttonStyle(MainButtonStyle(accentColor: config.accent)).padding(.horizontal, Constants.width*0.1)
         }.padding()
     }

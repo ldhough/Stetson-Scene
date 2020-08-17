@@ -375,7 +375,8 @@ class EventViewModel: ObservableObject {
         case invalid
     }
     
-    func insertEvent(_ event: EventInstance) {
+    func insertEventListDic(_ event: EventInstance) {
+        self.eventDictionary[event.guid!] = event
         if self.eventList.count == 0 {
             self.eventList.append(event)
             return
@@ -421,20 +422,65 @@ class EventViewModel: ObservableObject {
         }
     }
     
-    func retrieveFirebaseDataFavorites(doFilter: Bool, searchEngine: EventSearchEngine) {
-        
+    func retrieveFirebaseDataFavorites(doFilter: Bool, searchEngine: EventSearchEngine, filterOnlyTime: Bool) {
+        //
+        for (k, _) in self.significantDictionary {
+            if self.eventDictionary[k] == nil { //Favorite that we know exists from persistent storage is not in main event list - query Firebase for it
+                print("Persistent event not in app")
+                AppDelegate.shared().eventListRef.queryOrdered(byChild: "guid").queryEqual(toValue: k).observeSingleEvent(of: .value, with: { snapshot in
+                    if snapshot.value != nil { //if nil, event has presumably been removed from database/Firebase
+                        let e = snapshot.value as? Dictionary<String, Any>
+                        if e == nil {
+                            return
+                        }
+                        if e![k] == nil {
+                            return
+                        }
+                        var newInstance:EventInstance
+                        let newData = self.readEventData(eventData: e![k]! as! Dictionary<String, Any>)
+                        if newData.1 == .invalid {
+                            return
+                        } else {
+                            newInstance = newData.0
+                        }
+                        //add observer to numberAttending so that this information can update live in detail views
+                        if !self.beingObservedSet.contains(newInstance.guid) {
+                            AppDelegate.shared().eventListRef.child(newInstance.guid).child("numberAttending").observe(.value, with: { snapshot in
+                                newInstance.numAttending = snapshot.value as? Int
+                                self.beingObservedSet.insert(newInstance.guid)
+                            })
+                        }
+                        self.insertEventListDic(newInstance)
+                        if doFilter {
+                            if !filterOnlyTime {
+                                self.eventSearchEngine.checkEvent(newInstance, self)
+                            } else {
+                                print5("fav filter only time")
+                                self.eventSearchEngine.checkEvent(newInstance, self, checkOnlyTime: filterOnlyTime)
+                            }
+                        }
+                        //self.favEventSet[newInstance.guid] = newInstance //make reference to this event in favorite dictionary using its guid as a key
+                    }
+                })
+            }
+        }
     }
     
-    func retrieveFirebaseData(daysIntoYear: Int, doFilter: Bool, searchEngine: EventSearchEngine) {
+    func retrieveFirebaseData(daysIntoYear: Int, doFilter: Bool, searchEngine: EventSearchEngine, filterOnlyTime: Bool = false) {
         self.dataReturnedFromSnapshot = false
         //Prevent duplicate observers
         AppDelegate.shared().eventListRef.removeAllObservers()
+        AppDelegate.shared().updateListRef.removeAllObservers()
         self.loadPersistentEventData()
         self.eventList = []
+        self.eventDictionary = [:]
+        //self.retrieveFirebaseDataFavorites(doFilter: doFilter, searchEngine: searchEngine)
         AppDelegate.shared().updateListRef.observe(.value, with: { (snapshot) in
             self.eventList = []
+            self.eventDictionary = [:]
 //            self.beingObservedSet = []
-//
+            // bugs - favoriting in future, then triggering new load from firebase, doubles favorited events
+            // also, favorites in future are loaded even though they shouldnt be
             AppDelegate.shared().eventListRef.queryOrdered(byChild: "daysIntoYear").queryEnding(atValue: daysIntoYear).observeSingleEvent(of: .value, with: { snapshot in
                 let fullEventList = snapshot.value as? Dictionary<String, Dictionary<String, Any>>
                 //print(fullEventList)
@@ -443,16 +489,24 @@ class EventViewModel: ObservableObject {
                     if newInstanceCheck.1 == .invalid {
                         continue
                     } else {
-                        self.insertEvent(newInstanceCheck.0)
+                        if self.eventDictionary[newInstanceCheck.0.guid] == nil {
+                            self.insertEventListDic(newInstanceCheck.0)
+                        }
                         AppDelegate.shared().eventListRef.child(newInstanceCheck.0.guid).child("numberAttending").observe(.value, with: { snapshot in
                             newInstanceCheck.0.numAttending = snapshot.value as? Int
                             self.beingObservedSet.insert(newInstanceCheck.0.guid)
                         })
                         if doFilter {
-                            self.eventSearchEngine.checkEvent(newInstanceCheck.0, self)
+                            if !filterOnlyTime {
+                                self.eventSearchEngine.checkEvent(newInstanceCheck.0, self)
+                            } else {
+                                print5("filter only time")
+                                self.eventSearchEngine.checkEvent(newInstanceCheck.0, self, checkOnlyTime: filterOnlyTime)
+                            }
                         }
                     }
                 }
+                self.retrieveFirebaseDataFavorites(doFilter: doFilter, searchEngine: searchEngine, filterOnlyTime: filterOnlyTime)
                 self.dataReturnedFromSnapshot = true
             })
         })
