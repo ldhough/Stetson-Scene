@@ -167,10 +167,10 @@ struct ListCell : View {
                 Button(action: {
                     haptic()
                     self.evm.toggleFavorite(self.event)
-                    self.fav = self.event.isFavorite //this fixes the display
+                    //self.fav = self.event.isFavorite //this fixes the display
                 }) {
-                    Text(self.fav ? "Unfavorite":"Favorite")
-                    Image(systemName: self.fav ? "heart.fill":"heart")
+                    Text(self.event.isFavorite ? "Unfavorite":"Favorite")
+                    Image(systemName: self.event.isFavorite ? "heart.fill":"heart")
                 }
                 
                 //NAVIGATE
@@ -238,6 +238,6 @@ struct ListCell : View {
             }))))
             .actionSheet(isPresented: $calendar) {
                 self.evm.manageCalendar(self.event)
-        }
+        } //end of background and action sheet nonsense
     }
 }

@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftUI
+import CoreLocation
 
 struct TrendingView : View {
     @ObservedObject var evm:EventViewModel
@@ -126,6 +127,20 @@ struct Cards : View {
     @Binding var page:String
     @Binding var subPage:String
     
+    //context menu
+    @State var detailView: Bool = false
+    @State var share: Bool = false
+    @State var calendar: Bool = false
+    @State var fav: Bool = false
+    @State var navigate: Bool = false
+    //for alerts
+    @State var internalAlert: Bool = false
+    @State var externalAlert: Bool = false
+    @State var tooFar: Bool = false
+    @State var arrived: Bool = false
+    @State var eventDetails: Bool = false
+    @State var isVirtual: Bool = false
+    
     var body: some View {
         //horizontal list of events in list
         HStack(spacing: 0) {
@@ -156,15 +171,124 @@ struct Cards : View {
                         .frame(width: self.cardWidth, height: self.height)
                         .cornerRadius(20)
                         .shadow(radius: 5)
-                        .onTapGesture { self.selectedEvent = event }
+                        .onTapGesture {
+                            self.detailView = true
+                            self.selectedEvent = event
+                        }
+                        .contextMenu {
+                                //SHARE
+                                Button(action: {
+                                    haptic()
+                                    self.selectedEvent = event
+                                    self.share.toggle()
+                                    self.evm.isVirtual(event: event)
+                                    if event.isVirtual {
+                                        event.linkText = self.evm.makeLink(text: event.eventDescription)
+                                        if event.linkText == "" { event.isVirtual = false }
+                                        event.shareDetails = "Check out this event I found via StetsonScene! \(event.name!) is happening on \(event.date!) at \(event.time!)!"
+                                    } else {
+                                        event.shareDetails = "Check out this event I found via StetsonScene! \(event.name!), on \(event.date!) at \(event.time!), is happening at the \(event.location!)!"
+                                    }
+                                }) {
+                                    Text("Share")
+                                    Image(systemName: "square.and.arrow.up")
+                                }
+                                //ADD TO CALENDAR
+                                Button(action: {
+                                    haptic()
+                                    self.selectedEvent = event
+                                    self.calendar = true
+                                }) {
+                                    Text(event.isInCalendar ? "Already in Calendar" : "Add to Calendar")
+                                    Image(systemName: "calendar.badge.plus")
+                                }
+                                
+                                //FAVORITE
+                                Button(action: {
+                                    haptic()
+                                    self.selectedEvent = event
+                                    self.evm.toggleFavorite(event)
+                                    //self.fav = event.isFavorite //this fixes the display
+                                }) {
+                                    Text(event.isFavorite ? "Unfavorite":"Favorite")
+                                    Image(systemName: event.isFavorite ? "heart.fill":"heart")
+                                }
+                                
+                                //NAVIGATE
+                                Button(action: {
+                                    haptic()
+                                    self.selectedEvent = event
+                                    self.evm.isVirtual(event: event)
+                                    //if you're trying to navigate to an event and are too far from campus, alert user and don't go to map
+                                    let locationManager = CLLocationManager()
+                                    let StetsonUniversity = CLLocation(latitude: 29.0349780, longitude: -81.3026430)
+                                    if !event.isVirtual && locationManager.location != nil && (CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways) && StetsonUniversity.distance(from: locationManager.location!) > 805 {
+                                        self.externalAlert = true
+                                        self.tooFar = true
+                                        self.navigate = false
+                                    } else if event.isVirtual { //if you're trying to navigate to a virtual event, alert user and don't go to map
+                                        //TODO: add in the capability to follow a link to register or something
+                                        self.externalAlert = true
+                                        self.isVirtual = true
+                                        self.navigate = false
+                                    } else { //otherwise go to map
+                                        self.externalAlert = false
+                                        self.isVirtual = false
+                                        self.tooFar = false
+                                        self.navigate = true
+                                    }
+                                }) {
+                                    Text("Navigate")
+                                    Image(systemName: "location")
+                                }
+                        } //end of context menu
                 }.frame(width: Constants.width).animation(.default) //end of vstack
             } //end of foreach
-        }.sheet(item: $selectedEvent) { event in
-            EventDetailView(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage).environmentObject(self.config)
-        }//end of hstack
+            .background(EmptyView().sheet(isPresented: $share, content: { //NEED TO LINK TO APPROPRIATE LINKS ONCE APP IS PUBLISHED
+                ShareView(activityItems: [/*"linktoapp.com"*/(self.selectedEvent!.isVirtual && URL(string: self.selectedEvent!.linkText) != nil) ? URL(string: self.selectedEvent!.linkText)!:"", self.selectedEvent!.hasCultural ? "\(self.selectedEvent!.shareDetails) It’s even offering a cultural credit!" : "\(self.selectedEvent!.shareDetails)"/*, event.isVirtual ? URL(string: event.linkText)!:""*/], applicationActivities: nil)
+            }).background(EmptyView().sheet(isPresented: self.$detailView, content: {
+                EventDetailView(evm: self.evm, event: self.selectedEvent!, page: self.$page, subPage: self.$subPage).environmentObject(self.config)
+            })))
+        } //end of hstack
+        .actionSheet(isPresented: $calendar) {
+            self.evm.manageCalendar(self.selectedEvent!)
+        } //end of background and action sheet nonsense
     } //end of view
     
 } //end of struct
+
+//.background(EmptyView().sheet(isPresented: $navigate, content: {
+//        ZStack {
+//            if self.arMode && !self.event.isVirtual {
+//                ARNavigationIndicator(evm: self.evm, arFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails, page: self.$page, subPage: self.$subPage).environmentObject(self.config)
+//            } else if !self.event.isVirtual { //mapMode
+//                MapView(evm: self.evm, mapFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails, page: self.$page, subPage: self.$subPage).environmentObject(self.config)
+//            }
+//            if self.config.appEventMode {
+//                ZStack {
+//                    Text(self.arMode ? "Map View" : "AR View").fontWeight(.light).font(.system(size: 18)).foregroundColor(self.config.accent)
+//                }.padding(10)
+//                    .background(RoundedRectangle(cornerRadius: 15).stroke(Color.clear).foregroundColor(Color.tertiarySystemBackground.opacity(0.8)).background(RoundedRectangle(cornerRadius: 10).foregroundColor(Color.tertiarySystemBackground.opacity(0.8))))
+//                    .onTapGesture { withAnimation { self.arMode.toggle() } }
+//                    .offset(y: Constants.height*0.4)
+//            }
+//        }.alert(isPresented: self.$internalAlert) { () -> Alert in //done in the view
+//            if self.arrived {
+//                return self.evm.alert(title: "You've Arrived!", message: "Have fun at \(String(describing: self.event.name!))!")
+//            } else if self.eventDetails {
+//                return self.evm.alert(title: "\(self.event.name!)", message: "This event is at \(self.event.time!) on \(self.event.date!).")/*, and you are \(distanceFromBuilding!)m from \(event!.location!)*/
+//            }
+//            return self.evm.alert(title: "ERROR", message: "Please report as a bug.")
+//        }
+//    }).alert(isPresented: self.$externalAlert) { () -> Alert in //done outside the view
+//        if self.isVirtual {
+//            return self.evm.alert(title: "Virtual Event", message: "Sorry! This event is virtual, so you have no where to navigate to.")
+//        } else if self.tooFar {
+//            //return self.evm.alert(title: "Too Far to Navigate to Event", message: "You're currently too far away from campus to navigate to this event. You can still view it in the map, and once you get closer to campus, can navigate there.")
+//            return self.evm.navAlert(lat: self.event.mainLat, lon: self.event.mainLon)
+//        }
+//        return self.evm.alert(title: "ERROR", message: "Please report as a bug.")
+//    }
 
 //CARDCONTROL: shows which card is currently displayed
 struct CardControl : UIViewRepresentable {
