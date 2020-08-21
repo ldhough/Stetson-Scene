@@ -60,6 +60,7 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
     var userLocation: CLLocation!
     var oldLocation: CLLocation!
     var newLocation: CLLocation!
+    @State var virtualChecked:Bool = false
     
     @Binding var page:String
     @Binding var subPage:String
@@ -111,19 +112,14 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
             userAltitude = lastLocation.altitude
             userLocation = lastLocation
         }
-        //        newLocation = userLocation
-        //        print("NEW LOCATION: ", newLocation)
-        
         //if you're navigating to an event with AR, update distanceFromBuilding so it can be displayed on the AR tag
         if !arFindMode {
             let building = CLLocation(latitude: navToEvent!.mainLat, longitude: navToEvent!.mainLon)
             distanceFromBuilding = Int(building.distance(from: userLocation))
         }
-        //        only update the nodes if you have a change in on/off campus
-        //        if oldLocation != nil && ((StetsonUniversity.distance(from: oldLocation) > 805 && StetsonUniversity.distance(from: newLocation) <= 805)
-        //            || (StetsonUniversity.distance(from: oldLocation) <= 805 && StetsonUniversity.distance(from: newLocation) > 805)) {
         if StetsonUniversity.distance(from: userLocation) > 805 && !alertSent { //805m = 0.5mi //if you're too far away from campus, create just one node and send an alert
             for annotationNode in self.sceneLocationView.locationNodes { annotationNode.removeFromParentNode() } //clean scene
+            if !virtualChecked { checkVirtual() }
             createBuildingNode(location: "Stetson University", lat: 29.0349780, lon: -81.3026430, altitude: (userAltitude! + 15)) //just create a stetson node
             externalAlert = true
             tooFar = true
@@ -131,27 +127,17 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
         } else { //if you're within 0.5mi of campus
             for annotationNode in self.sceneLocationView.locationNodes { annotationNode.removeFromParentNode() } //clean scene
             determineNodes() //create the appropriate nodes depending on appEventMode & arFindMode
-            print("UPDATING USERLOCATION AND CREATING NODES")
             externalAlert = false
             tooFar = false
         }
-        //}
-        //        oldLocation = userLocation
-        //        print("OLD LOCATION: ", oldLocation)
     }
     
     func determineNodes() {
         var locationsWithNode: [String] = []
         //determine if all events are virtual
         //start with allVirtual = true
-        for event in evm.eventList {
-            evm.isVirtual(event: event)
-            if self.page == "Favorites" && event.isFavorite && !event.isVirtual {
-                allVirtual = false
-            } else if self.page != "Favorites" && !event.isVirtual {
-                allVirtual = false
-            }
-        }
+        if !virtualChecked { checkVirtual() }
+        
         if config.appEventMode {
             //if you're navigating to a single event and are close enough to campus to navigate, create just one node for it
             if !arFindMode && navToEvent != nil && StetsonUniversity.distance(from: userLocation) <= 805 {
@@ -186,7 +172,6 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
             //if all events are virtual, create a single Stetson node and send an alert
             if arFindMode && allVirtual && !alertSent {
                 createBuildingNode(location: "Stetson University", lat: 29.0349780, lon: -81.3026430, altitude: (userAltitude! + 15))
-                //allVirtual = true //already would be
                 alertSent = true
             }
         } else {
@@ -197,6 +182,20 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
                 }
             }
         }
+    }
+    
+    func checkVirtual() {
+        for event in evm.eventList {
+            print("looping through events to see which are virtual")
+            evm.isVirtual(event: event)
+            print(event.isVirtual)
+            if self.page == "Favorites" && event.isFavorite && !event.isVirtual {
+                allVirtual = false
+            } else if self.page != "Favorites" && !event.isVirtual {
+                allVirtual = false
+            }
+        }
+        virtualChecked = true
     }
     
     func createBuildingNode(location: String, lat: Double, lon: Double, altitude: Double) {
@@ -260,11 +259,11 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
                 //if all events are virtual and you tap on the Stetson University node, send the virtual events only alert
                 if arFindMode && allVirtual && (String(describing: hits.name!)) == "Stetson University" {
                     externalAlert = true
-                    //allVirtual = true //already assigned
                     return
                 }
                 //if you're too far from campus and you tap the Stetson node, send the too far alert
                 if arFindMode && StetsonUniversity.distance(from: userLocation) > 805 && (String(describing: hits.name!)) == "Stetson University" {
+                    print("tapped when too far")
                     externalAlert = true
                     tooFar = true
                     return

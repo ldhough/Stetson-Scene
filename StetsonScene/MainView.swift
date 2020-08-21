@@ -80,8 +80,8 @@ struct MainView : View {
                                 //IF IT'S FAVORITES PAGE BUT THERE AREN'T ANY FAVORITES
                                 if self.page == "Favorites" && !evm.doFavoritesExist(list: self.evm.eventList) {
                                     VStack(alignment: .center, spacing: 10) {
-                                        Text("No Events Favorited").fontWeight(.light).font(.system(size: 20)).padding([.horizontal]).foregroundColor(config.accent)
-                                        Text("Add some events to your favorites by using the hard-press shortcut on the event preview or the favorite button on the event detail page.").fontWeight(.light).font(.system(size: 16)).padding([.horizontal]).foregroundColor(Color.label)
+                                        Text("No Events Favorited").fontWeight(.light).font(.system(size: 20)).padding([.horizontal]).foregroundColor((self.page == "Favorites" && colorScheme == .light) ? Color.tertiarySystemBackground : Color.label)
+                                        Text("Add some events to your favorites by using the hard-press shortcut on the event preview or the favorite button on the event detail page.").fontWeight(.light).font(.system(size: 16)).padding([.horizontal]).foregroundColor((self.page == "Favorites" && colorScheme == .light) ? Color.tertiarySystemBackground : Color.label)
                                         Spacer()
                                         Spacer()
                                     }
@@ -102,8 +102,8 @@ struct MainView : View {
                                 //IF IT'S FAVORITES PAGE BUT THERE AREN'T ANY FAVORITES
                                 if self.page == "Favorites" && !evm.doFavoritesExist(list: self.evm.eventList) {
                                     VStack(alignment: .center, spacing: 10) {
-                                        Text("No Events Favorited").fontWeight(.light).font(.system(size: 20)).padding([.horizontal]).foregroundColor(config.accent)
-                                        Text("Add some events to your favorites by using the hard-press shortcut on the event preview or the favorite button on the event detail page.").fontWeight(.light).font(.system(size: 16)).padding([.horizontal]).foregroundColor(Color.label)
+                                        Text("No Events Favorited").fontWeight(.light).font(.system(size: 20)).padding([.horizontal]).foregroundColor((self.page == "Favorites" && colorScheme == .light) ? Color.tertiarySystemBackground : Color.label)
+                                        Text("Add some events to your favorites by using the hard-press shortcut on the event preview or the favorite button on the event detail page.").fontWeight(.light).font(.system(size: 16)).padding([.horizontal]).foregroundColor((self.page == "Favorites" && colorScheme == .light) ? Color.tertiarySystemBackground : Color.label)
                                         Spacer()
                                         Spacer()
                                     }
@@ -128,17 +128,24 @@ struct MainView : View {
                                                 } else { //config.page == "Discover"
                                                     return self.evm.alert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
                                                 }
+                                            } else if self.page == "Favorites" && self.noFavorites {
+                                                return self.evm.alert(title: "No Favorites to Show", message: "Add some favorites so we can show you them in \(self.subPage) Mode!")
                                             }
                                             return self.evm.alert(title: "ERROR", message: "Please report as a bug.")
                                     }
                                 }
                                 if self.subPage == "Map" {
-                                    MapView(evm: self.evm, mapFindMode: true, internalAlert: .constant(false), externalAlert: .constant(false), tooFar: .constant(false), allVirtual: self.$allVirtual, arrived: .constant(false), eventDetails: .constant(false), page: self.$page, subPage: self.$subPage).environmentObject(self.config)
+                                    MapView(evm: self.evm, mapFindMode: true, internalAlert: .constant(false), externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: self.$allVirtual, arrived: .constant(false), eventDetails: .constant(false), page: self.$page, subPage: self.$subPage).environmentObject(self.config)
                                         .blur(radius: self.showOptions ? 5 : 0)
                                         .disabled(self.showOptions ? true : false)
                                         .edgesIgnoringSafeArea(.top)
-                                        .alert(isPresented: self.$allVirtual) { () -> Alert in
-                                            return self.evm.alert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
+                                        .alert(isPresented: self.self.$externalAlert) { () -> Alert in
+                                            if self.allVirtual {
+                                                return self.evm.alert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
+                                            } else if self.page == "Favorites" && self.noFavorites {
+                                                return self.evm.alert(title: "No Favorites to Show", message: "Add some favorites so we can show you them in \(self.subPage) Mode!")
+                                            }
+                                            return self.evm.alert(title: "ERROR", message: "Please report as a bug.")
                                     }
                                 }
                                 if config.appEventMode {
@@ -151,9 +158,10 @@ struct MainView : View {
                                 }
                             }.sheet(isPresented: $listVirtualEvents, content: {
                                 ListView(evm: self.evm, allVirtual: true, page: self.$page, subPage: self.$subPage).environmentObject(self.config).background(Color.secondarySystemBackground)
-                            }).alert(isPresented: self.$noFavorites) { () -> Alert in //if favorites map or favorites AR & there are no favorites
-                                return self.evm.alert(title: "No Favorites to Show", message: "Add some favorites so we can show you them in \(self.subPage) Mode!")
-                            } //end of ZStack
+                            })
+//                            .alert(isPresented: self.$noFavorites) { () -> Alert in //if favorites map or favorites AR & there are no favorites
+//                                return self.evm.alert(title: "No Favorites to Show", message: "Add some favorites so we can show you them in \(self.subPage) Mode!")
+//                            } //end of ZStack
                         }
                     }
                     if self.page == "Information" {
@@ -178,19 +186,20 @@ struct MainView : View {
                             .disabled(self.showOptions ? true : false)
                             .edgesIgnoringSafeArea(.top)
                     }
-                }.onTapGesture { self.showOptions = false } //end of ZStack that holds everything above the tab bar
-                TabBar(evm: self.evm, showOptions: self.$showOptions, noFavorites: self.$noFavorites, page: self.$page, subPage: self.$subPage)
+                }//.onTapGesture { self.showOptions = false } //end of ZStack that holds everything above the tab bar //interferes with tapping on map pin, figure this out later
+                TabBar(evm: self.evm, showOptions: self.$showOptions, externalAlert: self.$externalAlert, noFavorites: self.$noFavorites, page: self.$page, subPage: self.$subPage)
                 
             }.edgesIgnoringSafeArea(.bottom)//end of VStack
             
         }.animation(.spring()) //end of ZStack
-    }
-}
+    } //end of view
+} //end of struct
 
 struct TabBar : View {
     @ObservedObject var evm:EventViewModel
     @EnvironmentObject var config: Configuration
     @Binding var showOptions: Bool
+    @Binding var externalAlert: Bool
     @Binding var noFavorites: Bool
     
     @Binding var page:String
@@ -231,6 +240,7 @@ struct TabBar : View {
                             self.page = "Favorites"
                             //if there aren't any favorites, send alert through noFavorites & don't allow Map/AR to show by not getting rid of options
                             if !self.evm.doFavoritesExist(list: self.evm.eventList) && (self.subPage == "AR" || self.subPage == "Map") {
+                                self.externalAlert = true
                                 self.noFavorites = true
                                 self.showOptions = true
                             }
@@ -299,7 +309,7 @@ struct TabBar : View {
             
             //other tabs
             if self.showOptions {
-                TabOptions(evm: self.evm, showOptions: self.$showOptions, noFavorites: self.$noFavorites, page: self.$page, subPage: self.$subPage).offset(x: self.page == "Discover" ? -100 : -35, y: -65)
+                TabOptions(evm: self.evm, showOptions: self.$showOptions, externalAlert: self.$externalAlert, noFavorites: self.$noFavorites, page: self.$page, subPage: self.$subPage).offset(x: self.page == "Discover" ? -100 : -35, y: -65)
             }
             
         }//zstack end
@@ -311,6 +321,7 @@ struct TabOptions: View {
     @EnvironmentObject var config: Configuration
     @Binding var showOptions: Bool
     @Environment(\.colorScheme) var colorScheme
+    @Binding var externalAlert: Bool
     @Binding var noFavorites: Bool
     
     @Binding var page:String
@@ -370,6 +381,7 @@ struct TabOptions: View {
                     }
                     //if there aren't any favorites, send alert through noFavorites & don't allow AR to show by not getting rid of options
                     if !self.evm.doFavoritesExist(list: self.evm.eventList) && self.page == "Favorites" {
+                        self.externalAlert = true
                         self.noFavorites = true
                         self.showOptions = true
                     }
@@ -392,6 +404,7 @@ struct TabOptions: View {
                     }
                     //if there aren't any favorites, send alert through noFavorites & don't allow Map to show by not getting rid of options
                     if !self.evm.doFavoritesExist(list: self.evm.eventList) && self.page == "Favorites" {
+                        self.externalAlert = true
                         self.noFavorites = true
                         self.showOptions = true
                     }
