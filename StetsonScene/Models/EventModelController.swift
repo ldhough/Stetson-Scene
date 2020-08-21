@@ -824,6 +824,23 @@ class EventViewModel: ObservableObject {
         return ""
     }
     
+    //Function removes carryover HTML tags & elements from the event descriptions
+    func scrapeHTMLTags(text: String) -> String {
+        let scrapeHTMLPattern = #"<[^>]+>"#
+        let nbspPattern = #"&\w+;"#
+        let paragraphPattern = #"</p>"#
+        do {
+            let scrapeHTMLRegex = try NSRegularExpression(pattern: scrapeHTMLPattern, options: [])
+            let nbspRegex = try NSRegularExpression(pattern: nbspPattern, options: [])
+            let paragraphRegex = try NSRegularExpression(pattern: paragraphPattern, options: [])
+            var scrapedString = paragraphRegex.stringByReplacingMatches(in: text, options: [], range: NSRange(text.startIndex..., in: text), withTemplate: "\n")
+            scrapedString = scrapeHTMLRegex.stringByReplacingMatches(in: scrapedString, options: [], range: NSRange(text.startIndex..., in: scrapedString), withTemplate: "")
+            scrapedString = nbspRegex.stringByReplacingMatches(in: scrapedString, options: [], range: NSRange(scrapedString.startIndex..., in: scrapedString), withTemplate: " ")
+            return scrapedString
+        } catch { print("Regex error") }
+        return text
+    }
+    
     func compareDates(date1: Date, date2: Date) -> Bool {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .short

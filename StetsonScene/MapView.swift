@@ -226,7 +226,7 @@ final class Coordinator: NSObject, MKMapViewDelegate {
                 }
             }
         } else {
-            window?.rootViewController?.present(UIHostingController(rootView: BuildingDetailView(evm: self.evm, buildingInstance: self.evm.buildingModelController.buildingDic[(view.annotation?.title!!)!]!, page: self.$page, subPage: self.$subPage).environmentObject(self.config)), animated: true)
+            window?.rootViewController?.present(UIHostingController(rootView: BuildingDetailView(evm: self.evm, buildingInstance: self.evm.buildingModelController.buildingDic[(view.annotation?.title!!)!]!).environmentObject(self.config)), animated: true)
         }
     }
     

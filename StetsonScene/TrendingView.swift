@@ -215,32 +215,32 @@ struct Cards : View {
                                 }
                                 
                                 //NAVIGATE
-                                Button(action: {
-                                    haptic()
-                                    self.selectedEvent = event
-                                    self.evm.isVirtual(event: event)
-                                    //if you're trying to navigate to an event and are too far from campus, alert user and don't go to map
-                                    let locationManager = CLLocationManager()
-                                    let StetsonUniversity = CLLocation(latitude: 29.0349780, longitude: -81.3026430)
-                                    if !event.isVirtual && locationManager.location != nil && (CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways) && StetsonUniversity.distance(from: locationManager.location!) > 805 {
-                                        self.externalAlert = true
-                                        self.tooFar = true
-                                        self.navigate = false
-                                    } else if event.isVirtual { //if you're trying to navigate to a virtual event, alert user and don't go to map
-                                        //TODO: add in the capability to follow a link to register or something
-                                        self.externalAlert = true
-                                        self.isVirtual = true
-                                        self.navigate = false
-                                    } else { //otherwise go to map
-                                        self.externalAlert = false
-                                        self.isVirtual = false
-                                        self.tooFar = false
-                                        self.navigate = true
-                                    }
-                                }) {
-                                    Text("Navigate")
-                                    Image(systemName: "location")
-                                }
+//                                Button(action: {
+//                                    haptic()
+//                                    self.selectedEvent = event
+//                                    self.evm.isVirtual(event: event)
+//                                    //if you're trying to navigate to an event and are too far from campus, alert user and don't go to map
+//                                    let locationManager = CLLocationManager()
+//                                    let StetsonUniversity = CLLocation(latitude: 29.0349780, longitude: -81.3026430)
+//                                    if !event.isVirtual && locationManager.location != nil && (CLLocationManager.authorizationStatus() == .authorizedWhenInUse || CLLocationManager.authorizationStatus() == .authorizedAlways) && StetsonUniversity.distance(from: locationManager.location!) > 805 {
+//                                        self.externalAlert = true
+//                                        self.tooFar = true
+//                                        self.navigate = false
+//                                    } else if event.isVirtual { //if you're trying to navigate to a virtual event, alert user and don't go to map
+//                                        //TODO: add in the capability to follow a link to register or something
+//                                        self.externalAlert = true
+//                                        self.isVirtual = true
+//                                        self.navigate = false
+//                                    } else { //otherwise go to map
+//                                        self.externalAlert = false
+//                                        self.isVirtual = false
+//                                        self.tooFar = false
+//                                        self.navigate = true
+//                                    }
+//                                }) {
+//                                    Text("Navigate")
+//                                    Image(systemName: "location")
+//                                }
                         } //end of context menu
                 }.frame(width: Constants.width).animation(.default) //end of vstack
             } //end of foreach

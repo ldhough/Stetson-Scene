@@ -54,23 +54,32 @@ struct InformationView: View {
     @State var bugReport = false
     @State var feedback = false
     @State var result: Result<MFMailComposeResult, Error>? = nil
+    @State var addEventHelp = false
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Information").fontWeight(.heavy).font(.system(size: 50)).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(Color.label).padding([.top]).padding(.bottom, 10)
+            Text("Information").fontWeight(.heavy).font(.system(size: 50)).frame(maxWidth: .infinity, alignment: .leading).foregroundColor(Color.label).padding([.top]).padding(.bottom, 10).padding([.horizontal])
             if overview {
+                //add event to app
+                InformationRow(accentColor: self.config.accent, title: "Add your Event to this App", description: "Simple how-to for getting your event on this app.", image: "plus")
+                .onTapGesture { self.addEventHelp = true }
+                .sheet(isPresented: $addEventHelp ) { AddEventHelp().environmentObject(self.config) }
+                //change theme
                 InformationRow(accentColor: self.config.accent, title: "Change Theme", description: "Choose a new accent color to use throughout the application.", image: "slider.horizontal.below.rectangle").onTapGesture { self.overview = false }
-                InformationRow(accentColor: self.config.accent, title: "Submit Bug Report", description: "Let us know if you find something weird or broken so we can fix it!", image: "ant.fill").onTapGesture {
+                //building mode
+                InformationRow(accentColor: self.config.accent, title: "Switch to \(config.appEventMode ? "Tour" : "Event") Mode", description: "Use the app to \(config.appEventMode ? "tour campus and explore buildings." : "find events.")", image: config.appEventMode ? "house.fill" : "calendar").onTapGesture { self.config.appEventMode.toggle() }
+                //bug report
+                InformationRow(accentColor: self.config.accent, title: "Submit Bug Report", description: "Notify us of issues you find so we can fix it!", image: "ant.fill").onTapGesture {
                             MFMailComposeViewController.canSendMail() ? self.bugReport.toggle() : self.alertNoMail.toggle()
                         }.sheet(isPresented: $bugReport) {
                             MailView(result: self.$result, email: "stetsonscene@gmail.com", eventName: "StetsonScene Bug Report", mBody: "<p> </p>")
                         }
-                InformationRow(accentColor: self.config.accent, title: "Give Us Feedback", description: "Suggestions are encouraged! We want to make this app the best it can, so let us know if you have any ideas for improvements.", image: "ellipses.bubble.fill").onTapGesture {
+                //feedback
+                InformationRow(accentColor: self.config.accent, title: "Give Us Feedback", description: "Suggestions are encouraged! We want to make this app the best it can be.", image: "ellipses.bubble.fill").onTapGesture {
                         MFMailComposeViewController.canSendMail() ? self.feedback.toggle() : self.alertNoMail.toggle()
                     }.sheet(isPresented: $feedback) {
                         MailView(result: self.$result, email: "stetsonscene@gmail.com", eventName: "StetsonScene Feedback", mBody: "<p> </p>")
                     }
-                InformationRow(accentColor: self.config.accent, title: "Switch to \(config.appEventMode ? "Tour" : "Event") Mode", description: "Use the app to \(config.appEventMode ? "tour campus and explore buildings." : "find events.")", image: config.appEventMode ? "house.fill" : "calendar").onTapGesture { self.config.appEventMode.toggle() }
             } else {
                 InformationRow(accentColor: self.config.accent, title: "Change Theme", description: "Choose a new accent color to use throughout the application.", image: "slider.horizontal.below.rectangle").onTapGesture { self.overview = true }
                 ColorPicker(overview: $overview).environmentObject(config).padding(.vertical, 20)
@@ -78,7 +87,7 @@ struct InformationView: View {
             Spacer()
         }.alert(isPresented: self.$alertNoMail) {
                 Alert(title: Text("Mail not set up on this phone!"))
-        }.padding([.horizontal])
+        }
     }
 }
 
@@ -95,7 +104,7 @@ struct InformationRow: View {
                 Text(title).font(.headline).foregroundColor(Color.label)
                 Text(description).font(.body).foregroundColor(Color.secondaryLabel)
             }
-        }.padding([.horizontal]).padding(.vertical, 5)
+        }.padding(.vertical, 5).padding(.horizontal, 10)
     }
 }
 

@@ -285,7 +285,7 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
                     }
                 }
             } else {
-                let buildingList = UIHostingController(rootView: BuildingDetailView(evm: self.evm, buildingInstance: self.evm.buildingModelController.buildingDic[(String(describing: hits.name!))]!, page: self.$page, subPage: self.$subPage).environmentObject(self.config))
+                let buildingList = UIHostingController(rootView: BuildingDetailView(evm: self.evm, buildingInstance: self.evm.buildingModelController.buildingDic[(String(describing: hits.name!))]!).environmentObject(self.config))
                 present(buildingList, animated: true)
             }
         }

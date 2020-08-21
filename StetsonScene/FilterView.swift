@@ -59,7 +59,7 @@ struct FilterView : View {
         VStack {
             CustomSlider(value: $weeksDisplayed, range: (1, 20)) { modifiers in
               ZStack {
-                LinearGradient(gradient: .init(colors: [self.config.accent, Color.blue]), startPoint: .leading, endPoint: .trailing)
+                LinearGradient(gradient: .init(colors: [self.config.accent.opacity(0.25), self.config.accent]), startPoint: .leading, endPoint: .trailing)
                 Text("Number of Weeks Displayed").font(.system(size: 16, weight: .light, design: .default)).foregroundColor(Color.white)
                 ZStack {
                     Circle().fill(Color.black)

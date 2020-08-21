@@ -9,6 +9,7 @@
 import Foundation
 import SwiftUI
 import CoreLocation
+import MessageUI
 
 struct EventDetailView : View {
     @ObservedObject var evm:EventViewModel
@@ -19,9 +20,15 @@ struct EventDetailView : View {
     @Binding var page:String
     @Binding var subPage:String
     
+    @State var showDetails = false
+    @State var result: Result<MFMailComposeResult, Error>? = nil
+    @State var isShowingMailView = false
+    @State var alertNoMail = false
+    @State var navMap:Bool = false
+    
     var body: some View {
         VStack {
-            RoundedRectangle(cornerRadius: 20).frame(width: Constants.width*0.25, height: 5, alignment: .center).foregroundColor(Color.secondaryLabel.opacity(0.2)).padding(.vertical, 10)
+            RoundedRectangle(cornerRadius: 20).frame(width: Constants.width*0.25, height: 5, alignment: .center).foregroundColor(Color.secondaryLabel.opacity(0.2)).padding(.vertical, 20)
             //Event name
             Text(event.name).fontWeight(.medium).font(.system(size: 30)).frame(maxWidth: .infinity, alignment: .center).multilineTextAlignment(.center).foregroundColor(event.hasCultural ? config.accent : Color.label).padding([.horizontal]).padding(.bottom, 5)
             //Info row
@@ -34,8 +41,37 @@ struct EventDetailView : View {
             
             ScrollView {
                 //Description
-                Text(event.eventDescription!).fontWeight(.light).font(.system(size: 16)).multilineTextAlignment(.leading).foregroundColor(Color.label).padding(.horizontal, 10)
-                Text("DETAILS").fontWeight(.light).font(.system(size: 16)).foregroundColor(config.accent).padding(.top)
+                Text(evm.scrapeHTMLTags(text: event.eventDescription!)).fontWeight(.light).font(.system(size: 16)).multilineTextAlignment(.leading).foregroundColor(Color.label).padding(.horizontal, 10)
+                //Text("DETAILS").fontWeight(.light).font(.system(size: 16)).foregroundColor(config.accent).padding(.top)
+                Button(action: {
+                    self.showDetails = true
+                    self.event.linkText = self.evm.makeLink(text: self.event.eventDescription)
+                }) {
+                    Text("DETAILS").fontWeight(.light).font(.system(size: 16)).foregroundColor(config.accent).padding(.top)
+                }.actionSheet(isPresented: $showDetails, content: {
+                    ActionSheet(title: Text("Details"),
+                                message: Text("This event is located at \(event.location!), \(event.mainAddress!). It is being hosted by \(event.contactName!)."),
+                    buttons: [.default(Text("Navigate to \(event.name)"), action: {
+                         self.navMap.toggle()
+                    }),
+                              .default(Text("Email \(event.contactName!)"), action: {
+                                if MFMailComposeViewController.canSendMail() {
+                                    self.isShowingMailView.toggle()
+                                } else {
+                                    self.alertNoMail.toggle()
+                                }
+                              }),
+                              .default(Text("Call \(event.contactName!)"), action: {
+                                let url = URL(string: "tel://" + self.event.contactPhone!.trimmingCharacters(in: CharacterSet(charactersIn: "-")))! as NSURL
+                                UIApplication.shared.open(url as URL)
+                              }),
+                              .destructive(Text("Cancel"), action: {
+                              })])
+                }).sheet(isPresented: $isShowingMailView) {
+                    MailView(result: self.$result, email: self.event.contactMail, eventName: self.event.name)
+                }.alert(isPresented: self.$alertNoMail) {
+                    Alert(title: Text("Mail not set up on this phone!"))
+                }
             }.padding([.horizontal]).padding(.bottom, 5)
         }.background(Color.secondarySystemBackground).edgesIgnoringSafeArea(.bottom)
     }
@@ -151,7 +187,7 @@ struct Buttons: View {
                                 .offset(y: Constants.height*0.4)
                         }
                         VStack {
-                        RoundedRectangle(cornerRadius: 20).frame(width: Constants.width*0.25, height: 5, alignment: .center).foregroundColor(Color.secondaryLabel.opacity(0.2)).padding(.vertical, 10)
+                        RoundedRectangle(cornerRadius: 20).frame(width: Constants.width*0.25, height: 5, alignment: .center).foregroundColor(Color.secondaryLabel.opacity(0.2)).padding(.vertical, 20)
                             Spacer()
                             Spacer()
                         }

@@ -234,7 +234,7 @@ struct ListCell : View {
                 }
                 return self.evm.alert(title: "ERROR", message: "Please report as a bug.")
             }.background(EmptyView().sheet(isPresented: $share, content: { //NEED TO LINK TO APPROPRIATE LINKS ONCE APP IS PUBLISHED
-                ShareView(activityItems: [/*"linktoapp.com"*/(self.event.isVirtual && URL(string: self.event.linkText) != nil) ? URL(string: self.event.linkText)!:"", self.event.hasCultural ? "\(self.event.shareDetails) It’s even offering a cultural credit!" : "\(self.event.shareDetails)"/*, event.isVirtual ? URL(string: event.linkText)!:""*/], applicationActivities: nil)
+                ShareView(activityItems: [(self.event.isVirtual && URL(string: self.event.linkText) != nil) ? URL(string: self.event.linkText)!:"", self.event.hasCultural ? "\(self.event.shareDetails) It’s even offering a cultural credit!" : "\(self.event.shareDetails)"/*, event.isVirtual ? URL(string: event.linkText)!:""*/], applicationActivities: nil)
             }))))
             .actionSheet(isPresented: $calendar) {
                 self.evm.manageCalendar(self.event)

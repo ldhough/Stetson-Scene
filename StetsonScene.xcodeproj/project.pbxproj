@@ -11,6 +11,7 @@
 		3C0F520923EBA72600C91790 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F520723EBA72600C91790 /* SceneDelegate.swift */; };
 		3C0F523623EDC11B00C91790 /* EventModelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F523523EDC11B00C91790 /* EventModelController.swift */; };
 		3C0F524323EDCD4600C91790 /* EventInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C0F524223EDCD4600C91790 /* EventInstance.swift */; };
+		3C1D8AFB24F04E3600A86454 /* AddEventHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C1D8AFA24F04E3600A86454 /* AddEventHelp.swift */; };
 		3C22171A23E22776003CC5C3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3C22171823E22776003CC5C3 /* Main.storyboard */; };
 		3C22171C23E22778003CC5C3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3C22171B23E22778003CC5C3 /* Assets.xcassets */; };
 		3C22171F23E22778003CC5C3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3C22171D23E22778003CC5C3 /* LaunchScreen.storyboard */; };
@@ -45,6 +46,7 @@
 		3C0F520723EBA72600C91790 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		3C0F523523EDC11B00C91790 /* EventModelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventModelController.swift; sourceTree = "<group>"; };
 		3C0F524223EDCD4600C91790 /* EventInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventInstance.swift; sourceTree = "<group>"; };
+		3C1D8AFA24F04E3600A86454 /* AddEventHelp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEventHelp.swift; sourceTree = "<group>"; };
 		3C22170F23E22776003CC5C3 /* StetsonScene.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StetsonScene.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3C22171923E22776003CC5C3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		3C22171B23E22778003CC5C3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -121,6 +123,7 @@
 				3C732FB924C39C6A005C0FA6 /* ARView.swift */,
 				3C3A46F324C4BC75004B2785 /* MapView.swift */,
 				3C7A741224BF68E8005DA0B1 /* InformationView.swift */,
+				3C1D8AFA24F04E3600A86454 /* AddEventHelp.swift */,
 				4844EAA124E9D89C00F084F2 /* SearchBarView.swift */,
 				3C23C9C924699902003E254D /* Configuration.swift */,
 				4898798123F1A9FD00062714 /* PersistentData.xcdatamodeld */,
@@ -281,6 +284,7 @@
 				3C3A140F24E37A70007232E6 /* BuildingDetailView.swift in Sources */,
 				3C732FBA24C39C6A005C0FA6 /* ARView.swift in Sources */,
 				3CD01BCA24C4D10D0042FACD /* DiscoverFavorites.swift in Sources */,
+				3C1D8AFB24F04E3600A86454 /* AddEventHelp.swift in Sources */,
 				3C0F523623EDC11B00C91790 /* EventModelController.swift in Sources */,
 				3C0F524323EDCD4600C91790 /* EventInstance.swift in Sources */,
 				3C3A46F424C4BC75004B2785 /* MapView.swift in Sources */,
