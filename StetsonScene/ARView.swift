@@ -285,8 +285,14 @@ class ARView: UIViewController, ARSCNViewDelegate, CLLocationManagerDelegate {
                     }
                 }
             } else {
+                if StetsonUniversity.distance(from: userLocation) < 805 {
                 let buildingList = UIHostingController(rootView: BuildingDetailView(evm: self.evm, buildingInstance: self.evm.buildingModelController.buildingDic[(String(describing: hits.name!))]!).environmentObject(self.config))
                 present(buildingList, animated: true)
+                } else {
+                    externalAlert = true
+                    tooFar = true
+                    return
+                }
             }
         }
     }

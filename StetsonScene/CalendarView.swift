@@ -132,12 +132,11 @@ struct Month: View {
         //Discover
         //back: blue
         VStack(alignment: HorizontalAlignment.center, spacing: 10) {
-            Text(getMonthHeader()).fontWeight(.medium).font(.system(size: 30)).foregroundColor((self.page == "Favorites" || self.colorScheme == .dark) ? Color.label : Color.secondarySystemBackground).padding(.top, 15)
+            Text(getMonthHeader()).fontWeight(.medium).font(.system(size: 30)).foregroundColor((self.page == "Favorites" /*|| self.colorScheme == .dark*/) ? Color.label : Color.secondarySystemBackground).padding(.top, 15)
             //weekday header
             HStack {
                 ForEach(weekdaysArray, id: \.self) { weekday in
-                    Text(weekday).fontWeight(Font.Weight.light).font(.system(size: 18))
-                        .foregroundColor((self.page == "Favorites" || self.colorScheme == .dark) ? Color.secondaryLabel : Color.tertiarySystemBackground).frame(minWidth: 0, maxWidth: .infinity)
+                    Text(weekday).fontWeight(Font.Weight.light).font(.system(size: 18)).foregroundColor((self.page == "Favorites" /*|| self.colorScheme == .dark*/) ? Color.label : Color.secondarySystemBackground).frame(minWidth: 0, maxWidth: .infinity)
                 }
             }
             //month
@@ -234,36 +233,36 @@ struct DateCell: View {
         if self.page == "Favorites" {
             if Int(checkDate.0)! < Int(currentDate.0)! { //If month before than current month
                 if Int(checkDate.2)! >=  Int(currentDate.2)! {
-                    return Color.label
+                    return self.page == "Discover" ? Color.secondarySystemBackground : Color.label
                 }
-                return Color.red
+                return Color.secondaryLabel//Color.red
             } else if Int(checkDate.0)! > Int(currentDate.0)! {
                 if Int(checkDate.2)! >= Int(currentDate.2)! {
-                    return Color.label
+                    return self.page == "Discover" ? Color.secondarySystemBackground : Color.label
                 }
-                return Color.red
+                return Color.secondaryLabel//Color.red
             }
             if Int(checkDate.1)! < Int(currentDate.1)! {
-                return Color.red
+                return Color.secondaryLabel//Color.red
             } else {
-                return Color.label//Color.tertiarySystemBackground
+                return self.page == "Discover" ? Color.secondarySystemBackground : Color.label
             }
         } else {
             if Int(checkDate.0)! < Int(currentDate.0)! { //If month before than current month
                 if Int(checkDate.2)! >=  Int(currentDate.2)! {
-                    return Color.label
+                    return self.page == "Discover" ? Color.secondarySystemBackground : Color.label
                 }
-                return Color.red
+                return Color.secondaryLabel//Color.red
             } else if Int(checkDate.0)! > Int(currentDate.0)! {
                 if Int(checkDate.2)! >= Int(currentDate.2)! {
-                    return Color.label
+                    return self.page == "Discover" ? Color.secondarySystemBackground : Color.label
                 }
-                return Color.red
+                return Color.secondaryLabel//Color.red
             }
             if Int(checkDate.1)! < Int(currentDate.1)! {
-                return Color.red
+                return Color.secondaryLabel//Color.red
             } else {
-                return Color.label//config.accent
+                return self.page == "Discover" ? Color.secondarySystemBackground : Color.label
             }
         }
     }

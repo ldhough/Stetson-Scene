@@ -53,7 +53,7 @@ struct SearchBar: View {
             }).onTapGesture(/*count: 2*/) { self.searching = true
             }.onLongPressGesture(minimumDuration: 0, maximumDistance: 0, pressing: nil, perform: hide_keyboard)
                 .font(.system(size: 16, weight: .light, design: .default))
-                .foregroundColor(colorScheme == .dark ? config.accent : Color.tertiarySystemBackground)
+                .foregroundColor(Color.label)
                 .padding(7)
                 .background(fillIt())
             }.padding() //HStack end

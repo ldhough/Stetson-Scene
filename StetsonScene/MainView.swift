@@ -79,12 +79,12 @@ struct MainView : View {
                                 DiscoverFavoritesView(evm: self.evm, page: self.$page, subPage: self.$subPage)
                                 //IF IT'S FAVORITES PAGE BUT THERE AREN'T ANY FAVORITES
                                 if self.page == "Favorites" && !evm.doFavoritesExist(list: self.evm.eventList) {
-                                    VStack(alignment: .center, spacing: 10) {
-                                        Text("No Events Favorited").fontWeight(.light).font(.system(size: 20)).padding([.horizontal]).foregroundColor((self.page == "Favorites" && colorScheme == .light) ? Color.tertiarySystemBackground : Color.label)
+                                    VStack(alignment: .leading, spacing: 10) {
+                                        Text("No Events Favorited").fontWeight(.light).font(.system(size: 16)).padding([.horizontal]).foregroundColor((self.page == "Favorites" && colorScheme == .light) ? Color.tertiarySystemBackground : Color.label)
                                         Text("Add some events to your favorites by using the hard-press shortcut on the event preview or the favorite button on the event detail page.").fontWeight(.light).font(.system(size: 16)).padding([.horizontal]).foregroundColor((self.page == "Favorites" && colorScheme == .light) ? Color.tertiarySystemBackground : Color.label)
                                         Spacer()
                                         Spacer()
-                                    }
+                                    }.padding(.vertical, 10)
                                 } else {
                                     if self.evm.dataReturnedFromSnapshot {
                                         ListView(evm: self.evm, page: self.$page, subPage: self.$subPage)
@@ -101,12 +101,12 @@ struct MainView : View {
                                 DiscoverFavoritesView(evm: self.evm, page: self.$page, subPage: self.$subPage)
                                 //IF IT'S FAVORITES PAGE BUT THERE AREN'T ANY FAVORITES
                                 if self.page == "Favorites" && !evm.doFavoritesExist(list: self.evm.eventList) {
-                                    VStack(alignment: .center, spacing: 10) {
-                                        Text("No Events Favorited").fontWeight(.light).font(.system(size: 20)).padding([.horizontal]).foregroundColor((self.page == "Favorites" && colorScheme == .light) ? Color.tertiarySystemBackground : Color.label)
+                                    VStack(alignment: .leading, spacing: 10) {
+                                        Text("No Events Favorited").fontWeight(.light).font(.system(size: 16)).padding([.horizontal]).foregroundColor((self.page == "Favorites" && colorScheme == .light) ? Color.tertiarySystemBackground : Color.label)
                                         Text("Add some events to your favorites by using the hard-press shortcut on the event preview or the favorite button on the event detail page.").fontWeight(.light).font(.system(size: 16)).padding([.horizontal]).foregroundColor((self.page == "Favorites" && colorScheme == .light) ? Color.tertiarySystemBackground : Color.label)
                                         Spacer()
                                         Spacer()
-                                    }
+                                    }.padding(.vertical, 10)
                                 } else {
                                     CalendarView(evm: self.evm, page: self.$page, subPage: self.$subPage)
                                 }
@@ -125,7 +125,7 @@ struct MainView : View {
                                             } else if self.allVirtual {
                                                 if self.page == "Favorites" {
                                                     return self.evm.alert(title: "All Favorited Events are Virtual", message: "Unfortunately, there are no events in your favorites list that are on campus at the moment. Check out the virtual event list instead.")
-                                                } else { //config.page == "Discover"
+                                                } else {
                                                     return self.evm.alert(title: "All Events are Virtual", message: "Unfortunately, there are no events on campus at the moment. Check out the virtual event list instead.")
                                                 }
                                             } else if self.page == "Favorites" && self.noFavorites {
