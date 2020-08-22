@@ -24,7 +24,6 @@ struct EventDetailView : View {
     @State var result: Result<MFMailComposeResult, Error>? = nil
     @State var isShowingMailView = false
     @State var alertNoMail = false
-    @State var navMap:Bool = false
     
     var body: some View {
         VStack {
@@ -32,8 +31,8 @@ struct EventDetailView : View {
             //Event name
             Text(event.name).fontWeight(.medium).font(.system(size: 30)).frame(maxWidth: .infinity, alignment: .center).multilineTextAlignment(.center).foregroundColor(event.hasCultural ? config.accent : Color.label).padding([.horizontal]).padding(.bottom, 5)
             //Info row
-            Text("\(event.date) | \(event.time)").fontWeight(.light).font(.system(size: 20)).frame(maxWidth: Constants.width, alignment: .center).foregroundColor(event.hasCultural ? Color.label : config.accent)
-            Text("\(event.location)").fontWeight(.light).font(.system(size: 20)).frame(maxWidth: Constants.width, alignment: .center).foregroundColor(event.hasCultural ? Color.label : config.accent)
+            Text("\(event.date) | \(event.time)").fontWeight(.light).font(.system(size: 20)).frame(maxWidth: Constants.width, alignment: .center).foregroundColor(Color.secondaryLabel)
+            Text("\(event.location)").fontWeight(.light).font(.system(size: 20)).frame(maxWidth: Constants.width, alignment: .center).foregroundColor(Color.secondaryLabel)
             //Buttons
             Buttons(evm: self.evm, event: event, page: self.$page, subPage: self.$subPage).padding(.vertical, 5)
             //Divider
@@ -42,36 +41,45 @@ struct EventDetailView : View {
             ScrollView {
                 //Description
                 Text(evm.scrapeHTMLTags(text: event.eventDescription!)).fontWeight(.light).font(.system(size: 16)).multilineTextAlignment(.leading).foregroundColor(Color.label).padding(.horizontal, 10)
-                //Text("DETAILS").fontWeight(.light).font(.system(size: 16)).foregroundColor(config.accent).padding(.top)
-                Button(action: {
-                    self.showDetails = true
-                    self.event.linkText = self.evm.makeLink(text: self.event.eventDescription)
-                }) {
-                    Text("DETAILS").fontWeight(.light).font(.system(size: 16)).foregroundColor(config.accent).padding(.top)
-                }.actionSheet(isPresented: $showDetails, content: {
-                    ActionSheet(title: Text("Details"),
-                                message: Text("This event is located at \(event.location!), \(event.mainAddress!). It is being hosted by \(event.contactName!)."),
-                    buttons: [.default(Text("Navigate to \(event.name)"), action: {
-                         self.navMap.toggle()
-                    }),
-                              .default(Text("Email \(event.contactName!)"), action: {
-                                if MFMailComposeViewController.canSendMail() {
-                                    self.isShowingMailView.toggle()
-                                } else {
-                                    self.alertNoMail.toggle()
-                                }
-                              }),
-                              .default(Text("Call \(event.contactName!)"), action: {
-                                let url = URL(string: "tel://" + self.event.contactPhone!.trimmingCharacters(in: CharacterSet(charactersIn: "-")))! as NSURL
-                                UIApplication.shared.open(url as URL)
-                              }),
-                              .destructive(Text("Cancel"), action: {
-                              })])
-                }).sheet(isPresented: $isShowingMailView) {
-                    MailView(result: self.$result, email: self.event.contactMail, eventName: self.event.name)
-                }.alert(isPresented: self.$alertNoMail) {
-                    Alert(title: Text("Mail not set up on this phone!"))
-                }
+                    //contact event host
+                    Button(action: {
+                        self.showDetails = true
+                    }) {
+                        HStack {
+                            Image(systemName: "phone.fill").resizable().frame(width: 15, height: 15).foregroundColor(config.accent)
+                            Text("Contact Event Host").fontWeight(.light).font(.system(size: 16)).foregroundColor(config.accent)
+                        }
+                    }.actionSheet(isPresented: $showDetails, content: {
+                        ActionSheet(title: Text("Contact Event Host"),
+                                    message: Text("Email or Call \(event.contactName)."),
+                                    buttons: [.default(Text("Email \(event.contactName!)"), action: {
+                                        if MFMailComposeViewController.canSendMail() {
+                                            self.isShowingMailView.toggle()
+                                        } else {
+                                            self.alertNoMail.toggle()
+                                        }
+                                    }),
+                                              .default(Text("Call \(event.contactName!)"), action: {
+                                                let url = URL(string: "tel://" + self.event.contactPhone!.trimmingCharacters(in: CharacterSet(charactersIn: "-")))! as NSURL
+                                                UIApplication.shared.open(url as URL)
+                                              }),
+                                              .destructive(Text("Cancel"), action: {
+                                              })])
+                    }).sheet(isPresented: $isShowingMailView) {
+                        MailView(result: self.$result, email: self.event.contactMail, eventName: self.event.name)
+                    }.alert(isPresented: self.$alertNoMail) {
+                        Alert(title: Text("Mail not set up on this phone!"))
+                    }
+                    //website
+                    if URL(string: self.event.linkText) != nil {
+                    Button(action: {
+                        UIApplication.shared.open(URL(string: self.event.linkText)!)
+                    }) {
+                        HStack {
+                            Image(systemName: "globe").resizable().frame(width: 15, height: 15).foregroundColor(config.accent)
+                            Text("Visit Website").fontWeight(.light).font(.system(size: 16)).foregroundColor(config.accent)
+                        }
+                    }}
             }.padding([.horizontal]).padding(.bottom, 5)
         }.background(Color.secondarySystemBackground).edgesIgnoringSafeArea(.bottom)
     }
@@ -172,25 +180,25 @@ struct Buttons: View {
                         self.navigate = true
                     }
             }.sheet(isPresented: $navigate, content: {
-                    ZStack {
-                        if self.arMode && !self.event.isVirtual {
-                            ARNavigationIndicator(evm: self.evm, arFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails, page: self.$page, subPage: self.$subPage).environmentObject(self.config)
-                        } else if !self.event.isVirtual { //mapMode
-                            MapView(evm: self.evm, mapFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails, page: self.$page, subPage: self.$subPage).environmentObject(self.config)
-                        }
-                        if self.config.appEventMode {
-                            ZStack {
-                                Text(self.arMode ? "Map View" : "AR View").fontWeight(.light).font(.system(size: 18)).foregroundColor(self.config.accent)
-                            }.padding(10)
-                                .background(RoundedRectangle(cornerRadius: 15).stroke(Color.clear).foregroundColor(Color.tertiarySystemBackground.opacity(0.8)).background(RoundedRectangle(cornerRadius: 10).foregroundColor(Color.tertiarySystemBackground.opacity(0.8))))
-                                .onTapGesture { withAnimation { self.arMode.toggle() } }
-                                .offset(y: Constants.height*0.4)
-                        }
-                        VStack {
+                ZStack {
+                    if self.arMode && !self.event.isVirtual {
+                        ARNavigationIndicator(evm: self.evm, arFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails, page: self.$page, subPage: self.$subPage).environmentObject(self.config)
+                    } else if !self.event.isVirtual { //mapMode
+                        MapView(evm: self.evm, mapFindMode: false, navToEvent: self.event, internalAlert: self.$internalAlert, externalAlert: self.$externalAlert, tooFar: .constant(false), allVirtual: .constant(false), arrived: self.$arrived, eventDetails: self.$eventDetails, page: self.$page, subPage: self.$subPage).environmentObject(self.config)
+                    }
+                    if self.config.appEventMode {
+                        ZStack {
+                            Text(self.arMode ? "Map View" : "AR View").fontWeight(.light).font(.system(size: 18)).foregroundColor(self.config.accent)
+                        }.padding(10)
+                            .background(RoundedRectangle(cornerRadius: 15).stroke(Color.clear).foregroundColor(Color.tertiarySystemBackground.opacity(0.8)).background(RoundedRectangle(cornerRadius: 10).foregroundColor(Color.tertiarySystemBackground.opacity(0.8))))
+                            .onTapGesture { withAnimation { self.arMode.toggle() } }
+                            .offset(y: Constants.height*0.4)
+                    }
+                    VStack {
                         RoundedRectangle(cornerRadius: 20).frame(width: Constants.width*0.25, height: 5, alignment: .center).foregroundColor(Color.secondaryLabel.opacity(0.2)).padding(.vertical, 20)
-                            Spacer()
-                            Spacer()
-                        }
+                        Spacer()
+                        Spacer()
+                    }
                 }.alert(isPresented: self.$internalAlert) { () -> Alert in //done in the view
                     if self.arrived {
                         return self.evm.alert(title: "You've Arrived!", message: "Have fun at \(String(describing: self.event.name!))!")

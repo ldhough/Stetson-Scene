@@ -136,7 +136,10 @@ struct ListCell : View {
             }.padding(.vertical, self.subPage == "Calendar" ? 5 : 10).padding(.horizontal, self.subPage == "Calendar" ? 5 : 10) //padding within the cell, between words and borders
         }.background(RoundedRectangle(cornerRadius: 10).stroke(Color.clear).foregroundColor(Color.label).background(RoundedRectangle(cornerRadius: 10).foregroundColor(self.page == "Favorites" ? (colorScheme == .light ? Color.secondarySystemBackground : config.accent.opacity(0.1)) : Color.tertiarySystemBackground)))
             .padding(.top, (self.subPage == "AR" || self.subPage == "Map") ? 15 : 0)
-            .onTapGesture {self.detailView = true }
+            .onTapGesture {
+                self.detailView = true
+                self.event.linkText = self.evm.makeLink(text: self.event.eventDescription)
+            }
             .contextMenu {
                 //SHARE
                 Button(action: {
