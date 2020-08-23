@@ -442,6 +442,13 @@ class EventViewModel: ObservableObject {
                             return
                         } else {
                             newInstance = newData.0
+                            
+                            if newInstance.location == "" || newInstance.location == "Default location" {
+                                if self.checkIsVirtual(event: newInstance) {
+                                    newInstance.location = "Virtual"
+                                }
+                            }
+                            
                         }
                         //add observer to numberAttending so that this information can update live in detail views
                         if !self.beingObservedSet.contains(newInstance.guid) {
@@ -489,6 +496,13 @@ class EventViewModel: ObservableObject {
                     if newInstanceCheck.1 == .invalid {
                         continue
                     } else {
+                        
+                        if newInstanceCheck.0.location == "" || newInstanceCheck.0.location == "Default location" {
+                            if self.checkIsVirtual(event: newInstanceCheck.0) {
+                                newInstanceCheck.0.location = "Virtual"
+                            }
+                        }
+                        
                         if self.eventDictionary[newInstanceCheck.0.guid] == nil {
                             self.insertEventListDic(newInstanceCheck.0)
                         }
@@ -602,6 +616,7 @@ class EventViewModel: ObservableObject {
             default:
                 break;
             }
+            
         }
         
         print(self.persistentLocations)
@@ -745,6 +760,13 @@ class EventViewModel: ObservableObject {
         if event.mainLon == 0.0 && event.mainLat == 0.0 && (event.location.lowercased() == "virtual" || event.location == "") {
             event.isVirtual = true
         }
+    }
+    
+    func checkIsVirtual(event: EventInstance) -> Bool {
+        if event.mainLon == 0.0 && event.mainLat == 0.0 && (event.location.lowercased() == "virtual" || event.location == "") {
+            return true
+        }
+        return false
     }
     
     //determine if any events are favorited
