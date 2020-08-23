@@ -65,6 +65,8 @@ class EventInstance: Identifiable, ObservableObject {
     @Published var isInCalendar:Bool = false
     @Published var isVirtual:Bool = false
     
+    var recommendScore:Double = 0.0
+    
     var linkText:String = ""
     var shareDetails:String = ""
     

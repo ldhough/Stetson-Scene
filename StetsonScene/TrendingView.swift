@@ -37,25 +37,9 @@ struct TrendingView : View {
     }
     
     func trendingList() -> [EventInstance] {
-        var allTrending: [EventInstance] = []
-        var selectTrending: [EventInstance] = []
-        var id = 0
-        
-        //pick out trending events
-        for event in self.evm.eventList {
-            //if event.isTrending {
-                allTrending.append(event)
-            //}
-        }
-        
-        //shuffle all the trending events and pick the first 10
-        for event in allTrending.shuffled() {
-            if id<10 {
-                selectTrending.append(event)
-                id += 1
-            }
-        }
-        return selectTrending
+        let recEngine = RecommendationEngine(evm: self.evm)
+        let list = recEngine.runEngine()
+        return list
     }
 }
 
