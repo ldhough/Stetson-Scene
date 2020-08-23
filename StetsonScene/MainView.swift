@@ -187,7 +187,7 @@ struct MainView : View {
                             .edgesIgnoringSafeArea(.top)
                     }
                 }//.onTapGesture { self.showOptions = false } //end of ZStack that holds everything above the tab bar //interferes with tapping on map pin, figure this out later
-                TabBar(evm: self.evm, showOptions: self.$showOptions, externalAlert: self.$externalAlert, noFavorites: self.$noFavorites, page: self.$page, subPage: self.$subPage)
+                TabBar(evm: self.evm, showOptions: self.$showOptions, externalAlert: self.$externalAlert, noFavorites: self.$noFavorites, page: self.$page, subPage: self.$subPage).padding(.bottom, Constants.height < 700 ? 0 : 10)
                 
             }.edgesIgnoringSafeArea(.bottom)//end of VStack
             
